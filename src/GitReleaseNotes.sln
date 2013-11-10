@@ -1,0 +1,51 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitReleaseNotes", "GitReleaseNotes\GitReleaseNotes.csproj", "{61D661AC-DC68-4862-8830-FE730C9B15FE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{C796948C-D89C-45DA-8EA7-169E4301B30F}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+		.nuget\packages.config = .nuget\packages.config
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A1F62FBD-CDAC-45AF-A89F-898114F27337}"
+	ProjectSection(SolutionItems) = preProject
+		..\Build.cmd = ..\Build.cmd
+		..\GitReleaseNotes.nuspec = ..\GitReleaseNotes.nuspec
+		..\GitReleaseNotes.proj = ..\GitReleaseNotes.proj
+		..\LICENSE = ..\LICENSE
+		..\README.md = ..\README.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitReleaseNotes.Tests", "GitReleaseNotes.Tests\GitReleaseNotes.Tests.csproj", "{CBA088EC-CF1D-43B6-A53D-ECCD89728AA9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitReleaseNotes.AcceptanceTests", "GitReleaseNotes.AcceptanceTests\GitReleaseNotes.AcceptanceTests.csproj", "{FF8FE94C-FF7D-498D-9AB6-1C8AD9A222D3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{61D661AC-DC68-4862-8830-FE730C9B15FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61D661AC-DC68-4862-8830-FE730C9B15FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61D661AC-DC68-4862-8830-FE730C9B15FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61D661AC-DC68-4862-8830-FE730C9B15FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CBA088EC-CF1D-43B6-A53D-ECCD89728AA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBA088EC-CF1D-43B6-A53D-ECCD89728AA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CBA088EC-CF1D-43B6-A53D-ECCD89728AA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CBA088EC-CF1D-43B6-A53D-ECCD89728AA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF8FE94C-FF7D-498D-9AB6-1C8AD9A222D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF8FE94C-FF7D-498D-9AB6-1C8AD9A222D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF8FE94C-FF7D-498D-9AB6-1C8AD9A222D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF8FE94C-FF7D-498D-9AB6-1C8AD9A222D3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
