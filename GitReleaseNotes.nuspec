@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>GitReleaseNotes</id>
+    <version>$version$</version>
+    <authors>JakeGinnivan</authors>
+    <owners>JakeGinnivan</owners>
+    <licenseUrl>https://github.com/JakeGinnivan/GitReleaseNotes/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/JakeGinnivan/GitReleaseNotes</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>The easy way to generate release notes for your Git projects</description>
+    <releaseNotes>Initial release</releaseNotes>
+    <copyright>Copyright Jake Ginnivan 2013</copyright>
+    <tags>Release notes</tags>
+  </metadata>
+  <files>
+    <file src="GitReleaseNotes.exe" target="tools"/>
+    <file src="GitReleaseNotes.pdb" target="tools"/>
+    <file src="Args.dll" target="tools"/>
+    <file src="LibGit2Sharp.dll" target="tools"/>
+    <file src="NativeBinaries/amd64/git2-11f8336.dll" target="tools/NativeBinaries/amd64/"/>
+    <file src="NativeBinaries/x86/git2-11f8336.dll" target="tools/NativeBinaries/x86/"/>
+  </files>
+</package>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Cleanup;Build;Package" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Root>$(MSBuildProjectDirectory)\</Root>
+    <BuildPlatform Condition="$(BuildPlatform) == ''">Any CPU</BuildPlatform>
+    <Configuration Condition="$(Configuration) == ''">Debug</Configuration>
+    <MSBuildCommunityTasksPath>$(Root)tools\MSBuildCommunityTasks\</MSBuildCommunityTasksPath>
+    <BuildOutputPath Condition="'$(BuildOutputPath)' == ''">$(Root)src\GitReleaseNotes\bin\$(Configuration)\</BuildOutputPath>
+    <DropPath>$(Root)build\Artifacts\</DropPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildCommunityTasksPath)MSBuild.Community.Tasks.Targets"/>
+  <UsingTask AssemblyFile="$(Root)tools\xunit.net\xunit.runner.msbuild.dll" TaskName="Xunit.Runner.MSBuild.xunit"/>
+
+  <Target Name="Cleanup">
+    <Error Condition="$(Root) == ''" Text="Root variable must be defined" />
+
+    <!-- Diagnostics -->
+    <Message Text="Diagnostics:"/>
+    <Message Text="Project root:    $(Root)" />
+    <Message Text="Drop path:       $(DropPath)" />
+
+    <!-- Clean up -->
+    <ItemGroup>
+      <FilesToDelete Include="$(Root)**\bin\**\*.*" />
+      <FilesToDelete Include="$(Root)**\obj\**\*.*" />
+      <FilesToDelete Include="$(DropPath)**\*.*" />
+    </ItemGroup>
+    <Delete Files="@(FilesToDelete)" ContinueOnError="true" />
+    <RemoveDir Directories="$(DropPath)" />
+  </Target>
+
+  <Target Name="Build">
+    <MSBuild Projects="$(Root)src\GitReleaseNotes.sln" Properties="Configuration=$(Configuration);Platform=$(BuildPlatform)" />
+  </Target>
+
+  <Target Name="Test">
+    <xunit Assembly="$(Root)src\GitReleaseNotes.Tests\bin\$(Configuration)\GitReleaseNotes.Tests.dll" ShadowCopy="False" />
+    <xunit Assembly="$(Root)src\GitReleaseNotes.AcceptanceTests\bin\$(Configuration)\GitReleaseNotes.AcceptanceTests.dll" ShadowCopy="False" />
+  </Target>
+
+  <Target Name="Package" DependsOnTargets="Test">
+    <ItemGroup>
+      <BuildOutput Include="$(Root)src\GitHubFlowVersion\bin\$(Configuration)\**\*.*"/>
+    </ItemGroup>
+
+    <Copy SourceFiles="@(BuildOutput)"
+          DestinationFiles="@(BuildOutput->'$(DropPath)%(RecursiveDir)%(Filename)%(Extension)')" />
+    
+    <MakeDir Directories="$(DropPath)" />
+    <Exec Command="$(Root)src\.NuGet\NuGet.exe pack $(Root)GitReleaseNotes.nuspec -BasePath $(BuildOutputPath) -OutputDirectory $(DropPath) -Properties Version=$(GitHubFlowVersion_SemVer) -Tool"/>
+  </Target>
+</Project>
