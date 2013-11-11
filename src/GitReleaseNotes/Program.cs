@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -7,8 +8,13 @@ using LibGit2Sharp;
 
 namespace GitReleaseNotes
 {
-    class Program
+    public class Program
     {
+        public static readonly Dictionary<IssueTracker, IIssueTracker> IssueTrackers = new Dictionary<IssueTracker, IIssueTracker>
+        {
+            {IssueTracker.GitHub, new GitHubIssueTracker()}
+        };
+
         static void Main(string[] args)
         {
             var arguments = Args.Configuration.Configure<GitReleaseNotesArguments>().CreateAndBind(args);
@@ -28,7 +34,7 @@ namespace GitReleaseNotes
             var gitHelper = new GitHelper();
             var gitRepo = new Repository(gitDirectory);
             var lastTag = new TaggedCommitFinder(gitRepo, gitHelper).GetLastTaggedCommit();
-            var commitsToScan = gitRepo.Commits.TakeWhile(c => c != lastTag.Commit);
+            var commitsToScan = gitRepo.Commits.TakeWhile(c => c != lastTag.Commit).ToArray();
 
             if (arguments.Verbose)
             {
@@ -38,6 +44,10 @@ namespace GitReleaseNotes
                     Console.WriteLine(commit.Message);
                 }
             }
+
+            var releaseNotes = IssueTrackers[arguments.IssueTracker].ScanCommitMessagesForReleaseNotes(commitsToScan);
+
+            new ReleaseNotesWriter().WriteReleaseNotes(releaseNotes);
         }
     }
 }

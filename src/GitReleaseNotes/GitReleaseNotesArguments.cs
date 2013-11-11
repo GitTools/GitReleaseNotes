@@ -10,5 +10,8 @@ namespace GitReleaseNotes
 
         [Description("Enables verbose logging")]
         public bool Verbose { get; set; }
+
+        [Description("Specifies the issue tracker used, possible Options: GitHub")]
+        public IssueTracker IssueTracker { get; set; }
     }
 }
