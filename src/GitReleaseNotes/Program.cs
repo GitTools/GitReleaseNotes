@@ -33,8 +33,11 @@ namespace GitReleaseNotes
 
             var gitHelper = new GitHelper();
             var gitRepo = new Repository(gitDirectory);
-            var lastTag = new TaggedCommitFinder(gitRepo, gitHelper).GetLastTaggedCommit();
-            var commitsToScan = gitRepo.Commits.TakeWhile(c => c != lastTag.Commit).ToArray();
+            var taggedCommitFinder = new TaggedCommitFinder(gitRepo, gitHelper);
+            var tagToStartFrom = string.IsNullOrEmpty(arguments.FromTag) ? 
+                taggedCommitFinder.GetLastTaggedCommit() : 
+                taggedCommitFinder.GetTag(arguments.FromTag);
+            var commitsToScan = gitRepo.Commits.TakeWhile(c => c != tagToStartFrom.Commit).ToArray();
 
             if (arguments.Verbose)
             {

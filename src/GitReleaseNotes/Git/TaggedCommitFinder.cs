@@ -1,28 +1,41 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using LibGit2Sharp;
-using LibGit2Sharp.Core.Compat;
 
 namespace GitReleaseNotes.Git
 {
     public class TaggedCommitFinder : ITaggedCommitFinder
     {
-        private readonly Lazy<TaggedCommit> _lastTaggedRelease;
+        private readonly Dictionary<string, TaggedCommit> _cache = new Dictionary<string, TaggedCommit>();
+        private readonly IRepository _gitRepo;
+        private readonly IGitHelper _gitHelper;
 
         public TaggedCommitFinder(IRepository gitRepo, IGitHelper gitHelper)
         {
-            _lastTaggedRelease = new Lazy<TaggedCommit>(() => GetLastTaggedCommit(gitRepo, gitHelper));
+            _gitRepo = gitRepo;
+            _gitHelper = gitHelper;
         }
 
         public TaggedCommit GetLastTaggedCommit()
         {
-            return _lastTaggedRelease.Value;
+            return GetTag(string.Empty);
         }
 
-        private static TaggedCommit GetLastTaggedCommit(IRepository gitRepo, IGitHelper gitHelper)
+        public TaggedCommit GetTag(string fromTag)
+        {
+            if (!_cache.ContainsKey(fromTag))
+                _cache.Add(fromTag, GetLastTaggedCommit(_gitRepo, _gitHelper, t => string.IsNullOrEmpty(fromTag) || t.TagName == fromTag));
+
+            return _cache[fromTag];
+        }
+
+        private static TaggedCommit GetLastTaggedCommit(IRepository gitRepo, IGitHelper gitHelper, Func<TaggedCommit, bool> filterTags)
         {
             var branch = gitHelper.GetBranch(gitRepo, "master");
-            var tags = gitRepo.Tags.Select(t => new TaggedCommit((Commit)t.Target, t.Name))
-                .Where(a => a != null)
+            var tags = gitRepo.Tags
+                .Select(t => new TaggedCommit((Commit)t.Target, t.Name))
+                .Where(filterTags)
                 .ToArray();
             var olderThan = branch.Tip.Committer.When;
             var lastTaggedCommit =

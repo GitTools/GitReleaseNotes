@@ -13,5 +13,8 @@ namespace GitReleaseNotes
 
         [Description("Specifies the issue tracker used, possible Options: GitHub")]
         public IssueTracker IssueTracker { get; set; }
+
+        [Description("Speficy the tag name to start from, default is the last tag on master")]
+        public string FromTag { get; set; }
     }
 }
