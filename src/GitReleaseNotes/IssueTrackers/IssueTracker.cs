@@ -1,4 +1,4 @@
-namespace GitReleaseNotes
+namespace GitReleaseNotes.IssueTrackers
 {
     public enum IssueTracker
     {

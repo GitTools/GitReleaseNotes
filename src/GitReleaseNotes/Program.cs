@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using GitReleaseNotes.Git;
+using GitReleaseNotes.IssueTrackers;
+using GitReleaseNotes.IssueTrackers.GitHub;
 using LibGit2Sharp;
 
 namespace GitReleaseNotes
@@ -12,7 +14,7 @@ namespace GitReleaseNotes
     {
         public static readonly Dictionary<IssueTracker, IIssueTracker> IssueTrackers = new Dictionary<IssueTracker, IIssueTracker>
         {
-            {IssueTracker.GitHub, new GitHubIssueTracker()}
+            {IssueTracker.GitHub, new GitHubIssueTracker(new IssueNumberExtractor())}
         };
 
         static void Main(string[] args)
@@ -48,7 +50,7 @@ namespace GitReleaseNotes
                 }
             }
 
-            var releaseNotes = IssueTrackers[arguments.IssueTracker].ScanCommitMessagesForReleaseNotes(commitsToScan);
+            var releaseNotes = IssueTrackers[arguments.IssueTracker].ScanCommitMessagesForReleaseNotes(arguments, commitsToScan);
 
             new ReleaseNotesWriter().WriteReleaseNotes(releaseNotes);
         }

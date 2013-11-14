@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Reflection;
+using GitReleaseNotes.IssueTrackers;
 using Xunit;
 
 namespace GitReleaseNotes.Tests
