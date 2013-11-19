@@ -53,15 +53,16 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
                 Credentials = new Octokit.Credentials(arguments.Token)
             };
 
+            var since = commitsToScan.Select(c=>c.Author.When).Min();
             var potentialIssues = github.Issue.GetForRepository(organisation, repository, new RepositoryIssueRequest
             {
                 Filter = IssueFilter.All,
-                Since = commitsToScan.Select(c=>c.Author.When).Min()
+                Since = since,
+                State = ItemState.Closed
             }).Result;
 
             var closedMentionedIssues = potentialIssues
                 .Where(i => issueNumbersToScan.Contains(i.Number.ToString()))
-                .Where(i=>i.State == ItemState.Closed)
                 .ToArray();
             
             return new SemanticReleaseNotes(closedMentionedIssues.Select(i=>
