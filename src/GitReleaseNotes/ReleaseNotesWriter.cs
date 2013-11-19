@@ -1,10 +1,27 @@
-﻿namespace GitReleaseNotes
+﻿using System.Text;
+
+namespace GitReleaseNotes
 {
-    internal class ReleaseNotesWriter
+    public class ReleaseNotesWriter
     {
-        public void WriteReleaseNotes(SemanticReleaseNotes releaseNotes)
+        private readonly IFileSystem _fileSystem;
+
+        public ReleaseNotesWriter(IFileSystem fileSystem)
         {
-            
+            _fileSystem = fileSystem;
+        }
+
+        public void WriteReleaseNotes(GitReleaseNotesArguments arguments, SemanticReleaseNotes releaseNotes)
+        {
+            var builder = new StringBuilder();
+
+            foreach (var releaseNoteItem in releaseNotes.ReleaseNoteItems)
+            {
+                var item = string.Format(" - {0} [{1}]({2})", releaseNoteItem.Title, releaseNoteItem.IssueNumber, releaseNoteItem.HtmlUrl);
+                builder.AppendLine(item);
+            }
+
+            _fileSystem.WriteAllText(arguments.OutputFile, builder.ToString());
         }
     }
 }

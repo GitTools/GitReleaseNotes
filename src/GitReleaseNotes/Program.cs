@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Args.Help;
+using Args.Help.Formatters;
 using GitReleaseNotes.Git;
 using GitReleaseNotes.IssueTrackers;
 using GitReleaseNotes.IssueTrackers.GitHub;
@@ -17,9 +19,35 @@ namespace GitReleaseNotes
             {IssueTracker.GitHub, new GitHubIssueTracker(new IssueNumberExtractor())}
         };
 
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
-            var arguments = Args.Configuration.Configure<GitReleaseNotesArguments>().CreateAndBind(args);
+            var modelBindingDefinition = Args.Configuration.Configure<GitReleaseNotesArguments>();
+
+            if (args.Any(a => a == "/?"))
+            {
+                var help = new HelpProvider().GenerateModelHelp(modelBindingDefinition);
+                var f = new ConsoleHelpFormatter();
+                f.WriteHelp(help, Console.Out);
+
+                return 0;
+            }
+            
+            var arguments = modelBindingDefinition.CreateAndBind(args);
+
+            if (arguments.IssueTracker == null)
+            {
+                Console.WriteLine("The IssueTracker argument must be provided, see help (/?) for possible options");
+                return 1;
+            }
+            if (string.IsNullOrEmpty(arguments.OutputFile) || !arguments.OutputFile.EndsWith(".md"))
+            {
+                Console.WriteLine("Specify an output file (*.md)");
+                return 1;
+            }
+
+            var issueTracker = IssueTrackers[arguments.IssueTracker.Value];
+            if (!issueTracker.VerifyArgumentsAndWriteErrorsToConsole(arguments))
+                return 1;
 
             var workingDirectory = arguments.WorkingDirectory ?? Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
@@ -50,9 +78,10 @@ namespace GitReleaseNotes
                 }
             }
 
-            var releaseNotes = IssueTrackers[arguments.IssueTracker].ScanCommitMessagesForReleaseNotes(arguments, commitsToScan);
+            var releaseNotes = issueTracker.ScanCommitMessagesForReleaseNotes(arguments, commitsToScan);
 
-            new ReleaseNotesWriter().WriteReleaseNotes(releaseNotes);
+            new ReleaseNotesWriter(new FileSystem()).WriteReleaseNotes(arguments, releaseNotes);
+            return 0;
         }
     }
 }

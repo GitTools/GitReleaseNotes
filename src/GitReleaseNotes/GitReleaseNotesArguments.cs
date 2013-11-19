@@ -13,9 +13,18 @@ namespace GitReleaseNotes
         public bool Verbose { get; set; }
 
         [Description("Specifies the issue tracker used, possible Options: GitHub")]
-        public IssueTracker IssueTracker { get; set; }
+        public IssueTracker? IssueTracker { get; set; }
 
         [Description("Speficy the tag name to start from, default is the last tag on master")]
         public string FromTag { get; set; }
+
+        [Description("GitHub access token")]
+        public string Token { get; set; }
+
+        [Description("GitHub Repository name, in Organisation/Repository format")]
+        public string Repo { get; set; }
+
+        [Description("The release notes file")]
+        public string OutputFile { get; set; }
     }
 }
