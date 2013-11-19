@@ -108,3 +108,4 @@ Backup*/
 UpgradeLog*.XML
 build/
 src/GitReleaseNotes.sln.ide/graph
+*.orig

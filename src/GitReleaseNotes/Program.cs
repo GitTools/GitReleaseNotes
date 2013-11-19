@@ -80,7 +80,7 @@ namespace GitReleaseNotes
 
             var releaseNotes = issueTracker.ScanCommitMessagesForReleaseNotes(arguments, commitsToScan);
 
-            new ReleaseNotesWriter(new FileSystem()).WriteReleaseNotes(arguments, releaseNotes);
+            new ReleaseNotesWriter(new FileSystem(), repositoryRoot).WriteReleaseNotes(arguments, releaseNotes);
             return 0;
         }
 

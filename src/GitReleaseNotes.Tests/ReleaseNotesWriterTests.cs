@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using ApprovalTests;
 using ApprovalTests.Reporters;
@@ -12,27 +13,126 @@ namespace GitReleaseNotes.Tests
     public class ReleaseNotesWriterTests
     {
         private readonly IFileSystem _fileSystem;
+        private readonly ReleaseNotesWriter _sut;
+        private const string WorkingDir = "c:\\WorkingDir";
 
         public ReleaseNotesWriterTests()
         {
             _fileSystem = Substitute.For<IFileSystem>();
+            _sut = new ReleaseNotesWriter(_fileSystem, WorkingDir);
         }
 
         [Fact]
         public void ApproveSimpleTests()
         {
-            var releaseNotesWriter = new ReleaseNotesWriter(_fileSystem);
-
-            var arguments = new GitReleaseNotesArguments();
+            var arguments = new GitReleaseNotesArguments
+            {
+                OutputFile = "ReleaseFile.md"
+            };
             var releaseNotes = new SemanticReleaseNotes(new[]
             {
-                new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new string[0]), 
+
+                new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new string[0])
             });
 
-            releaseNotesWriter.WriteReleaseNotes(arguments, releaseNotes);
+            _sut.WriteReleaseNotes(arguments, releaseNotes);
 
-            var content = _fileSystem.ReceivedCalls().Single(c => c.GetMethodInfo().Name == "WriteAllText").GetArguments()[1];
-            Approvals.Verify(content);
+            Approvals.Verify(GetContent());
+        }
+
+        [Fact]
+        public void ItemIsCategorised()
+        {
+            var arguments = new GitReleaseNotesArguments
+            {
+                OutputFile = "ReleaseFile.md"
+            };
+            var releaseNotes = new SemanticReleaseNotes(new[]
+            {
+                new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new[]{"feature"})
+            });
+
+            _sut.WriteReleaseNotes(arguments, releaseNotes);
+
+            Approvals.Verify(GetContent());
+        }
+
+        [Fact]
+        public void LabelOfBugIsCategorisedAsFix()
+        {
+            var arguments = new GitReleaseNotesArguments
+            {
+                OutputFile = "ReleaseFile.md"
+            };
+            var releaseNotes = new SemanticReleaseNotes(new[]
+            {
+                new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new[]{"bug"})
+            });
+
+            _sut.WriteReleaseNotes(arguments, releaseNotes);
+
+            Approvals.Verify(GetContent());
+        }
+
+        [Fact]
+        public void AdditionalCategoriesCanBeSpecifiedOnCommandLine()
+        {
+            var arguments = new GitReleaseNotesArguments
+            {
+                Categories = "internal refactoring",
+                OutputFile = "ReleaseFile.md"
+            };
+            var releaseNotes = new SemanticReleaseNotes(new[]
+            {
+                new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new[]{"internal refactoring"})
+            });
+
+            _sut.WriteReleaseNotes(arguments, releaseNotes);
+
+            Approvals.Verify(GetContent());
+        }
+
+        [Fact]
+        public void RelativePathIsWrittenToRepositoryRoot()
+        {
+            var arguments = new GitReleaseNotesArguments
+            {
+                Categories = "internal refactoring",
+                OutputFile = "ReleaseFile.md"
+            };
+            var releaseNotes = new SemanticReleaseNotes(new[]
+            {
+                new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new string[0])
+            });
+
+            _sut.WriteReleaseNotes(arguments, releaseNotes);
+
+            var fileName = _fileSystem.ReceivedCalls().Single(c => c.GetMethodInfo().Name == "WriteAllText").GetArguments()[0];
+            Assert.Equal(Path.Combine(WorkingDir, "ReleaseFile.md"), fileName);
+        }
+
+        [Fact]
+        public void AbsolutePathIsWrittenToRepositoryRoot()
+        {
+            var arguments = new GitReleaseNotesArguments
+            {
+                Categories = "internal refactoring",
+                OutputFile = "c:\\AnotherDir\\ReleaseFile.md"
+            };
+            var releaseNotes = new SemanticReleaseNotes(new[]
+            {
+                new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new string[0])
+            });
+
+            _sut.WriteReleaseNotes(arguments, releaseNotes);
+
+            var fileName = _fileSystem.ReceivedCalls().Single(c => c.GetMethodInfo().Name == "WriteAllText").GetArguments()[0];
+            Assert.Equal("c:\\AnotherDir\\ReleaseFile.md", fileName);
+        }
+
+        private object GetContent()
+        {
+            return _fileSystem.ReceivedCalls().Single(c => c.GetMethodInfo().Name == "WriteAllText").GetArguments()[1];
         }
     }
 }
