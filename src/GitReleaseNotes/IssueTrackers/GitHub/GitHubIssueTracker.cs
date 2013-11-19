@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
-using System.Net.Http.Headers;
 using LibGit2Sharp;
 using Octokit;
 
@@ -10,9 +10,11 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
     public class GitHubIssueTracker : IIssueTracker
     {
         private readonly IIssueNumberExtractor _issueNumberExtractor;
+        private readonly IGitHubClient _gitHubClient;
 
-        public GitHubIssueTracker(IIssueNumberExtractor issueNumberExtractor)
+        public GitHubIssueTracker(IIssueNumberExtractor issueNumberExtractor, IGitHubClient gitHubClient)
         {
+            _gitHubClient = gitHubClient;
             _issueNumberExtractor = issueNumberExtractor;
         }
 
@@ -48,13 +50,8 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
 
             var issueNumbersToScan = _issueNumberExtractor.GetIssueNumbers(arguments, commitsToScan, @"#(?<issueNumber>\d+)");
 
-            var github = new GitHubClient(new ProductHeaderValue("OctokitTests"))
-            {
-                Credentials = new Octokit.Credentials(arguments.Token)
-            };
-
             var since = commitsToScan.Select(c=>c.Author.When).Min();
-            var potentialIssues = github.Issue.GetForRepository(organisation, repository, new RepositoryIssueRequest
+            var potentialIssues = _gitHubClient.Issue.GetForRepository(organisation, repository, new RepositoryIssueRequest
             {
                 Filter = IssueFilter.All,
                 Since = since,
@@ -62,11 +59,14 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
             }).Result;
 
             var closedMentionedIssues = potentialIssues
-                .Where(i => issueNumbersToScan.Contains(i.Number.ToString()))
+                .Where(i => issueNumbersToScan.Contains(i.Number.ToString(CultureInfo.InvariantCulture)))
                 .ToArray();
             
             return new SemanticReleaseNotes(closedMentionedIssues.Select(i=>
-                new ReleaseNoteItem(i.Title, string.Format("#{0}", i.Number), i.HtmlUrl, i.Labels.Select(l=>l.Name).ToArray())));
+            {
+                var labels = i.Labels == null ? new string[0] : i.Labels.Select(l=>l.Name).ToArray();
+                return new ReleaseNoteItem(i.Title, string.Format("#{0}", i.Number), i.HtmlUrl, labels);
+            }));
         }
     }
 }

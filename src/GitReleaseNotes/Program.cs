@@ -2,22 +2,21 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Reflection;
 using Args.Help;
 using Args.Help.Formatters;
 using GitReleaseNotes.Git;
 using GitReleaseNotes.IssueTrackers;
 using GitReleaseNotes.IssueTrackers.GitHub;
-using LibGit2Sharp;
+using Octokit;
+using Repository = LibGit2Sharp.Repository;
 
 namespace GitReleaseNotes
 {
     public class Program
     {
-        public static readonly Dictionary<IssueTracker, IIssueTracker> IssueTrackers = new Dictionary<IssueTracker, IIssueTracker>
-        {
-            {IssueTracker.GitHub, new GitHubIssueTracker(new IssueNumberExtractor())}
-        };
+        public static Dictionary<IssueTracker, IIssueTracker> IssueTrackers;
 
         static int Main(string[] args)
         {
@@ -45,6 +44,7 @@ namespace GitReleaseNotes
                 return 1;
             }
 
+            CreateIssueTrackers(arguments);
             var issueTracker = IssueTrackers[arguments.IssueTracker.Value];
             if (!issueTracker.VerifyArgumentsAndWriteErrorsToConsole(arguments))
                 return 1;
@@ -82,6 +82,18 @@ namespace GitReleaseNotes
 
             new ReleaseNotesWriter(new FileSystem()).WriteReleaseNotes(arguments, releaseNotes);
             return 0;
+        }
+
+        private static void CreateIssueTrackers(GitReleaseNotesArguments arguments)
+        {
+            var gitHubClient = new GitHubClient(new ProductHeaderValue("OctokitTests"))
+            {
+                Credentials = new Credentials(arguments.Token)
+            };
+            IssueTrackers = new Dictionary<IssueTracker, IIssueTracker>
+            {
+                {IssueTracker.GitHub, new GitHubIssueTracker(new IssueNumberExtractor(), gitHubClient)}
+            };
         }
     }
 }
