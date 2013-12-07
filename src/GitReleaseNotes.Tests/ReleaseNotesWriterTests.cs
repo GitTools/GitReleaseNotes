@@ -31,8 +31,10 @@ namespace GitReleaseNotes.Tests
             };
             var releaseNotes = new SemanticReleaseNotes(new[]
             {
-
-                new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new string[0])
+                new SemanticRelease("", null, new[]
+                {
+                    new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new string[0])
+                })
             });
 
             _sut.WriteReleaseNotes(arguments, releaseNotes);
@@ -49,7 +51,39 @@ namespace GitReleaseNotes.Tests
             };
             var releaseNotes = new SemanticReleaseNotes(new[]
             {
-                new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new[]{"feature"})
+                new SemanticRelease("", null, new[]
+                {
+                    new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"),
+                        new[] {"feature"})
+                })
+            });
+
+            _sut.WriteReleaseNotes(arguments, releaseNotes);
+
+            Approvals.Verify(GetContent());
+        }
+        
+        [Fact]
+        public void MultipleReleases()
+        {
+            var arguments = new GitReleaseNotesArguments
+            {
+                OutputFile = "ReleaseFile.md"
+            };
+            var releaseNotes = new SemanticReleaseNotes(new[]
+            {
+                new SemanticRelease("", null, new[]
+                {
+                    new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"),
+                        new[] {"feature"})
+                }),
+                new SemanticRelease("1.2.0", new DateTimeOffset(2013, 12, 06, 0,0,0, new TimeSpan()), new []
+                {
+                    new ReleaseNoteItem("Issue 2", "#2", new Uri("http://github.com/org/repo/issues/2"),
+                        new[] {"feature"}),
+                        new ReleaseNoteItem("Issue 3", "#3", new Uri("http://github.com/org/repo/issues/3"),
+                        new[] {"bug"})
+                })
             });
 
             _sut.WriteReleaseNotes(arguments, releaseNotes);
@@ -66,7 +100,10 @@ namespace GitReleaseNotes.Tests
             };
             var releaseNotes = new SemanticReleaseNotes(new[]
             {
-                new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new[]{"bug"})
+                new SemanticRelease("", null, new[]
+                {
+                    new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new[] {"bug"})
+                })
             });
 
             _sut.WriteReleaseNotes(arguments, releaseNotes);
@@ -84,7 +121,11 @@ namespace GitReleaseNotes.Tests
             };
             var releaseNotes = new SemanticReleaseNotes(new[]
             {
-                new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new[]{"internal refactoring"})
+                new SemanticRelease("", null, new[]
+                {
+                    new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"),
+                        new[] {"internal refactoring"})
+                })
             });
 
             _sut.WriteReleaseNotes(arguments, releaseNotes);
@@ -102,7 +143,10 @@ namespace GitReleaseNotes.Tests
             };
             var releaseNotes = new SemanticReleaseNotes(new[]
             {
-                new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new string[0])
+                new SemanticRelease("", null, new[]
+                {
+                    new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new string[0])
+                })
             });
 
             _sut.WriteReleaseNotes(arguments, releaseNotes);
@@ -121,7 +165,10 @@ namespace GitReleaseNotes.Tests
             };
             var releaseNotes = new SemanticReleaseNotes(new[]
             {
-                new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new string[0])
+                new SemanticRelease("", null, new[]
+                {
+                    new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new string[0])
+                })
             });
 
             _sut.WriteReleaseNotes(arguments, releaseNotes);

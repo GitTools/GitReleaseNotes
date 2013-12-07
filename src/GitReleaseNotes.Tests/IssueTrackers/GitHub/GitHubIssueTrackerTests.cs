@@ -33,7 +33,11 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
         public void CreatesReleaseNotesForClosedGitHubIssues()
         {
             var commit = CreateCommit("Fixes #1", DateTimeOffset.Now.AddDays(-1));
-            var commitsToScan = new[] { commit };
+            var commitsToScan = new List<Commit> { commit };
+            var toScan = new Dictionary<ReleaseInfo, List<Commit>>
+            {
+                {new ReleaseInfo(), commitsToScan}
+            };
             _issuesClient
                 .GetForRepository("Org", "Repo", Arg.Any<RepositoryIssueRequest>())
                 .Returns(Task.FromResult<IReadOnlyList<Issue>>(new List<Issue>
@@ -46,9 +50,9 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
                 }.AsReadOnly()));
             _gitHubClient.Issue.Returns(_issuesClient);
 
-            var releaseNotes = _sut.ScanCommitMessagesForReleaseNotes(_gitReleaseNotesArguments, commitsToScan);
+            var releaseNotes = _sut.ScanCommitMessagesForReleaseNotes(_gitReleaseNotesArguments, toScan);
 
-            Assert.Equal("Issue Title", releaseNotes.ReleaseNoteItems[0].Title);
+            Assert.Equal("Issue Title", releaseNotes.Releases[0].ReleaseNoteItems[0].Title);
         }
 
         private static Commit CreateCommit(string message, DateTimeOffset when)

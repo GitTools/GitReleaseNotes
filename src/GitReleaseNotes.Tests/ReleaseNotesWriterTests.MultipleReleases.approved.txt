@@ -1,0 +1,9 @@
+﻿# vNext
+
+ - Issue 1 [#1](http://github.com/org/repo/issues/1) +feature
+
+
+# 1.2.0 (06 December 2013)
+
+ - Issue 2 [#2](http://github.com/org/repo/issues/2) +feature
+ - Issue 3 [#3](http://github.com/org/repo/issues/3) +fix

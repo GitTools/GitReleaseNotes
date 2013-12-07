@@ -62,6 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArgumentTests.cs" />
+    <Compile Include="CommitGrouperTests.cs" />
     <Compile Include="IssueTrackers\GitHub\GitHubIssueTrackerTests.cs" />
     <Compile Include="IssueTrackers\IssueNumberExtractor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

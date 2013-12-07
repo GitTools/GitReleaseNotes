@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using LibGit2Sharp;
@@ -42,31 +43,51 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
             return true;
         }
 
-        public SemanticReleaseNotes ScanCommitMessagesForReleaseNotes(GitReleaseNotesArguments arguments, Commit[] commitsToScan)
+        public SemanticReleaseNotes ScanCommitMessagesForReleaseNotes(GitReleaseNotesArguments arguments, Dictionary<ReleaseInfo, List<Commit>> releases)
         {
             var repoParts = arguments.Repo.Split('/');
             var organisation = repoParts[0];
             var repository = repoParts[1];
 
-            var issueNumbersToScan = _issueNumberExtractor.GetIssueNumbers(arguments, commitsToScan, @"#(?<issueNumber>\d+)");
+            var issueNumbersToScan = _issueNumberExtractor.GetIssueNumbers(arguments, releases, @"#(?<issueNumber>\d+)");
 
-            var since = commitsToScan.Select(c=>c.Author.When).Min();
-            var potentialIssues = _gitHubClient.Issue.GetForRepository(organisation, repository, new RepositoryIssueRequest
+            var potentialIssues = GetPotentialIssues(releases, organisation, repository).ToArray();
+
+            var closedMentionedIssuesByRelease = issueNumbersToScan.Select(issues =>
+            {
+                var issuesForRelease = potentialIssues
+                    .Where(i => issues.Value.Contains(i.Number.ToString(CultureInfo.InvariantCulture)))
+                    .ToArray();
+                return new
+                {
+                    ReleaseInfo = issues.Key,
+                    IssuesForRelease = issuesForRelease
+                };
+            })
+                .Where(g => g.IssuesForRelease.Any())
+                .OrderBy(g=>g.ReleaseInfo.When);
+
+            return new SemanticReleaseNotes(closedMentionedIssuesByRelease.Select(r =>
+            {
+                var releaseNoteItems = r.IssuesForRelease.Select(i =>
+                {
+                    var labels = i.Labels == null ? new string[0] : i.Labels.Select(l => l.Name).ToArray();
+                    return new ReleaseNoteItem(i.Title, string.Format("#{0}", i.Number), i.HtmlUrl, labels);
+                }).ToArray();
+                return new SemanticRelease(r.ReleaseInfo.Name, r.ReleaseInfo.When, releaseNoteItems);
+                
+            }));
+        }
+
+        private IEnumerable<Issue> GetPotentialIssues(Dictionary<ReleaseInfo, List<Commit>> releases, string organisation, string repository)
+        {
+            var since = releases.SelectMany(c => c.Value).Select(c => c.Author.When).Min();
+            return _gitHubClient.Issue.GetForRepository(organisation, repository, new RepositoryIssueRequest
             {
                 Filter = IssueFilter.All,
                 Since = since,
                 State = ItemState.Closed
             }).Result;
-
-            var closedMentionedIssues = potentialIssues
-                .Where(i => issueNumbersToScan.Contains(i.Number.ToString(CultureInfo.InvariantCulture)))
-                .ToArray();
-            
-            return new SemanticReleaseNotes(closedMentionedIssues.Select(i=>
-            {
-                var labels = i.Labels == null ? new string[0] : i.Labels.Select(l=>l.Name).ToArray();
-                return new ReleaseNoteItem(i.Title, string.Format("#{0}", i.Number), i.HtmlUrl, labels);
-            }));
         }
     }
 }
