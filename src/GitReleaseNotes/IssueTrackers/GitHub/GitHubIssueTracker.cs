@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using LibGit2Sharp;
@@ -12,10 +11,12 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
     {
         private readonly IIssueNumberExtractor _issueNumberExtractor;
         private readonly IGitHubClient _gitHubClient;
+        private readonly ILog _log;
 
-        public GitHubIssueTracker(IIssueNumberExtractor issueNumberExtractor, IGitHubClient gitHubClient)
+        public GitHubIssueTracker(IIssueNumberExtractor issueNumberExtractor, IGitHubClient gitHubClient, ILog log)
         {
             _gitHubClient = gitHubClient;
+            _log = log;
             _issueNumberExtractor = issueNumberExtractor;
         }
 
@@ -23,31 +24,46 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
         {
             if (arguments.Repo == null)
             {
-                Console.WriteLine("GitHub repository cannot be null");
+                _log.WriteLine("GitHub repository name must be specified");
                 return false;
             }
             var repoParts = arguments.Repo.Split('/');
 
             if (repoParts.Length != 2)
             {
-                Console.WriteLine("GitHub repository name should be in format Organisation/RepoName");
+                _log.WriteLine("GitHub repository name should be in format Organisation/RepoName");
                 return false;
             }
 
             if (string.IsNullOrEmpty(arguments.Token))
             {
-                Console.WriteLine("You must specify a GitHub Authentication token with the /Token argument");
+                _log.WriteLine("You must specify a GitHub Authentication token with the /Token argument");
+                return false;
+            }
+
+            if (arguments.Publish && string.IsNullOrEmpty(arguments.Version))
+            {
+                _log.WriteLine("You must specifiy the version (will be tag) when using the /Publish flag");
                 return false;
             }
 
             return true;
         }
 
+        public void PublishRelease(string releaseNotesOutput, GitReleaseNotesArguments arguments)
+        {
+            string organisation;
+            string repository;
+            GetRepository(arguments, out organisation, out repository);
+
+            _gitHubClient.Release.CreateRelease(organisation, repository, new ReleaseUpdate(arguments.Version));
+        }
+
         public SemanticReleaseNotes ScanCommitMessagesForReleaseNotes(GitReleaseNotesArguments arguments, Dictionary<ReleaseInfo, List<Commit>> releases)
         {
-            var repoParts = arguments.Repo.Split('/');
-            var organisation = repoParts[0];
-            var repository = repoParts[1];
+            string organisation;
+            string repository;
+            GetRepository(arguments, out organisation, out repository);
 
             var issueNumbersToScan = _issueNumberExtractor.GetIssueNumbers(arguments, releases, @"#(?<issueNumber>\d+)");
 
@@ -77,6 +93,13 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
                 return new SemanticRelease(r.ReleaseInfo.Name, r.ReleaseInfo.When, releaseNoteItems);
                 
             }));
+        }
+
+        private static void GetRepository(GitReleaseNotesArguments arguments, out string organisation, out string repository)
+        {
+            var repoParts = arguments.Repo.Split('/');
+            organisation = repoParts[0];
+            repository = repoParts[1];
         }
 
         private IEnumerable<Issue> GetPotentialIssues(Dictionary<ReleaseInfo, List<Commit>> releases, string organisation, string repository)

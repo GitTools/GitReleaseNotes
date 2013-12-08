@@ -29,5 +29,11 @@ namespace GitReleaseNotes
 
         [Description("Allows additional labels to be treated as categories")]
         public string Categories { get; set; }
+
+        [Description("Publish the release to the specified issue tracker")]
+        public bool Publish { get; set; }
+
+        [Description("Specifies the version to publish")]
+        public string Version { get; set; }
     }
 }

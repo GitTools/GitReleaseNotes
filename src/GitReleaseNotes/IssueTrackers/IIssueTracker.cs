@@ -7,5 +7,6 @@ namespace GitReleaseNotes.IssueTrackers
     {
         SemanticReleaseNotes ScanCommitMessagesForReleaseNotes(GitReleaseNotesArguments arguments, Dictionary<ReleaseInfo, List<Commit>> releases);
         bool VerifyArgumentsAndWriteErrorsToConsole(GitReleaseNotesArguments arguments);
+        void PublishRelease(string releaseNotesOutput, GitReleaseNotesArguments arguments);
     }
 }
