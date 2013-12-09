@@ -34,7 +34,7 @@ namespace GitReleaseNotes
 
             var arguments = modelBindingDefinition.CreateAndBind(args);
 
-            if (!ArgumentVerifier.VerifyArguments(arguments)) 
+            if (!ArgumentVerifier.VerifyArguments(arguments))
                 return 1;
 
             CreateIssueTrackers(arguments);
@@ -64,7 +64,7 @@ namespace GitReleaseNotes
 
             var releases = new CommitGrouper().GetCommitsByRelease(gitRepo, tagToStartFrom);
 
-            Console.WriteLine("Scanning {0} commits over {1} releases for issue numbers", releases.Sum(r=>r.Value.Count), releases.Count);
+            Console.WriteLine("Scanning {0} commits over {1} releases for issue numbers", releases.Sum(r => r.Value.Count), releases.Count);
 
             if (arguments.Verbose)
             {
@@ -94,18 +94,22 @@ namespace GitReleaseNotes
             if (!arguments.Publish)
                 return;
 
+            Console.WriteLine("Publishing release {0} to {1}", arguments.Version, arguments.IssueTracker);
             issueTracker.PublishRelease(releaseNotesOutput, arguments);
         }
 
         private static void CreateIssueTrackers(GitReleaseNotesArguments arguments)
         {
-            var gitHubClient = new GitHubClient(new ProductHeaderValue("GitReleaseNotes"))
-            {
-                Credentials = new Credentials(arguments.Token)
-            };
             IssueTrackers = new Dictionary<IssueTracker, IIssueTracker>
             {
-                {IssueTracker.GitHub, new GitHubIssueTracker(new IssueNumberExtractor(), gitHubClient, new Log())}
+                {
+                    IssueTracker.GitHub,
+                    new GitHubIssueTracker(new IssueNumberExtractor(),
+                        () => new GitHubClient(new ProductHeaderValue("GitReleaseNotes"))
+                        {
+                            Credentials = new Credentials(arguments.Token)
+                        }, new Log())
+                }
             };
         }
     }

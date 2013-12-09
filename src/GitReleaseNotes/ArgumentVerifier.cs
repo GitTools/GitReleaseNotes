@@ -15,7 +15,7 @@ namespace GitReleaseNotes
             }
             if (string.IsNullOrEmpty(arguments.OutputFile) || !arguments.OutputFile.EndsWith(".md"))
             {
-                Console.WriteLine("Specify an output file (*.md)");
+                Console.WriteLine("Specify an output file (*.md) [/OutputFile ...]");
                 {
                     return false;
                 }

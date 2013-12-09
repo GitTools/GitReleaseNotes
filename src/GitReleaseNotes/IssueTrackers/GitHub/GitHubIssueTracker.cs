@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using LibGit2Sharp;
@@ -10,21 +11,21 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
     public class GitHubIssueTracker : IIssueTracker
     {
         private readonly IIssueNumberExtractor _issueNumberExtractor;
-        private readonly IGitHubClient _gitHubClient;
+        private readonly Func<IGitHubClient> _gitHubClientFactory;
         private readonly ILog _log;
 
-        public GitHubIssueTracker(IIssueNumberExtractor issueNumberExtractor, IGitHubClient gitHubClient, ILog log)
+        public GitHubIssueTracker(IIssueNumberExtractor issueNumberExtractor, Func<IGitHubClient> gitHubClientFactory, ILog log)
         {
-            _gitHubClient = gitHubClient;
             _log = log;
             _issueNumberExtractor = issueNumberExtractor;
+            _gitHubClientFactory = gitHubClientFactory;
         }
 
         public bool VerifyArgumentsAndWriteErrorsToConsole(GitReleaseNotesArguments arguments)
         {
             if (arguments.Repo == null)
             {
-                _log.WriteLine("GitHub repository name must be specified");
+                _log.WriteLine("GitHub repository name must be specified [/Repo .../...]");
                 return false;
             }
             var repoParts = arguments.Repo.Split('/');
@@ -43,7 +44,7 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
 
             if (arguments.Publish && string.IsNullOrEmpty(arguments.Version))
             {
-                _log.WriteLine("You must specifiy the version (will be tag) when using the /Publish flag");
+                _log.WriteLine("You must specifiy the version [/Version ...] (will be tag) when using the /Publish flag");
                 return false;
             }
 
@@ -56,7 +57,13 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
             string repository;
             GetRepository(arguments, out organisation, out repository);
 
-            _gitHubClient.Release.CreateRelease(organisation, repository, new ReleaseUpdate(arguments.Version));
+            var releaseUpdate = new ReleaseUpdate(arguments.Version)
+            {
+                Name = arguments.Version,
+                Body = releaseNotesOutput
+            };
+            var release = _gitHubClientFactory().Release.CreateRelease(organisation, repository, releaseUpdate);
+            release.Wait();
         }
 
         public SemanticReleaseNotes ScanCommitMessagesForReleaseNotes(GitReleaseNotesArguments arguments, Dictionary<ReleaseInfo, List<Commit>> releases)
@@ -105,7 +112,7 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
         private IEnumerable<Issue> GetPotentialIssues(Dictionary<ReleaseInfo, List<Commit>> releases, string organisation, string repository)
         {
             var since = releases.SelectMany(c => c.Value).Select(c => c.Author.When).Min();
-            return _gitHubClient.Issue.GetForRepository(organisation, repository, new RepositoryIssueRequest
+            return _gitHubClientFactory().Issue.GetForRepository(organisation, repository, new RepositoryIssueRequest
             {
                 Filter = IssueFilter.All,
                 Since = since,

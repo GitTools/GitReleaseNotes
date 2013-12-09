@@ -23,7 +23,7 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
         {
             _log = Substitute.For<ILog>();
             _gitHubClient = Substitute.For<IGitHubClient>();
-            _sut = new GitHubIssueTracker(new IssueNumberExtractor(), _gitHubClient, _log);
+            _sut = new GitHubIssueTracker(new IssueNumberExtractor(), () => _gitHubClient, _log);
             _gitReleaseNotesArguments = new GitReleaseNotesArguments
             {
                 Repo = "Org/Repo",
@@ -64,7 +64,7 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
             var result = _sut.VerifyArgumentsAndWriteErrorsToConsole(new GitReleaseNotesArguments());
 
             Assert.False(result);
-            _log.Received().WriteLine("GitHub repository name must be specified");
+            _log.Received().WriteLine("GitHub repository name must be specified [/Repo .../...]");
         }
 
         [Theory]
@@ -113,7 +113,7 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
             });
 
             Assert.False(result);
-            _log.Received().WriteLine("You must specifiy the version (will be tag) when using the /Publish flag");
+            _log.Received().WriteLine("You must specifiy the version [/Version ...] (will be tag) when using the /Publish flag");
         }
 
         private static Commit CreateCommit(string message, DateTimeOffset when)
