@@ -54,9 +54,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArgumentVerifier.cs" />
     <Compile Include="CommitGrouper.cs" />
     <Compile Include="FileSystem.cs" />
     <Compile Include="IFileSystem.cs" />
+    <Compile Include="ILog.cs" />
     <Compile Include="IssueTrackers\GitHub\GitHubIssueTracker.cs" />
     <Compile Include="GitReleaseNotesArguments.cs" />
     <Compile Include="Git\GitDirFinder.cs" />
@@ -68,12 +70,14 @@
     <Compile Include="IssueTrackers\IssueNumberExtractor.cs" />
     <Compile Include="IssueTrackers\IIssueTracker.cs" />
     <Compile Include="IssueTrackers\IssueTracker.cs" />
+    <Compile Include="Log.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Git\TaggedCommit.cs" />
     <Compile Include="Git\TaggedCommitFinder.cs" />
+    <Compile Include="ReleaseFileWriter.cs" />
     <Compile Include="ReleaseInfo.cs" />
-    <Compile Include="ReleaseNotesWriter.cs" />
+    <Compile Include="ReleaseNotesGenerator.cs" />
     <Compile Include="SemanticRelease.cs" />
     <Compile Include="SemanticReleaseNotes.cs" />
   </ItemGroup>

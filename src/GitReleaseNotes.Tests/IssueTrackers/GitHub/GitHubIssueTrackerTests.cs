@@ -7,6 +7,7 @@ using LibGit2Sharp;
 using NSubstitute;
 using Octokit;
 using Xunit;
+using Xunit.Extensions;
 
 namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
 {
@@ -16,11 +17,13 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
         private readonly GitHubIssueTracker _sut;
         private readonly GitReleaseNotesArguments _gitReleaseNotesArguments;
         private readonly IIssuesClient _issuesClient;
+        private readonly ILog _log;
 
         public GitHubIssueTrackerTests()
         {
+            _log = Substitute.For<ILog>();
             _gitHubClient = Substitute.For<IGitHubClient>();
-            _sut = new GitHubIssueTracker(new IssueNumberExtractor(), _gitHubClient);
+            _sut = new GitHubIssueTracker(new IssueNumberExtractor(), () => _gitHubClient, _log);
             _gitReleaseNotesArguments = new GitReleaseNotesArguments
             {
                 Repo = "Org/Repo",
@@ -53,6 +56,64 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
             var releaseNotes = _sut.ScanCommitMessagesForReleaseNotes(_gitReleaseNotesArguments, toScan);
 
             Assert.Equal("Issue Title", releaseNotes.Releases[0].ReleaseNoteItems[0].Title);
+        }
+
+        [Fact]
+        public void ErrorLoggedWhenRepoIsNotSpecified()
+        {
+            var result = _sut.VerifyArgumentsAndWriteErrorsToConsole(new GitReleaseNotesArguments());
+
+            Assert.False(result);
+            _log.Received().WriteLine("GitHub repository name must be specified [/Repo .../...]");
+        }
+
+        [Theory]
+        [InlineData("Foo", false)]
+        [InlineData("Org/Repo", true)]
+        [InlineData("Org/Repo/SomethingElse", false)]
+        public void RepositoryMustBeInCorrectFormat(string repo, bool success)
+        {
+            var result = _sut.VerifyArgumentsAndWriteErrorsToConsole(new GitReleaseNotesArguments
+            {
+                Repo = repo,
+                Token = "Foo"
+            });
+
+            if (success)
+            {
+                Assert.True(result);
+            }
+            else
+            {
+                Assert.False(result);
+                _log.Received().WriteLine("GitHub repository name should be in format Organisation/RepoName");
+            }
+        }
+
+        [Fact]
+        public void MustSpecifyToken()
+        {
+            var result = _sut.VerifyArgumentsAndWriteErrorsToConsole(new GitReleaseNotesArguments
+            {
+                Repo = "Foo/Bar"
+            });
+
+            Assert.False(result);
+            _log.Received().WriteLine("You must specify a GitHub Authentication token with the /Token argument");
+        }
+
+        [Fact]
+        public void MustSpecifyVersionWhenPublishFlagIsSet()
+        {
+            var result = _sut.VerifyArgumentsAndWriteErrorsToConsole(new GitReleaseNotesArguments
+            {
+                Repo = "Foo/Bar",
+                Token = "Baz",
+                Publish = true
+            });
+
+            Assert.False(result);
+            _log.Received().WriteLine("You must specifiy the version [/Version ...] (will be tag) when using the /Publish flag");
         }
 
         private static Commit CreateCommit(string message, DateTimeOffset when)

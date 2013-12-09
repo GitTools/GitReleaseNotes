@@ -109,3 +109,4 @@ UpgradeLog*.XML
 build/
 src/GitReleaseNotes.sln.ide/graph
 *.orig
+src/_NCrunch_GitReleaseNotes

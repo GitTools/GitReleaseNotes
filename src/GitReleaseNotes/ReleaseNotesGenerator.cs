@@ -1,23 +1,14 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Text;
 
 namespace GitReleaseNotes
 {
-    public class ReleaseNotesWriter
+    public class ReleaseNotesGenerator
     {
-        private readonly IFileSystem _fileSystem;
         private readonly string[] _categories = { "bug", "enhancement", "feature" };
-        private readonly string _workingDirectory;
-
-        public ReleaseNotesWriter(IFileSystem fileSystem, string workingDirectory)
-        {
-            _fileSystem = fileSystem;
-            _workingDirectory = workingDirectory;
-        }
  
-        public void WriteReleaseNotes(GitReleaseNotesArguments arguments, SemanticReleaseNotes releaseNotes)
+        public string GenerateReleaseNotes(GitReleaseNotesArguments arguments, SemanticReleaseNotes releaseNotes)
         {
             var builder = new StringBuilder();
             var categories = arguments.Categories == null ? _categories : _categories.Concat(arguments.Categories.Split(',')).ToArray();
@@ -62,8 +53,7 @@ namespace GitReleaseNotes
                 }
             }
 
-            var outputFile = Path.IsPathRooted(arguments.OutputFile) ? arguments.OutputFile : Path.Combine(_workingDirectory, arguments.OutputFile);
-            _fileSystem.WriteAllText(outputFile, builder.ToString());
+            return builder.ToString();
         }
     }
 }

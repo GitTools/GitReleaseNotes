@@ -1,25 +1,19 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
 using ApprovalTests;
 using ApprovalTests.Reporters;
 using GitReleaseNotes.IssueTrackers.GitHub;
-using NSubstitute;
 using Xunit;
 
 namespace GitReleaseNotes.Tests
 {
     [UseReporter(typeof(DiffReporter))]
-    public class ReleaseNotesWriterTests
+    public class ReleaseNotesGeneratorTests
     {
-        private readonly IFileSystem _fileSystem;
-        private readonly ReleaseNotesWriter _sut;
-        private const string WorkingDir = "c:\\WorkingDir";
+        private readonly ReleaseNotesGenerator _sut;
 
-        public ReleaseNotesWriterTests()
+        public ReleaseNotesGeneratorTests()
         {
-            _fileSystem = Substitute.For<IFileSystem>();
-            _sut = new ReleaseNotesWriter(_fileSystem, WorkingDir);
+            _sut = new ReleaseNotesGenerator();
         }
 
         [Fact]
@@ -37,9 +31,9 @@ namespace GitReleaseNotes.Tests
                 })
             });
 
-            _sut.WriteReleaseNotes(arguments, releaseNotes);
+            var result =_sut.GenerateReleaseNotes(arguments, releaseNotes);
 
-            Approvals.Verify(GetContent());
+            Approvals.Verify(result);
         }
 
         [Fact]
@@ -58,9 +52,9 @@ namespace GitReleaseNotes.Tests
                 })
             });
 
-            _sut.WriteReleaseNotes(arguments, releaseNotes);
+            var result = _sut.GenerateReleaseNotes(arguments, releaseNotes);
 
-            Approvals.Verify(GetContent());
+            Approvals.Verify(result);
         }
         
         [Fact]
@@ -86,9 +80,9 @@ namespace GitReleaseNotes.Tests
                 })
             });
 
-            _sut.WriteReleaseNotes(arguments, releaseNotes);
+            var result = _sut.GenerateReleaseNotes(arguments, releaseNotes);
 
-            Approvals.Verify(GetContent());
+            Approvals.Verify(result);
         }
 
         [Fact]
@@ -106,9 +100,9 @@ namespace GitReleaseNotes.Tests
                 })
             });
 
-            _sut.WriteReleaseNotes(arguments, releaseNotes);
+            var result = _sut.GenerateReleaseNotes(arguments, releaseNotes);
 
-            Approvals.Verify(GetContent());
+            Approvals.Verify(result);
         }
 
         [Fact]
@@ -128,58 +122,9 @@ namespace GitReleaseNotes.Tests
                 })
             });
 
-            _sut.WriteReleaseNotes(arguments, releaseNotes);
+            var result = _sut.GenerateReleaseNotes(arguments, releaseNotes);
 
-            Approvals.Verify(GetContent());
-        }
-
-        [Fact]
-        public void RelativePathIsWrittenToRepositoryRoot()
-        {
-            var arguments = new GitReleaseNotesArguments
-            {
-                Categories = "internal refactoring",
-                OutputFile = "ReleaseFile.md"
-            };
-            var releaseNotes = new SemanticReleaseNotes(new[]
-            {
-                new SemanticRelease("", null, new[]
-                {
-                    new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new string[0])
-                })
-            });
-
-            _sut.WriteReleaseNotes(arguments, releaseNotes);
-
-            var fileName = _fileSystem.ReceivedCalls().Single(c => c.GetMethodInfo().Name == "WriteAllText").GetArguments()[0];
-            Assert.Equal(Path.Combine(WorkingDir, "ReleaseFile.md"), fileName);
-        }
-
-        [Fact]
-        public void AbsolutePathIsWrittenToRepositoryRoot()
-        {
-            var arguments = new GitReleaseNotesArguments
-            {
-                Categories = "internal refactoring",
-                OutputFile = "c:\\AnotherDir\\ReleaseFile.md"
-            };
-            var releaseNotes = new SemanticReleaseNotes(new[]
-            {
-                new SemanticRelease("", null, new[]
-                {
-                    new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new string[0])
-                })
-            });
-
-            _sut.WriteReleaseNotes(arguments, releaseNotes);
-
-            var fileName = _fileSystem.ReceivedCalls().Single(c => c.GetMethodInfo().Name == "WriteAllText").GetArguments()[0];
-            Assert.Equal("c:\\AnotherDir\\ReleaseFile.md", fileName);
-        }
-
-        private object GetContent()
-        {
-            return _fileSystem.ReceivedCalls().Single(c => c.GetMethodInfo().Name == "WriteAllText").GetArguments()[1];
+            Approvals.Verify(result);
         }
     }
 }

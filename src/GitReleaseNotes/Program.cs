@@ -9,7 +9,6 @@ using Args.Help.Formatters;
 using GitReleaseNotes.Git;
 using GitReleaseNotes.IssueTrackers;
 using GitReleaseNotes.IssueTrackers.GitHub;
-using LibGit2Sharp;
 using Octokit;
 using Credentials = Octokit.Credentials;
 using Repository = LibGit2Sharp.Repository;
@@ -35,16 +34,8 @@ namespace GitReleaseNotes
 
             var arguments = modelBindingDefinition.CreateAndBind(args);
 
-            if (arguments.IssueTracker == null)
-            {
-                Console.WriteLine("The IssueTracker argument must be provided, see help (/?) for possible options");
+            if (!ArgumentVerifier.VerifyArguments(arguments))
                 return 1;
-            }
-            if (string.IsNullOrEmpty(arguments.OutputFile) || !arguments.OutputFile.EndsWith(".md"))
-            {
-                Console.WriteLine("Specify an output file (*.md)");
-                return 1;
-            }
 
             CreateIssueTrackers(arguments);
             var issueTracker = IssueTrackers[arguments.IssueTracker.Value];
@@ -73,7 +64,7 @@ namespace GitReleaseNotes
 
             var releases = new CommitGrouper().GetCommitsByRelease(gitRepo, tagToStartFrom);
 
-            Console.WriteLine("Scanning {0} commits over {1} releases for issue numbers", releases.Sum(r=>r.Value.Count), releases.Count);
+            Console.WriteLine("Scanning {0} commits over {1} releases for issue numbers", releases.Sum(r => r.Value.Count), releases.Count);
 
             if (arguments.Verbose)
             {
@@ -88,19 +79,37 @@ namespace GitReleaseNotes
 
             var releaseNotes = issueTracker.ScanCommitMessagesForReleaseNotes(arguments, releases);
 
-            new ReleaseNotesWriter(new FileSystem(), repositoryRoot).WriteReleaseNotes(arguments, releaseNotes);
+            var fileSystem = new FileSystem();
+            var releaseNotesWriter = new ReleaseNotesGenerator();
+            var releaseFileWriter = new ReleaseFileWriter(fileSystem, repositoryRoot);
+            var releaseNotesOutput = releaseNotesWriter.GenerateReleaseNotes(arguments, releaseNotes);
+
+            releaseFileWriter.OutputReleaseNotesFile(releaseNotesOutput, arguments);
+            PublishReleaseIfNeeded(releaseNotesOutput, arguments, issueTracker);
             return 0;
+        }
+
+        private static void PublishReleaseIfNeeded(string releaseNotesOutput, GitReleaseNotesArguments arguments, IIssueTracker issueTracker)
+        {
+            if (!arguments.Publish)
+                return;
+
+            Console.WriteLine("Publishing release {0} to {1}", arguments.Version, arguments.IssueTracker);
+            issueTracker.PublishRelease(releaseNotesOutput, arguments);
         }
 
         private static void CreateIssueTrackers(GitReleaseNotesArguments arguments)
         {
-            var gitHubClient = new GitHubClient(new ProductHeaderValue("GitReleaseNotes"))
-            {
-                Credentials = new Credentials(arguments.Token)
-            };
             IssueTrackers = new Dictionary<IssueTracker, IIssueTracker>
             {
-                {IssueTracker.GitHub, new GitHubIssueTracker(new IssueNumberExtractor(), gitHubClient)}
+                {
+                    IssueTracker.GitHub,
+                    new GitHubIssueTracker(new IssueNumberExtractor(),
+                        () => new GitHubClient(new ProductHeaderValue("GitReleaseNotes"))
+                        {
+                            Credentials = new Credentials(arguments.Token)
+                        }, new Log())
+                }
             };
         }
     }
