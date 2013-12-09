@@ -1,21 +1,20 @@
 using System.Collections.Generic;
 using System.Linq;
-using GitReleaseNotes.IssueTrackers.GitHub;
 
 namespace GitReleaseNotes
 {
     public class SemanticReleaseNotes
     {
-        private readonly ReleaseNoteItem[] _releaseNoteItems;
+        private readonly SemanticRelease[] _releases;
 
-        public SemanticReleaseNotes(IEnumerable<ReleaseNoteItem> releaseNoteItems)
+        public SemanticReleaseNotes(IEnumerable<SemanticRelease> releaseNoteItems)
         {
-            _releaseNoteItems = releaseNoteItems.ToArray();
+            _releases = releaseNoteItems.ToArray();
         }
 
-        public ReleaseNoteItem[] ReleaseNoteItems
+        public SemanticRelease[] Releases
         {
-            get { return _releaseNoteItems; }
+            get { return _releases; }
         }
     }
 }

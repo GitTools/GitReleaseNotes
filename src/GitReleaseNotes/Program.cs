@@ -9,7 +9,9 @@ using Args.Help.Formatters;
 using GitReleaseNotes.Git;
 using GitReleaseNotes.IssueTrackers;
 using GitReleaseNotes.IssueTrackers.GitHub;
+using LibGit2Sharp;
 using Octokit;
+using Credentials = Octokit.Credentials;
 using Repository = LibGit2Sharp.Repository;
 
 namespace GitReleaseNotes
@@ -22,7 +24,7 @@ namespace GitReleaseNotes
         {
             var modelBindingDefinition = Args.Configuration.Configure<GitReleaseNotesArguments>();
 
-            if (args.Any(a => a == "/?"))
+            if (args.Any(a => a == "/?" || a == "?" || a.Equals("/help", StringComparison.InvariantCultureIgnoreCase)))
             {
                 var help = new HelpProvider().GenerateModelHelp(modelBindingDefinition);
                 var f = new ConsoleHelpFormatter();
@@ -30,7 +32,7 @@ namespace GitReleaseNotes
 
                 return 0;
             }
-            
+
             var arguments = modelBindingDefinition.CreateAndBind(args);
 
             if (arguments.IssueTracker == null)
@@ -64,21 +66,27 @@ namespace GitReleaseNotes
             var gitHelper = new GitHelper();
             var gitRepo = new Repository(gitDirectory);
             var taggedCommitFinder = new TaggedCommitFinder(gitRepo, gitHelper);
-            var tagToStartFrom = string.IsNullOrEmpty(arguments.FromTag) ? 
-                taggedCommitFinder.GetLastTaggedCommit() : 
+
+            var tagToStartFrom = string.IsNullOrEmpty(arguments.FromTag) ?
+                taggedCommitFinder.GetLastTaggedCommit() :
                 taggedCommitFinder.GetTag(arguments.FromTag);
-            var commitsToScan = gitRepo.Commits.TakeWhile(c => c != tagToStartFrom.Commit).ToArray();
+
+            var releases = new CommitGrouper().GetCommitsByRelease(gitRepo, tagToStartFrom);
+
+            Console.WriteLine("Scanning {0} commits over {1} releases for issue numbers", releases.Sum(r=>r.Value.Count), releases.Count);
 
             if (arguments.Verbose)
             {
-                Console.WriteLine("Scanning the following commits for issue numbers");
-                foreach (var commit in commitsToScan)
+                foreach (var release in releases)
                 {
-                    Console.WriteLine(commit.Message);
+                    foreach (var commit in release.Value)
+                    {
+                        Console.WriteLine("[{0}] {1}", release.Key.Name, commit.Message);
+                    }
                 }
             }
 
-            var releaseNotes = issueTracker.ScanCommitMessagesForReleaseNotes(arguments, commitsToScan);
+            var releaseNotes = issueTracker.ScanCommitMessagesForReleaseNotes(arguments, releases);
 
             new ReleaseNotesWriter(new FileSystem(), repositoryRoot).WriteReleaseNotes(arguments, releaseNotes);
             return 0;
@@ -86,7 +94,7 @@ namespace GitReleaseNotes
 
         private static void CreateIssueTrackers(GitReleaseNotesArguments arguments)
         {
-            var gitHubClient = new GitHubClient(new ProductHeaderValue("OctokitTests"))
+            var gitHubClient = new GitHubClient(new ProductHeaderValue("GitReleaseNotes"))
             {
                 Credentials = new Credentials(arguments.Token)
             };
