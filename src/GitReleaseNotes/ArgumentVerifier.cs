@@ -13,12 +13,14 @@ namespace GitReleaseNotes
                     return false;
                 }
             }
-            if ((string.IsNullOrEmpty(arguments.OutputFile) || !arguments.OutputFile.EndsWith(".md")) && !arguments.Publish)
+            if (string.IsNullOrEmpty(arguments.OutputFile) && !arguments.Publish)
             {
-                Console.WriteLine("Specify an output file (*.md) [/OutputFile ...]");
-                {
-                    return false;
-                }
+                Console.WriteLine("WARN: No Output file specified (*.md) [/OutputFile ...]");
+            }
+            if (!string.IsNullOrEmpty(arguments.OutputFile) && !arguments.OutputFile.EndsWith(".md"))
+            {
+                Console.WriteLine("WARN: Output file should have a .md extension [/OutputFile ...]");
+                arguments.OutputFile = null;
             }
             return true;
         }
