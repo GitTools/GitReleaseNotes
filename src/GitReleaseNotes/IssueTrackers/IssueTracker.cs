@@ -3,8 +3,8 @@ namespace GitReleaseNotes.IssueTrackers
     public enum IssueTracker
     {
         GitHub,
+        Jira
         //TODO Tfs
-        //TODO Jira
         //TODO Youtrack
     }
 }

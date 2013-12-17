@@ -12,7 +12,7 @@ namespace GitReleaseNotes
         [Description("Enables verbose logging")]
         public bool Verbose { get; set; }
 
-        [Description("Specifies the issue tracker used, possible Options: GitHub")]
+        [Description("Specifies the issue tracker used, possible Options: GitHub, Jira")]
         public IssueTracker? IssueTracker { get; set; }
 
         [Description("Speficy the tag name to start from, default is the last tag on master")]
@@ -20,6 +20,21 @@ namespace GitReleaseNotes
 
         [Description("GitHub access token")]
         public string Token { get; set; }
+
+        [Description("Jira Username")]
+        public string Username { get; set; }
+
+        [Description("Jira Password")]
+        public string Password { get; set; }
+
+        [Description("Jira project Id")]
+        public string JiraProjectId { get; set; }
+
+        [Description("Jql query for closed issues you would like included if mentioned. Defaults to project = <YOURPROJECTID> AND (issuetype = Bug OR issuetype = Story OR issuetype = \"New Feature\") AND status in (Closed, Done, Resolved)")]
+        public string Jql { get; set; }
+
+        [Description("Url of Jira server")]
+        public string JiraServer { get; set; }
 
         [Description("GitHub Repository name, in Organisation/Repository format")]
         public string Repo { get; set; }

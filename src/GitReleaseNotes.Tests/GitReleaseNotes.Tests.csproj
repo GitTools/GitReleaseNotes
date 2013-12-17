@@ -68,6 +68,7 @@
     <Compile Include="CommitGrouperTests.cs" />
     <Compile Include="IssueTrackers\GitHub\GitHubIssueTrackerTests.cs" />
     <Compile Include="IssueTrackers\IssueNumberExtractor.cs" />
+    <Compile Include="IssueTrackers\Jira\JiraIssueTrackerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReleaseFileWriterTests.cs" />
     <Compile Include="ReleaseNotesGeneratorTests.cs" />
