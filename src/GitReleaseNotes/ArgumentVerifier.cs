@@ -13,7 +13,7 @@ namespace GitReleaseNotes
                     return false;
                 }
             }
-            if (string.IsNullOrEmpty(arguments.OutputFile) || !arguments.OutputFile.EndsWith(".md"))
+            if ((string.IsNullOrEmpty(arguments.OutputFile) || !arguments.OutputFile.EndsWith(".md")) && !arguments.Publish)
             {
                 Console.WriteLine("Specify an output file (*.md) [/OutputFile ...]");
                 {
