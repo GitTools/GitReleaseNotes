@@ -9,6 +9,7 @@ using Args.Help.Formatters;
 using GitReleaseNotes.Git;
 using GitReleaseNotes.IssueTrackers;
 using GitReleaseNotes.IssueTrackers.GitHub;
+using GitReleaseNotes.IssueTrackers.Jira;
 using Octokit;
 using Credentials = Octokit.Credentials;
 using Repository = LibGit2Sharp.Repository;
@@ -38,6 +39,9 @@ namespace GitReleaseNotes
                 return 1;
 
             CreateIssueTrackers(arguments);
+            if (!IssueTrackers.ContainsKey(arguments.IssueTracker.Value))
+                throw new Exception(string.Format("{0} is not a known issue tracker", arguments.IssueTracker.Value));
+
             var issueTracker = IssueTrackers[arguments.IssueTracker.Value];
             if (!issueTracker.VerifyArgumentsAndWriteErrorsToConsole(arguments))
                 return 1;
@@ -109,6 +113,10 @@ namespace GitReleaseNotes
                         {
                             Credentials = new Credentials(arguments.Token)
                         }, new Log())
+                },
+                {
+                    IssueTracker.Jira, 
+                    new JiraIssueTracker(new IssueNumberExtractor(), new JiraApi())
                 }
             };
         }
