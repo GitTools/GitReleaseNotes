@@ -116,6 +116,22 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
             _log.Received().WriteLine("You must specifiy the version [/Version ...] (will be tag) when using the /Publish flag");
         }
 
+        [Fact]
+        public void CanCreateReleaseOnGitHub()
+        {
+            const string releaseNotesOutput = " - A thingy was fixed";
+            _sut.PublishRelease(releaseNotesOutput, new GitReleaseNotesArguments
+            {
+                Repo = "Foo/Baz",
+                Version = "1.2.0"
+            });
+
+            _gitHubClient.Release
+                .Received()
+                .CreateRelease("Foo", "Baz",
+                    Arg.Is<ReleaseUpdate>(r => r.TagName == "1.2.0" && r.Body == releaseNotesOutput && r.Name == "1.2.0"));
+        }
+
         private static Commit CreateCommit(string message, DateTimeOffset when)
         {
             var commit = Substitute.For<Commit>();
