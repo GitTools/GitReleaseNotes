@@ -117,7 +117,7 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
                 Filter = IssueFilter.All,
                 Since = since,
                 State = ItemState.Closed
-            }).Result;
+            }).Result.Where(i=>i.PullRequest == null);
         }
     }
 }
