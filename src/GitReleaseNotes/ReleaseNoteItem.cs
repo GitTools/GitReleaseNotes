@@ -1,6 +1,6 @@
 using System;
 
-namespace GitReleaseNotes.IssueTrackers.GitHub
+namespace GitReleaseNotes
 {
     public class ReleaseNoteItem
     {

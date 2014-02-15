@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using GitReleaseNotes.IssueTrackers;
 using LibGit2Sharp;
 using NSubstitute;
@@ -26,7 +27,7 @@ namespace GitReleaseNotes.Tests.IssueTrackers
                 {releaseInfo, commits}
             };
 
-            var issueNumbers = new IssueNumberExtractor().GetIssueNumbers(new GitReleaseNotesArguments(), releases, "#(?<issueNumber>\\d+)");
+            var issueNumbers = new IssueNumberExtractor().GetIssueNumbers(new GitReleaseNotesArguments(), releases, new Regex("#(?<issueNumber>\\d+)"));
 
             Assert.Contains("123", issueNumbers[releaseInfo]);
             Assert.Contains("51401", issueNumbers[releaseInfo]);

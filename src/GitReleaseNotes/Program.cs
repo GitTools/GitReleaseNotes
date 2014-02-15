@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Reflection;
 using Args.Help;
 using Args.Help.Formatters;
+using GitReleaseNotes.GenerationStrategy;
 using GitReleaseNotes.Git;
 using GitReleaseNotes.IssueTrackers;
 using GitReleaseNotes.IssueTrackers.GitHub;
@@ -16,11 +18,20 @@ using Repository = LibGit2Sharp.Repository;
 
 namespace GitReleaseNotes
 {
-    public class Program
+    public static class Program
     {
-        public static Dictionary<IssueTracker, IIssueTracker> IssueTrackers;
+        private static Dictionary<IssueTracker, IIssueTracker> _issueTrackers;
 
         static int Main(string[] args)
+        {
+            var main =GenerateReleaseNotes(args);
+            Console.WriteLine("Done");
+            if (Debugger.IsAttached)
+                Console.ReadKey();
+            return main;
+        }
+
+        private static int GenerateReleaseNotes(string[] args)
         {
             var modelBindingDefinition = Args.Configuration.Configure<GitReleaseNotesArguments>();
 
@@ -36,15 +47,19 @@ namespace GitReleaseNotes
             var arguments = modelBindingDefinition.CreateAndBind(args);
 
             if (!ArgumentVerifier.VerifyArguments(arguments))
+            {
                 return 1;
+            }
 
             CreateIssueTrackers(arguments);
-            if (!IssueTrackers.ContainsKey(arguments.IssueTracker.Value))
+            if (!_issueTrackers.ContainsKey(arguments.IssueTracker.Value))
                 throw new Exception(string.Format("{0} is not a known issue tracker", arguments.IssueTracker.Value));
 
-            var issueTracker = IssueTrackers[arguments.IssueTracker.Value];
-            if (!issueTracker.VerifyArgumentsAndWriteErrorsToConsole(arguments))
+            var issueTracker = _issueTrackers[arguments.IssueTracker.Value];
+            if (!issueTracker.VerifyArgumentsAndWriteErrorsToConsole())
+            {
                 return 1;
+            }
 
             var workingDirectory = arguments.WorkingDirectory ?? Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
@@ -62,26 +77,25 @@ namespace GitReleaseNotes
             var gitRepo = new Repository(gitDirectory);
             var taggedCommitFinder = new TaggedCommitFinder(gitRepo, gitHelper);
 
-            var tagToStartFrom = string.IsNullOrEmpty(arguments.FromTag) ?
-                taggedCommitFinder.GetLastTaggedCommit() :
-                taggedCommitFinder.GetTag(arguments.FromTag);
+            TaggedCommit tagToStartFrom;
+            if (string.IsNullOrEmpty(arguments.FromTag)) 
+                tagToStartFrom = taggedCommitFinder.GetLastTaggedCommit();
+            else if (arguments.FromTag == "all")
+                tagToStartFrom = null;
+            else 
+                tagToStartFrom = taggedCommitFinder.GetTag(arguments.FromTag);
 
             var releases = new CommitGrouper().GetCommitsByRelease(gitRepo, tagToStartFrom);
 
-            Console.WriteLine("Scanning {0} commits over {1} releases for issue numbers", releases.Sum(r => r.Value.Count), releases.Count);
+            IReleaseNotesStrategy generationStrategy;
+            if (arguments.FromClosedIssues)
+                generationStrategy = new ByClosedIssues();
+            else if (arguments.FromMentionedIssues)
+                generationStrategy = new ByMentionedCommits(new IssueNumberExtractor());
+            else
+                generationStrategy = new ByClosedIssues();
 
-            if (arguments.Verbose)
-            {
-                foreach (var release in releases)
-                {
-                    foreach (var commit in release.Value)
-                    {
-                        Console.WriteLine("[{0}] {1}", release.Key.Name, commit.Message);
-                    }
-                }
-            }
-
-            var releaseNotes = issueTracker.ScanCommitMessagesForReleaseNotes(arguments, releases);
+            var releaseNotes = generationStrategy.GetReleaseNotes(releases, arguments, issueTracker);
 
             var fileSystem = new FileSystem();
             var releaseNotesWriter = new ReleaseNotesGenerator();
@@ -99,24 +113,23 @@ namespace GitReleaseNotes
                 return;
 
             Console.WriteLine("Publishing release {0} to {1}", arguments.Version, arguments.IssueTracker);
-            issueTracker.PublishRelease(releaseNotesOutput, arguments);
+            issueTracker.PublishRelease(releaseNotesOutput);
         }
 
         private static void CreateIssueTrackers(GitReleaseNotesArguments arguments)
         {
-            IssueTrackers = new Dictionary<IssueTracker, IIssueTracker>
+            _issueTrackers = new Dictionary<IssueTracker, IIssueTracker>
             {
                 {
                     IssueTracker.GitHub,
-                    new GitHubIssueTracker(new IssueNumberExtractor(),
-                        () => new GitHubClient(new ProductHeaderValue("GitReleaseNotes"))
+                    new GitHubIssueTracker(() => new GitHubClient(new ProductHeaderValue("GitReleaseNotes"))
                         {
                             Credentials = new Credentials(arguments.Token)
-                        }, new Log())
+                        }, new Log(), arguments)
                 },
                 {
                     IssueTracker.Jira, 
-                    new JiraIssueTracker(new IssueNumberExtractor(), new JiraApi())
+                    new JiraIssueTracker(new JiraApi(), arguments)
                 }
             };
         }

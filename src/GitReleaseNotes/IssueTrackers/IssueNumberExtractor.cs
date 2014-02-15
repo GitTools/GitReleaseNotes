@@ -8,14 +8,9 @@ namespace GitReleaseNotes.IssueTrackers
 {
     public class IssueNumberExtractor : IIssueNumberExtractor
     {
-        /// <param name="arguments"></param>
-        /// <param name="releases"></param>
-        /// <param name="issueNumberRegexPattern">Must have a named group called 'issueNumber'</param>
-        public Dictionary<ReleaseInfo, List<string>> GetIssueNumbers(GitReleaseNotesArguments arguments, Dictionary<ReleaseInfo, List<Commit>> releases, string issueNumberRegexPattern)
+        public Dictionary<ReleaseInfo, List<string>> GetIssueNumbers(GitReleaseNotesArguments arguments, Dictionary<ReleaseInfo, List<Commit>> releases, Regex issueRegex)
         {
             var result = new Dictionary<ReleaseInfo, List<string>>();
-
-            var issueRegex = new Regex(issueNumberRegexPattern, RegexOptions.Compiled);
 
             foreach (var release in releases)
             {

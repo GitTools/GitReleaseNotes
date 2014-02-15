@@ -1,28 +1,29 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
 using System.Web.Helpers;
-using LibGit2Sharp;
 
 namespace GitReleaseNotes.IssueTrackers.Jira
 {
-    public interface IJiraApi
-    {
-        IEnumerable<JiraIssue> GetPotentialIssues(Dictionary<ReleaseInfo, List<Commit>> releases, GitReleaseNotesArguments arguments);
-    }
-
     public class JiraApi : IJiraApi
     {
-        public IEnumerable<JiraIssue> GetPotentialIssues(Dictionary<ReleaseInfo, List<Commit>> releases, GitReleaseNotesArguments arguments)
+        public IEnumerable<OnlineIssue> GetClosedIssues(GitReleaseNotesArguments arguments, DateTimeOffset? since)
         {
-            var since = releases.SelectMany(c => c.Value).Select(c => c.Author.When).Min();
-            var sinceFormatted = since.ToString("yyyy-MM-d HH:mm");
-            var jql = string.Format("{0} AND updated > '{1}'", arguments.Jql, sinceFormatted).Replace("\"", "\\\"");
+            string jql;
+            if (since.HasValue)
+            {
+                var sinceFormatted = since.Value.ToString("yyyy-MM-d HH:mm");
+                jql = string.Format("{0} AND updated > '{1}'", arguments.Jql, sinceFormatted).Replace("\"", "\\\"");
+            }
+            else
+            {
+                jql = arguments.Jql;
+            }
 
-            var searchUri = new Uri(new Uri(arguments.JiraServer, UriKind.Absolute), "/rest/api/latest/search");
+            var baseUrl = new Uri(arguments.JiraServer, UriKind.Absolute);
+            var searchUri = new Uri(baseUrl, "/rest/api/latest/search");
             var httpRequest = WebRequest.CreateHttp(searchUri);
             var usernameAndPass = string.Format("{0}:{1}", arguments.Username, arguments.Password);
             var token = Convert.ToBase64String(Encoding.UTF8.GetBytes(usernameAndPass));
@@ -57,11 +58,12 @@ namespace GitReleaseNotes.IssueTrackers.Jira
                     string id = issue.key;
                     string issueType = issue.fields.issuetype.name;
 
-                    yield return new JiraIssue
+                    yield return new OnlineIssue
                     {
                         Id = id,
-                        Name = summary,
-                        IssueType = issueType
+                        Title = summary,
+                        IssueType = IssueType.Issue,
+                        HtmlUrl = new Uri(baseUrl, string.Format("browse/{0}", id))
                     };
                 }
             }

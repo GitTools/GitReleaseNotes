@@ -37,9 +37,10 @@ if ($gitDir -ne $null)
     Write-Host "Found git directory for project at $gitDir"
     $repositoryDir = (get-item $gitDir -Force).Parent.FullName
     $gitHubFlowToolsDir = Join-Path $repositoryDir "tools\GitHubFlowVersion"
-    if ((Test-Path $gitHubFlowToolsDir -PathType Container) -eq $false)
+    if ((Test-Path $gitHubFlowToolsDir -PathType Container) -eq $true)
     {
-        Write-Host "Creating directory $gitHubFlowToolsDir"
+        Write-Host "Directory $gitHubFlowToolsDir already exists, removing old version"
+        Remove-Item $gitHubFlowToolsDir -Force -Recurse
     }
     
     Write-Host "GitHubFlowVersion tools installed to $gitHubFlowToolsDir"

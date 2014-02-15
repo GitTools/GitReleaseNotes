@@ -72,6 +72,31 @@ namespace GitReleaseNotes.Tests
             Assert.Equal(commit2, results.ElementAt(1).Value.ElementAt(0));
         }
 
+        [Fact]
+        public void GroupsTagsByReleasesIncludesEndDateOfRelease()
+        {
+            var commit1 = CreateCommit();
+            var commit2 = CreateCommit();
+            var commit3 = CreateCommit();
+            var startTagCommit = CreateCommit();
+            var firstCommit = CreateCommit();
+            SubstituteCommitLog(commit1, commit2, commit3, startTagCommit, firstCommit);
+            _tags.Add(commit2, "1.1.0");
+            _tags.Add(startTagCommit, "1.0.0");
+
+            var results = _sut.GetCommitsByRelease(_repository, null);
+
+            Assert.Equal(3, results.Count);
+            Assert.Equal(null, results.ElementAt(0).Key.Name);
+            Assert.Equal(null, results.ElementAt(0).Key.When);
+            Assert.Equal(commit2.Author.When, results.ElementAt(0).Key.PreviousReleaseDate);
+            Assert.Equal(commit2.Author.When, results.ElementAt(1).Key.When);
+            Assert.Equal(startTagCommit.Author.When, results.ElementAt(1).Key.PreviousReleaseDate);
+            Assert.Equal("1.0.0", results.ElementAt(2).Key.Name);
+            Assert.Equal(startTagCommit.Author.When, results.ElementAt(2).Key.When);
+            Assert.Equal(null, results.ElementAt(2).Key.PreviousReleaseDate);
+        }
+
         private Commit CreateCommit()
         {
             var commit = Substitute.For<Commit>();

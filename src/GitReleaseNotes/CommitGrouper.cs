@@ -13,13 +13,14 @@ namespace GitReleaseNotes
             var currentRelease = new Tuple<ReleaseInfo, List<Commit>>(new ReleaseInfo(), new List<Commit>());
             var releases = new Dictionary<ReleaseInfo, List<Commit>> {{currentRelease.Item1, currentRelease.Item2}};
             var tagLookup = gitRepo.Tags.ToDictionary(t => t.Target.Sha, t => t);
-            foreach (var commit in gitRepo.Commits
-                .TakeWhile(c => c != tagToStartFrom.Commit))
+            foreach (var commit in gitRepo.Commits.TakeWhile(c => tagToStartFrom == null || c != tagToStartFrom.Commit))
             {
                 if (tagLookup.ContainsKey(commit.Sha))
                 {
                     var tag = tagLookup[commit.Sha];
-                    var releaseInfo = new ReleaseInfo(tag.Name, ((Commit) tag.Target).Author.When);
+                    var releaseDate = ((Commit) tag.Target).Author.When;
+                    currentRelease.Item1.PreviousReleaseDate = releaseDate;
+                    var releaseInfo = new ReleaseInfo(tag.Name, releaseDate, null);
                     var commits = new List<Commit>();
                     currentRelease = new Tuple<ReleaseInfo, List<Commit>>(releaseInfo, commits);
                     releases.Add(releaseInfo, commits);

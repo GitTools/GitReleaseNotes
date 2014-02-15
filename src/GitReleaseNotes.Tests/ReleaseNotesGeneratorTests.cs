@@ -1,6 +1,7 @@
 ﻿using System;
 using ApprovalTests;
 using ApprovalTests.Reporters;
+using GitReleaseNotes.IssueTrackers;
 using GitReleaseNotes.IssueTrackers.GitHub;
 using Xunit;
 

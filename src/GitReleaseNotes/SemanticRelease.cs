@@ -1,4 +1,5 @@
 using System;
+using GitReleaseNotes.IssueTrackers;
 using GitReleaseNotes.IssueTrackers.GitHub;
 
 namespace GitReleaseNotes
