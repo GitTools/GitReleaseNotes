@@ -1,5 +1,6 @@
 ﻿using System;
 using GitReleaseNotes.IssueTrackers.GitHub;
+using LibGit2Sharp;
 using NSubstitute;
 using Octokit;
 using Xunit;
@@ -15,6 +16,7 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
         private readonly GitHubIssueTracker _sut;
         private readonly ILog _log;
         private GitReleaseNotesArguments _arguments;
+        private IRepository _repo;
 
         public GitHubIssueTrackerTests()
         {
@@ -25,7 +27,9 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
                 Repo = "Org/Repo",
                 Token = "213"
             };
-            _sut = new GitHubIssueTracker(() => _gitHubClient, _log, _arguments);
+            _repo = Substitute.For<IRepository>();
+
+            _sut = new GitHubIssueTracker(_repo, () => _gitHubClient, _log, _arguments);
         }
 
         //[Fact]

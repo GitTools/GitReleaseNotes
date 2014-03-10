@@ -68,5 +68,7 @@ namespace GitReleaseNotes.IssueTrackers.Jira
         {
             get { return _issueNumberRegex; }
         }
+
+        public bool RemotePresentWhichMatches { get { return false; }}
     }
 }

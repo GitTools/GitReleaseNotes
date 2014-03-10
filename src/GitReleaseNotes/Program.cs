@@ -12,6 +12,7 @@ using GitReleaseNotes.Git;
 using GitReleaseNotes.IssueTrackers;
 using GitReleaseNotes.IssueTrackers.GitHub;
 using GitReleaseNotes.IssueTrackers.Jira;
+using LibGit2Sharp;
 using Octokit;
 using Credentials = Octokit.Credentials;
 using Repository = LibGit2Sharp.Repository;
@@ -51,16 +52,6 @@ namespace GitReleaseNotes
                 return 1;
             }
 
-            CreateIssueTrackers(arguments);
-            if (!_issueTrackers.ContainsKey(arguments.IssueTracker.Value))
-                throw new Exception(string.Format("{0} is not a known issue tracker", arguments.IssueTracker.Value));
-
-            var issueTracker = _issueTrackers[arguments.IssueTracker.Value];
-            if (!issueTracker.VerifyArgumentsAndWriteErrorsToConsole())
-            {
-                return 1;
-            }
-
             var workingDirectory = arguments.WorkingDirectory ?? Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
             var gitDirectory = GitDirFinder.TreeWalkForGitDir(workingDirectory);
@@ -75,6 +66,27 @@ namespace GitReleaseNotes
 
             var gitHelper = new GitHelper();
             var gitRepo = new Repository(gitDirectory);
+
+            CreateIssueTrackers(gitRepo, arguments);
+
+            IIssueTracker issueTracker = null;
+            if (arguments.IssueTracker == null)
+            {
+                var firstOrDefault = _issueTrackers.FirstOrDefault(i => i.Value.RemotePresentWhichMatches);
+                if (firstOrDefault.Value != null)
+                    issueTracker = firstOrDefault.Value;
+            }
+            if (issueTracker == null)
+            {
+                if (!_issueTrackers.ContainsKey(arguments.IssueTracker.Value))
+                    throw new Exception(string.Format("{0} is not a known issue tracker", arguments.IssueTracker.Value));
+
+                issueTracker = _issueTrackers[arguments.IssueTracker.Value];
+            }
+            if (!issueTracker.VerifyArgumentsAndWriteErrorsToConsole())
+            {
+                return 1;
+            }
             var taggedCommitFinder = new TaggedCommitFinder(gitRepo, gitHelper);
 
             TaggedCommit tagToStartFrom;
@@ -116,13 +128,13 @@ namespace GitReleaseNotes
             issueTracker.PublishRelease(releaseNotesOutput);
         }
 
-        private static void CreateIssueTrackers(GitReleaseNotesArguments arguments)
+        private static void CreateIssueTrackers(IRepository repository, GitReleaseNotesArguments arguments)
         {
             _issueTrackers = new Dictionary<IssueTracker, IIssueTracker>
             {
                 {
                     IssueTracker.GitHub,
-                    new GitHubIssueTracker(() => new GitHubClient(new ProductHeaderValue("GitReleaseNotes"))
+                    new GitHubIssueTracker(repository, () => new GitHubClient(new ProductHeaderValue("GitReleaseNotes"))
                         {
                             Credentials = new Credentials(arguments.Token)
                         }, new Log(), arguments)

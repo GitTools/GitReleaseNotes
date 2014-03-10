@@ -1,4 +1,5 @@
 ﻿using System;
+using Octokit;
 
 namespace GitReleaseNotes
 {
@@ -6,13 +7,6 @@ namespace GitReleaseNotes
     {
         public static bool VerifyArguments(GitReleaseNotesArguments arguments)
         {
-            if (arguments.IssueTracker == null)
-            {
-                Console.WriteLine("The IssueTracker argument must be provided, see help (/?) for possible options");
-                {
-                    return false;
-                }
-            }
             if (string.IsNullOrEmpty(arguments.OutputFile) && !arguments.Publish)
             {
                 Console.WriteLine("WARN: No Output file specified (*.md) [/OutputFile ...]");
