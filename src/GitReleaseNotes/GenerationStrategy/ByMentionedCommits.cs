@@ -56,7 +56,7 @@ namespace GitReleaseNotes.GenerationStrategy
                 {
                     var labels = i.Labels ?? new string[0];
                     return new ReleaseNoteItem(i.Title, string.Format("{0}", i.Id), i.HtmlUrl, labels);
-                }).ToArray();
+                }).ToList();
                 return new SemanticRelease(r.ReleaseInfo.Name, r.ReleaseInfo.When, releaseNoteItems, new ReleaseDiffInfo
                 {
                     BeginningSha = r.ReleaseInfo.FirstCommit,

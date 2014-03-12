@@ -12,10 +12,10 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
 {
     public class GitHubIssueTrackerTests
     {
+        private readonly GitReleaseNotesArguments _arguments;
         private readonly IGitHubClient _gitHubClient;
         private readonly GitHubIssueTracker _sut;
         private readonly ILog _log;
-        private GitReleaseNotesArguments _arguments;
         private IRepository _repo;
 
         public GitHubIssueTrackerTests()

@@ -112,6 +112,7 @@ namespace GitReleaseNotes
             var fileSystem = new FileSystem();
             var releaseNotesWriter = new ReleaseNotesGenerator();
             var releaseFileWriter = new ReleaseFileWriter(fileSystem, repositoryRoot);
+            var previousReleaseNotes = new ReleaseNotesFileReader(fileSystem, repositoryRoot);
             var releaseNotesOutput = releaseNotesWriter.GenerateReleaseNotes(arguments, releaseNotes);
 
             releaseFileWriter.OutputReleaseNotesFile(releaseNotesOutput, arguments);

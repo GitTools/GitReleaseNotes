@@ -8,5 +8,10 @@ namespace GitReleaseNotes
         {
             File.WriteAllText(path, contents);
         }
+
+        public string ReadAllText(string path)
+        {
+            return File.ReadAllText(path);
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using ApprovalTests;
 using ApprovalTests.Reporters;
 using Xunit;
@@ -24,7 +25,7 @@ namespace GitReleaseNotes.Tests
             };
             var releaseNotes = new SemanticReleaseNotes(new[]
             {
-                new SemanticRelease("", null, new[]
+                new SemanticRelease("", null, new List<ReleaseNoteItem>
                 {
                     new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new string[0])
                 }, new ReleaseDiffInfo
@@ -48,7 +49,7 @@ namespace GitReleaseNotes.Tests
             };
             var releaseNotes = new SemanticReleaseNotes(new[]
             {
-                new SemanticRelease("", null, new[]
+                new SemanticRelease("", null, new List<ReleaseNoteItem>
                 {
                     new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"),
                         new[] {"feature"})
@@ -73,7 +74,7 @@ namespace GitReleaseNotes.Tests
             };
             var releaseNotes = new SemanticReleaseNotes(new[]
             {
-                new SemanticRelease("", null, new[]
+                new SemanticRelease("", null, new List<ReleaseNoteItem>
                 {
                     new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"),
                         new[] {"feature"})
@@ -82,7 +83,7 @@ namespace GitReleaseNotes.Tests
                     BeginningSha = "12345678",
                     EndSha = "67890123"
                 }),
-                new SemanticRelease("1.2.0", new DateTimeOffset(2013, 12, 06, 0,0,0, new TimeSpan()), new []
+                new SemanticRelease("1.2.0", new DateTimeOffset(2013, 12, 06, 0,0,0, new TimeSpan()), new List<ReleaseNoteItem>
                 {
                     new ReleaseNoteItem("Issue 2", "#2", new Uri("http://github.com/org/repo/issues/2"),
                         new[] {"feature"}),
@@ -109,7 +110,7 @@ namespace GitReleaseNotes.Tests
             };
             var releaseNotes = new SemanticReleaseNotes(new[]
             {
-                new SemanticRelease("", null, new[]
+                new SemanticRelease("", null, new List<ReleaseNoteItem>
                 {
                     new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new[] {"bug"})
                 }, new ReleaseDiffInfo
@@ -134,7 +135,7 @@ namespace GitReleaseNotes.Tests
             };
             var releaseNotes = new SemanticReleaseNotes(new[]
             {
-                new SemanticRelease("", null, new[]
+                new SemanticRelease("", null, new List<ReleaseNoteItem>
                 {
                     new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"),
                         new[] {"internal refactoring"})

@@ -90,6 +90,7 @@
     <Compile Include="Git\TaggedCommitFinder.cs" />
     <Compile Include="ReleaseFileWriter.cs" />
     <Compile Include="ReleaseInfo.cs" />
+    <Compile Include="ReleaseNotesFileReader.cs" />
     <Compile Include="ReleaseNotesGenerator.cs" />
     <Compile Include="SemanticRelease.cs" />
     <Compile Include="SemanticReleaseNotes.cs" />

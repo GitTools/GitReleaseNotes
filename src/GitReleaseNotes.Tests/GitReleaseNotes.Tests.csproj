@@ -47,6 +47,9 @@
     <Reference Include="Octokit">
       <HintPath>..\packages\Octokit.0.1.8\lib\net45\Octokit.dll</HintPath>
     </Reference>
+    <Reference Include="Shouldly">
+      <HintPath>..\packages\Shouldly.1.1.1.1\lib\35\Shouldly.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http" />
@@ -70,6 +73,7 @@
     <Compile Include="IssueTrackers\Jira\JiraIssueTrackerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReleaseFileWriterTests.cs" />
+    <Compile Include="ReleaseNotesFileReaderTests.cs" />
     <Compile Include="ReleaseNotesGeneratorTests.cs" />
   </ItemGroup>
   <ItemGroup>
