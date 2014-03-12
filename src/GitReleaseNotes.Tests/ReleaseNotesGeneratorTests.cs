@@ -1,8 +1,6 @@
 ﻿using System;
 using ApprovalTests;
 using ApprovalTests.Reporters;
-using GitReleaseNotes.IssueTrackers;
-using GitReleaseNotes.IssueTrackers.GitHub;
 using Xunit;
 
 namespace GitReleaseNotes.Tests
@@ -29,6 +27,10 @@ namespace GitReleaseNotes.Tests
                 new SemanticRelease("", null, new[]
                 {
                     new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new string[0])
+                }, new ReleaseDiffInfo
+                {
+                    BeginningSha = "12345678",
+                    EndSha = "67890123"
                 })
             });
 
@@ -50,6 +52,10 @@ namespace GitReleaseNotes.Tests
                 {
                     new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"),
                         new[] {"feature"})
+                }, new ReleaseDiffInfo
+                {
+                    BeginningSha = "12345678",
+                    EndSha = "67890123"
                 })
             });
 
@@ -71,6 +77,10 @@ namespace GitReleaseNotes.Tests
                 {
                     new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"),
                         new[] {"feature"})
+                }, new ReleaseDiffInfo
+                {
+                    BeginningSha = "12345678",
+                    EndSha = "67890123"
                 }),
                 new SemanticRelease("1.2.0", new DateTimeOffset(2013, 12, 06, 0,0,0, new TimeSpan()), new []
                 {
@@ -78,6 +88,10 @@ namespace GitReleaseNotes.Tests
                         new[] {"feature"}),
                         new ReleaseNoteItem("Issue 3", "#3", new Uri("http://github.com/org/repo/issues/3"),
                         new[] {"bug"})
+                }, new ReleaseDiffInfo
+                {
+                    BeginningSha = "asdsadaf",
+                    EndSha = "bfdsadre"
                 })
             });
 
@@ -98,6 +112,10 @@ namespace GitReleaseNotes.Tests
                 new SemanticRelease("", null, new[]
                 {
                     new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new[] {"bug"})
+                }, new ReleaseDiffInfo
+                {
+                    BeginningSha = "12345678",
+                    EndSha = "67890123"
                 })
             });
 
@@ -120,6 +138,10 @@ namespace GitReleaseNotes.Tests
                 {
                     new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"),
                         new[] {"internal refactoring"})
+                }, new ReleaseDiffInfo
+                {
+                    BeginningSha = "12345678",
+                    EndSha = "67890123"
                 })
             });
 

@@ -73,6 +73,7 @@
     <Compile Include="Git\ITaggedCommitFinder.cs" />
     <Compile Include="IssueTrackers\IssueType.cs" />
     <Compile Include="IssueTrackers\OnlineIssue.cs" />
+    <Compile Include="ReleaseDiffInfo.cs" />
     <Compile Include="ReleaseNoteItem.cs" />
     <Compile Include="IssueTrackers\IIssueNumberExtractor.cs" />
     <Compile Include="IssueTrackers\IssueNumberExtractor.cs" />

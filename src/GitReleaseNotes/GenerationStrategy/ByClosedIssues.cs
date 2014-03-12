@@ -22,7 +22,11 @@ namespace GitReleaseNotes.GenerationStrategy
                         (reloadLocal.Key.PreviousReleaseDate == null || i.DateClosed > reloadLocal.Key.PreviousReleaseDate))
                     .Select(i => new ReleaseNoteItem(i.Title, i.Id, i.HtmlUrl, i.Labels))
                     .ToArray();
-                semanticReleases.Add(new SemanticRelease(release.Key.Name, release.Key.When, releaseNoteItems));
+                semanticReleases.Add(new SemanticRelease(release.Key.Name, release.Key.When, releaseNoteItems, new ReleaseDiffInfo
+                {
+                    BeginningSha = release.Value.First().Sha,
+                    EndSha = release.Value.Last().Sha
+                }));
             }
 
             return new SemanticReleaseNotes(semanticReleases);

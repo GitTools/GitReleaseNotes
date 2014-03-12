@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using GitReleaseNotes.IssueTrackers;
-using GitReleaseNotes.IssueTrackers.GitHub;
 using LibGit2Sharp;
 
 namespace GitReleaseNotes.GenerationStrategy
@@ -58,7 +57,11 @@ namespace GitReleaseNotes.GenerationStrategy
                     var labels = i.Labels ?? new string[0];
                     return new ReleaseNoteItem(i.Title, string.Format("{0}", i.Id), i.HtmlUrl, labels);
                 }).ToArray();
-                return new SemanticRelease(r.ReleaseInfo.Name, r.ReleaseInfo.When, releaseNoteItems);
+                return new SemanticRelease(r.ReleaseInfo.Name, r.ReleaseInfo.When, releaseNoteItems, new ReleaseDiffInfo
+                {
+                    BeginningSha = r.ReleaseInfo.FirstCommit,
+                    EndSha = r.ReleaseInfo.LastCommit
+                });
             }));
         }
     }

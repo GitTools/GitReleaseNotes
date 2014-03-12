@@ -51,6 +51,15 @@ namespace GitReleaseNotes
                     var item = string.Format(" - {0} [{1}]({2}){3}", title, issueNumber, htmlUrl, category);
                     builder.AppendLine(item);
                 }
+
+                builder.AppendLine();
+                if (release.DiffInfo.Url == null)
+                    builder.AppendLine(string.Format("Commits: {0}...{1}", release.DiffInfo.BeginningSha, release.DiffInfo.EndSha));
+                else
+                {
+                    builder.AppendLine(string.Format("Commits: [{0}...{1}]({2})",
+                        release.DiffInfo.BeginningSha, release.DiffInfo.EndSha, release.DiffInfo.Url));
+                }
             }
 
             return builder.ToString();

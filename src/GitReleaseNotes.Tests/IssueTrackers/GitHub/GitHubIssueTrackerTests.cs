@@ -89,16 +89,6 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
         }
 
         [Fact]
-        public void MustSpecifyToken()
-        {
-            _arguments.Repo = "Foo/Bar";
-            var result = _sut.VerifyArgumentsAndWriteErrorsToConsole();
-
-            Assert.False(result);
-            _log.Received().WriteLine("You must specify a GitHub Authentication token with the /Token argument");
-        }
-
-        [Fact]
         public void MustSpecifyVersionWhenPublishFlagIsSet()
         {
             _arguments.Repo = "Foo/Bar";
