@@ -98,7 +98,7 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
             var upstream = _repository.Network.Remotes[remoteName];
             if (upstream != null && upstream.Url.ToLower().Contains("github.com"))
             {
-                var match = Regex.Match(upstream.Url, "github.com/(?<org>.*?)/(?<repo>.*?)");
+                var match = Regex.Match(upstream.Url, "github.com[/:](?<org>.*?)/(?<repo>[^\\./]*)");
                 if (match.Success)
                 {
                     organisation = match.Groups["org"].Value;

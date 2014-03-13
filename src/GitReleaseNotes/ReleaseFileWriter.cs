@@ -1,23 +1,18 @@
-using System.IO;
-
 namespace GitReleaseNotes
 {
     public class ReleaseFileWriter
     {
         private readonly IFileSystem _fileSystem;
-        private readonly string _repositoryRoot;
 
-        public ReleaseFileWriter(IFileSystem fileSystem, string repositoryRoot)
+        public ReleaseFileWriter(IFileSystem fileSystem)
         {
             _fileSystem = fileSystem;
-            _repositoryRoot = repositoryRoot;
         }
 
-        public void OutputReleaseNotesFile(string releaseNotesOutput, GitReleaseNotesArguments arguments)
+        public void OutputReleaseNotesFile(string releaseNotesOutput, string outputFile)
         {
-            if (string.IsNullOrEmpty(arguments.OutputFile))
+            if (string.IsNullOrEmpty(outputFile))
                 return;
-            var outputFile = Path.IsPathRooted(arguments.OutputFile) ? arguments.OutputFile : Path.Combine(_repositoryRoot, arguments.OutputFile);
             _fileSystem.WriteAllText(outputFile, releaseNotesOutput);
         }
     }

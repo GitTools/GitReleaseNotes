@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -8,11 +9,14 @@ namespace GitReleaseNotes
     {
         private readonly string[] _categories = { "bug", "enhancement", "feature" };
  
-        public string GenerateReleaseNotes(GitReleaseNotesArguments arguments, SemanticReleaseNotes releaseNotes)
+        public string GenerateReleaseNotes(
+            GitReleaseNotesArguments arguments, 
+            SemanticReleaseNotes releaseNotes, 
+            SemanticReleaseNotes previousReleaseNotes)
         {
             var builder = new StringBuilder();
             var categories = arguments.Categories == null ? _categories : _categories.Concat(arguments.Categories.Split(',')).ToArray();
-            for (int index = 0; index < releaseNotes.Releases.Length; index++)
+            for (var index = 0; index < releaseNotes.Releases.Length; index++)
             {
                 if (index > 0)
                 {
@@ -35,7 +39,18 @@ namespace GitReleaseNotes
                     builder.AppendLine();
                 }
 
-                foreach (var releaseNoteItem in release.ReleaseNoteItems)
+                var previousMatchingRelease = previousReleaseNotes.Releases
+                    .SingleOrDefault(r => r.ReleaseName == release.ReleaseName);
+
+                IEnumerable<ReleaseNoteItem> releaseNoteItems;
+                if (previousMatchingRelease == null)
+                    releaseNoteItems = release.ReleaseNoteItems;
+                else
+                {
+                    releaseNoteItems = previousMatchingRelease.ReleaseNoteItems
+                        .Concat(release.ReleaseNoteItems.Where(r => r.ResolvedOn > previousMatchingRelease.When));
+                }
+                foreach (var releaseNoteItem in releaseNoteItems)
                 {
                     var taggedCategory = releaseNoteItem.Tags
                         .FirstOrDefault(
@@ -48,7 +63,10 @@ namespace GitReleaseNotes
                     var category = taggedCategory == null
                         ? null
                         : string.Format(" +{0}", taggedCategory.Replace(" ", "-"));
-                    var item = string.Format(" - {0} [{1}]({2}){3}", title, issueNumber, htmlUrl, category);
+                    var issueNum = issueNumber == null ? null : string.Format(" [{0}]", issueNumber);
+                    var url = htmlUrl == null ? null : string.Format("({0})", htmlUrl);
+                    var item = string.Format("{4}{0}{1}{2}{3}", title, issueNum, url, category, 
+                        title.TrimStart().StartsWith("-") ? null : " - ");
                     builder.AppendLine(item);
                 }
 

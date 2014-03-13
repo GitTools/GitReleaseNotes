@@ -55,12 +55,12 @@ namespace GitReleaseNotes.GenerationStrategy
                 var releaseNoteItems = r.IssuesForRelease.Select(i =>
                 {
                     var labels = i.Labels ?? new string[0];
-                    return new ReleaseNoteItem(i.Title, string.Format("{0}", i.Id), i.HtmlUrl, labels);
+                    return new ReleaseNoteItem(i.Title, string.Format("{0}", i.Id), i.HtmlUrl, labels, i.DateClosed);
                 }).ToList();
                 return new SemanticRelease(r.ReleaseInfo.Name, r.ReleaseInfo.When, releaseNoteItems, new ReleaseDiffInfo
                 {
-                    BeginningSha = r.ReleaseInfo.FirstCommit,
-                    EndSha = r.ReleaseInfo.LastCommit
+                    BeginningSha = r.ReleaseInfo.FirstCommit.Substring(0, 10),
+                    EndSha = r.ReleaseInfo.LastCommit.Substring(0, 10)
                 });
             }));
         }

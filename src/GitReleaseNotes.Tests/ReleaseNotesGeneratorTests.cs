@@ -27,7 +27,8 @@ namespace GitReleaseNotes.Tests
             {
                 new SemanticRelease("", null, new List<ReleaseNoteItem>
                 {
-                    new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new string[0])
+                    new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new string[0], DateTime.Now),
+                    new ReleaseNoteItem("Issue 1", null, null, new string[0], DateTime.Now)
                 }, new ReleaseDiffInfo
                 {
                     BeginningSha = "12345678",
@@ -35,7 +36,43 @@ namespace GitReleaseNotes.Tests
                 })
             });
 
-            var result =_sut.GenerateReleaseNotes(arguments, releaseNotes);
+            var result =_sut.GenerateReleaseNotes(arguments, releaseNotes, new SemanticReleaseNotes());
+
+            Approvals.Verify(result);
+        }
+
+        [Fact]
+        public void ApproveSimpleUpdateTests()
+        {
+            var arguments = new GitReleaseNotesArguments
+            {
+                OutputFile = "ReleaseFile.md"
+            };
+            var releaseNotes = new SemanticReleaseNotes(new[]
+            {
+                new SemanticRelease("", null, new List<ReleaseNoteItem>
+                {
+                    new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new string[0], DateTime.Now.AddDays(-2)),
+                    new ReleaseNoteItem("Issue 2", "#2", new Uri("http://github.com/org/repo/issues/2"), new string[0], DateTime.Now)
+                }, new ReleaseDiffInfo
+                {
+                    BeginningSha = "12345678",
+                    EndSha = "67890123"
+                })
+            });
+
+            var previousReleaseNotesGeneratedOn = DateTime.Now.AddDays(-1);
+            var result =_sut.GenerateReleaseNotes(arguments, releaseNotes, new SemanticReleaseNotes(new[]
+            {
+                new SemanticRelease("", previousReleaseNotesGeneratedOn, new List<ReleaseNoteItem>
+                {
+                    new ReleaseNoteItem("Customised title for Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new string[0], previousReleaseNotesGeneratedOn)
+                }, new ReleaseDiffInfo
+                {
+                    BeginningSha = "asd39424",
+                    EndSha = "134asd53dsa"
+                }), 
+            }));
 
             Approvals.Verify(result);
         }
@@ -52,7 +89,7 @@ namespace GitReleaseNotes.Tests
                 new SemanticRelease("", null, new List<ReleaseNoteItem>
                 {
                     new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"),
-                        new[] {"feature"})
+                        new[] {"feature"}, DateTimeOffset.Now)
                 }, new ReleaseDiffInfo
                 {
                     BeginningSha = "12345678",
@@ -60,7 +97,7 @@ namespace GitReleaseNotes.Tests
                 })
             });
 
-            var result = _sut.GenerateReleaseNotes(arguments, releaseNotes);
+            var result = _sut.GenerateReleaseNotes(arguments, releaseNotes, new SemanticReleaseNotes());
 
             Approvals.Verify(result);
         }
@@ -77,7 +114,7 @@ namespace GitReleaseNotes.Tests
                 new SemanticRelease("", null, new List<ReleaseNoteItem>
                 {
                     new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"),
-                        new[] {"feature"})
+                        new[] {"feature"}, DateTimeOffset.Now)
                 }, new ReleaseDiffInfo
                 {
                     BeginningSha = "12345678",
@@ -86,9 +123,9 @@ namespace GitReleaseNotes.Tests
                 new SemanticRelease("1.2.0", new DateTimeOffset(2013, 12, 06, 0,0,0, new TimeSpan()), new List<ReleaseNoteItem>
                 {
                     new ReleaseNoteItem("Issue 2", "#2", new Uri("http://github.com/org/repo/issues/2"),
-                        new[] {"feature"}),
+                        new[] {"feature"}, DateTimeOffset.Now),
                         new ReleaseNoteItem("Issue 3", "#3", new Uri("http://github.com/org/repo/issues/3"),
-                        new[] {"bug"})
+                        new[] {"bug"}, DateTimeOffset.Now)
                 }, new ReleaseDiffInfo
                 {
                     BeginningSha = "asdsadaf",
@@ -96,7 +133,7 @@ namespace GitReleaseNotes.Tests
                 })
             });
 
-            var result = _sut.GenerateReleaseNotes(arguments, releaseNotes);
+            var result = _sut.GenerateReleaseNotes(arguments, releaseNotes, new SemanticReleaseNotes());
 
             Approvals.Verify(result);
         }
@@ -112,7 +149,7 @@ namespace GitReleaseNotes.Tests
             {
                 new SemanticRelease("", null, new List<ReleaseNoteItem>
                 {
-                    new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new[] {"bug"})
+                    new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new[] {"bug"}, DateTimeOffset.Now)
                 }, new ReleaseDiffInfo
                 {
                     BeginningSha = "12345678",
@@ -120,7 +157,7 @@ namespace GitReleaseNotes.Tests
                 })
             });
 
-            var result = _sut.GenerateReleaseNotes(arguments, releaseNotes);
+            var result = _sut.GenerateReleaseNotes(arguments, releaseNotes, new SemanticReleaseNotes());
 
             Approvals.Verify(result);
         }
@@ -138,7 +175,7 @@ namespace GitReleaseNotes.Tests
                 new SemanticRelease("", null, new List<ReleaseNoteItem>
                 {
                     new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"),
-                        new[] {"internal refactoring"})
+                        new[] {"internal refactoring"}, DateTimeOffset.Now)
                 }, new ReleaseDiffInfo
                 {
                     BeginningSha = "12345678",
@@ -146,7 +183,7 @@ namespace GitReleaseNotes.Tests
                 })
             });
 
-            var result = _sut.GenerateReleaseNotes(arguments, releaseNotes);
+            var result = _sut.GenerateReleaseNotes(arguments, releaseNotes, new SemanticReleaseNotes());
 
             Approvals.Verify(result);
         }

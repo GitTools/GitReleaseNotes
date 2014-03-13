@@ -25,7 +25,7 @@ namespace GitReleaseNotes
 
         static int Main(string[] args)
         {
-            var main =GenerateReleaseNotes(args);
+            var main = GenerateReleaseNotes(args);
             Console.WriteLine("Done");
             if (Debugger.IsAttached)
                 Console.ReadKey();
@@ -90,11 +90,11 @@ namespace GitReleaseNotes
             var taggedCommitFinder = new TaggedCommitFinder(gitRepo, gitHelper);
 
             TaggedCommit tagToStartFrom;
-            if (string.IsNullOrEmpty(arguments.FromTag)) 
+            if (string.IsNullOrEmpty(arguments.FromTag))
                 tagToStartFrom = taggedCommitFinder.GetLastTaggedCommit();
             else if (arguments.FromTag == "all")
                 tagToStartFrom = null;
-            else 
+            else
                 tagToStartFrom = taggedCommitFinder.GetTag(arguments.FromTag);
 
             var releases = new CommitGrouper().GetCommitsByRelease(gitRepo, tagToStartFrom);
@@ -111,11 +111,18 @@ namespace GitReleaseNotes
 
             var fileSystem = new FileSystem();
             var releaseNotesWriter = new ReleaseNotesGenerator();
-            var releaseFileWriter = new ReleaseFileWriter(fileSystem, repositoryRoot);
-            var previousReleaseNotes = new ReleaseNotesFileReader(fileSystem, repositoryRoot);
-            var releaseNotesOutput = releaseNotesWriter.GenerateReleaseNotes(arguments, releaseNotes);
+            string outputFile = null;
+            var previousReleaseNotes = new SemanticReleaseNotes();
+            var releaseFileWriter = new ReleaseFileWriter(fileSystem);
+            if (!string.IsNullOrEmpty(arguments.OutputFile))
+            {
+                outputFile = Path.IsPathRooted(arguments.OutputFile) ? arguments.OutputFile : Path.Combine(repositoryRoot, arguments.OutputFile);
+                previousReleaseNotes = new ReleaseNotesFileReader(fileSystem, repositoryRoot).ReadPreviousReleaseNotes(outputFile);
+            }
 
-            releaseFileWriter.OutputReleaseNotesFile(releaseNotesOutput, arguments);
+            var releaseNotesOutput = releaseNotesWriter.GenerateReleaseNotes(arguments, releaseNotes, previousReleaseNotes);
+            releaseFileWriter.OutputReleaseNotesFile(releaseNotesOutput, outputFile);
+
             PublishReleaseIfNeeded(releaseNotesOutput, arguments, issueTracker);
             return 0;
         }
@@ -135,10 +142,16 @@ namespace GitReleaseNotes
             {
                 {
                     IssueTracker.GitHub,
-                    new GitHubIssueTracker(repository, () => new GitHubClient(new ProductHeaderValue("GitReleaseNotes"))
+                    new GitHubIssueTracker(repository, () =>
+                    {
+                        var gitHubClient = new GitHubClient(new ProductHeaderValue("GitReleaseNotes"));
+                        if (arguments.Token != null)
                         {
-                            Credentials = new Credentials(arguments.Token)
-                        }, new Log(), arguments)
+                            gitHubClient.Credentials = new Credentials(arguments.Token);
+                        }
+
+                        return gitHubClient;
+                    }, new Log(), arguments)
                 },
                 {
                     IssueTracker.Jira, 
