@@ -97,7 +97,10 @@ namespace GitReleaseNotes
             else
                 tagToStartFrom = taggedCommitFinder.GetTag(arguments.FromTag);
 
-            var releases = new CommitGrouper().GetCommitsByRelease(gitRepo, tagToStartFrom);
+            var releases = new CommitGrouper().GetCommitsByRelease(
+                gitRepo, 
+                tagToStartFrom,
+                !string.IsNullOrEmpty(arguments.Version) ? new ReleaseInfo(arguments.Version, DateTimeOffset.Now, null, null) : null);
 
             IReleaseNotesStrategy generationStrategy;
             if (arguments.FromClosedIssues)
