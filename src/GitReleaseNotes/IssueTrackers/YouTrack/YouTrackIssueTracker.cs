@@ -46,9 +46,9 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
 
             if (string.IsNullOrEmpty(_arguments.YouTrackFilter))
             {
-                _arguments.YouTrackFilter = string.Format("project = {0} AND " +
-                               "(issuetype = Bug OR issuetype = Story OR issuetype = \"New Feature\") AND " +
-                               "status in (Closed, Done, Resolved)", _arguments.YouTrackProjectId);
+                _arguments.YouTrackFilter = string.Format(
+                    "project:{0} Type:Bug Type:Feature Type:Task Type:Exception State:Resolved", 
+                    _arguments.YouTrackProjectId);
             }
 
             return true;
