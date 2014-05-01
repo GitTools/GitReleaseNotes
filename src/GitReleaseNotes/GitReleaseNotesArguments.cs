@@ -48,7 +48,7 @@ namespace GitReleaseNotes
         [Description("YouTrack project ID")]
         public string YouTrackProjectId { get; set; }
 
-        [Description("YouTrack filter for closed issues that you would like included if mentioned. Defaults to project:<YOURPROJECTID> Type:Bug Type:Feature Type:Task Type:Exception State:Resolved")]
+        [Description("YouTrack filter for closed issues that you would like included if mentioned. Defaults to project:<YOURPROJECTID> State:Resolved State:-{{Won't fix}} State:-{{Can't Reproduce}} State:-Duplicate")]
         public string YouTrackFilter { get; set; }
 
         [Description("GitHub Repository name, in Organisation/Repository format")]

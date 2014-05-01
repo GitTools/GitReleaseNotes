@@ -47,7 +47,7 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
             if (string.IsNullOrEmpty(_arguments.YouTrackFilter))
             {
                 _arguments.YouTrackFilter = string.Format(
-                    "project:{0} Type:Bug Type:Feature Type:Task Type:Exception State:Resolved", 
+                    "project:{0} State:Resolved State:-{{Won't fix}} State:-{{Can't Reproduce}} State:-Duplicate", 
                     _arguments.YouTrackProjectId);
             }
 

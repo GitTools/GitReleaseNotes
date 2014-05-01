@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Web;
 using System.Xml.Linq;
 
@@ -15,14 +16,25 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
         {
             var loginUrl = string.Format(
                 CultureInfo.InvariantCulture,
-                "{0}/user/login?{1}&{2}",
-                youtrackHostUrl,
-                userName,
-                password);
+                "{0}/user/login",
+                youtrackHostUrl);
+
+            string loginText =
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "login={0}&password={1}",
+                        userName,
+                        password);
+            var loginBytes = Encoding.ASCII.GetBytes(loginText);
 
             var httpRequest = WebRequest.CreateHttp(loginUrl);
             httpRequest.Method = "POST";
             httpRequest.ContentType = "application/x-www-form-urlencoded";
+            httpRequest.CookieContainer = new CookieContainer();
+            httpRequest.ContentLength = loginBytes.Length;
+
+            var stream = httpRequest.GetRequestStream();
+            stream.Write(loginBytes, 0, loginBytes.Length);
 
             var response = (HttpWebResponse)httpRequest.GetResponse();
             if (response.StatusCode != HttpStatusCode.OK)
@@ -45,7 +57,7 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
             DateTimeOffset? since)
         {
             const int maxPerRequest = 5;
-            const string issueByDateRequestTemplate = "{0}/issue/byproject/{1}?filter={2}&after={3}&max={4}";
+            const string issueByDateRequestTemplate = "{0}/rest/issue/byproject/{1}?filter={2}&after={3}&max={4}";
             var result = new List<OnlineIssue>();
 
             string query;
@@ -79,6 +91,7 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
                 var httpRequest = WebRequest.CreateHttp(issueByDateRequest);
                 httpRequest.Method = "GET";
                 httpRequest.ContentType = "application/x-www-form-urlencoded";
+                httpRequest.CookieContainer = new CookieContainer();
                 httpRequest.CookieContainer.Add(authenticationCookies);
 
                 var response = (HttpWebResponse)httpRequest.GetResponse();
@@ -112,7 +125,6 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
                 int count = 0;
                 foreach (var issue in issues)
                 {
-                    Console.WriteLine("Processing issue {0}", issue.Id);
                     result.Add(
                         new OnlineIssue
                         {
