@@ -120,18 +120,29 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
                                  Summary = (from subElement in element.Descendants("field")
                                             where string.Equals("summary", subElement.Attribute("name").Value, StringComparison.OrdinalIgnoreCase)
                                             select subElement.Element("value").Value).FirstOrDefault(),
+                                 Updated = (from subElement in element.Descendants("field")
+                                            where string.Equals("updated", subElement.Attribute("name").Value, StringComparison.InvariantCultureIgnoreCase)
+                                            select subElement.Element("value").Value).FirstOrDefault(),
                              };
 
                 int count = 0;
                 foreach (var issue in issues)
                 {
+                    long milliSecondsSinceEpochStart;
+                    if (!long.TryParse(issue.Updated, out milliSecondsSinceEpochStart))
+                    {
+                        milliSecondsSinceEpochStart = 0L;
+                    }
+
+                    var epochTime = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero) + TimeSpan.FromMilliseconds(milliSecondsSinceEpochStart);
                     result.Add(
                         new OnlineIssue
                         {
                             Id = issue.Id,
                             Title = issue.Summary,
                             IssueType = IssueType.Issue,
-                            HtmlUrl = new Uri(new Uri(youtrackHostUrl, UriKind.Absolute), string.Format("issue/{0}", issue.Id))
+                            HtmlUrl = new Uri(new Uri(youtrackHostUrl, UriKind.Absolute), string.Format("issue/{0}", issue.Id)),
+                            DateClosed = epochTime,
                         });
 
                     count++;
