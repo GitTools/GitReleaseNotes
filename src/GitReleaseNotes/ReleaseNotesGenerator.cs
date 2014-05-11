@@ -8,10 +8,10 @@ namespace GitReleaseNotes
     public class ReleaseNotesGenerator
     {
         private readonly string[] _categories = { "bug", "enhancement", "feature" };
- 
+
         public string GenerateReleaseNotes(
-            GitReleaseNotesArguments arguments, 
-            SemanticReleaseNotes releaseNotes, 
+            GitReleaseNotesArguments arguments,
+            SemanticReleaseNotes releaseNotes,
             SemanticReleaseNotes previousReleaseNotes)
         {
             var builder = new StringBuilder();
@@ -65,8 +65,11 @@ namespace GitReleaseNotes
                         : string.Format(" +{0}", taggedCategory.Replace(" ", "-"));
                     var issueNum = issueNumber == null ? null : string.Format(" [{0}]", issueNumber);
                     var url = htmlUrl == null ? null : string.Format("({0})", htmlUrl);
-                    var item = string.Format("{4}{0}{1}{2}{3}", title, issueNum, url, category, 
-                        title.TrimStart().StartsWith("-") ? null : " - ");
+                    var contributors = releaseNoteItem.Contributors == null || releaseNoteItem.Contributors.Length == 0 ?
+                        string.Empty : " contributed by " + string.Join(", ", releaseNoteItem.Contributors.Select(r => string.Format("{0} ([{1}]({2}))", r.Name, r.Username, r.Url)));
+                    var item = string.Format("{4}{0}{1}{2}{5}{3}", title, issueNum, url, category,
+                        title.TrimStart().StartsWith("-") ? null : " - ",
+                        contributors);
                     builder.AppendLine(item);
                 }
 

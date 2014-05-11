@@ -126,6 +126,7 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
                 State = ItemState.Closed
             });
             var readOnlyList = forRepository.Result;
+
             return readOnlyList.Select(i => new OnlineIssue
             {
                 HtmlUrl = i.HtmlUrl,
@@ -133,7 +134,8 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
                 IssueType = i.PullRequest == null ? IssueType.Issue : IssueType.PullRequest,
                 Labels = i.Labels.Select(l => l.Name).ToArray(),
                 Title = i.Title,
-                DateClosed = i.ClosedAt.Value
+                DateClosed = i.ClosedAt.Value,
+                Contributors = i.PullRequest == null ? new Contributor[0] : new[] { new Contributor(i.User.Name, i.User.Login, i.User.Url) }
             });
         }
     }

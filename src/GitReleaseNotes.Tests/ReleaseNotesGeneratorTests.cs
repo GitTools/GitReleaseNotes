@@ -27,8 +27,8 @@ namespace GitReleaseNotes.Tests
             {
                 new SemanticRelease("", null, new List<ReleaseNoteItem>
                 {
-                    new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new string[0], DateTime.Now),
-                    new ReleaseNoteItem("Issue 1", null, null, new string[0], DateTime.Now)
+                    new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new string[0], DateTime.Now, new[]{ new Contributor("Foo Bar", "@foo", "http://url.com/foo") }),
+                    new ReleaseNoteItem("Issue 1", null, null, new string[0], DateTime.Now, new Contributor[0])
                 }, new ReleaseDiffInfo
                 {
                     BeginningSha = "12345678",
@@ -52,8 +52,8 @@ namespace GitReleaseNotes.Tests
             {
                 new SemanticRelease("", null, new List<ReleaseNoteItem>
                 {
-                    new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new string[0], DateTime.Now.AddDays(-2)),
-                    new ReleaseNoteItem("Issue 2", "#2", new Uri("http://github.com/org/repo/issues/2"), new string[0], DateTime.Now)
+                    new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new string[0], DateTime.Now.AddDays(-2), new Contributor[0]),
+                    new ReleaseNoteItem("Issue 2", "#2", new Uri("http://github.com/org/repo/issues/2"), new string[0], DateTime.Now, new Contributor[0])
                 }, new ReleaseDiffInfo
                 {
                     BeginningSha = "12345678",
@@ -66,7 +66,8 @@ namespace GitReleaseNotes.Tests
             {
                 new SemanticRelease("", previousReleaseNotesGeneratedOn, new List<ReleaseNoteItem>
                 {
-                    new ReleaseNoteItem("Customised title for Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new string[0], previousReleaseNotesGeneratedOn)
+                    new ReleaseNoteItem("Customised title for Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new string[0], previousReleaseNotesGeneratedOn,
+                        new Contributor[0])
                 }, new ReleaseDiffInfo
                 {
                     BeginningSha = "asd39424",
@@ -89,7 +90,7 @@ namespace GitReleaseNotes.Tests
                 new SemanticRelease("", null, new List<ReleaseNoteItem>
                 {
                     new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"),
-                        new[] {"feature"}, DateTimeOffset.Now)
+                        new[] {"feature"}, DateTimeOffset.Now, new Contributor[0])
                 }, new ReleaseDiffInfo
                 {
                     BeginningSha = "12345678",
@@ -114,7 +115,7 @@ namespace GitReleaseNotes.Tests
                 new SemanticRelease("", null, new List<ReleaseNoteItem>
                 {
                     new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"),
-                        new[] {"feature"}, DateTimeOffset.Now)
+                        new[] {"feature"}, DateTimeOffset.Now, new Contributor[0])
                 }, new ReleaseDiffInfo
                 {
                     BeginningSha = "12345678",
@@ -123,9 +124,9 @@ namespace GitReleaseNotes.Tests
                 new SemanticRelease("1.2.0", new DateTimeOffset(2013, 12, 06, 0,0,0, new TimeSpan()), new List<ReleaseNoteItem>
                 {
                     new ReleaseNoteItem("Issue 2", "#2", new Uri("http://github.com/org/repo/issues/2"),
-                        new[] {"feature"}, DateTimeOffset.Now),
+                        new[] {"feature"}, DateTimeOffset.Now, new Contributor[0]),
                         new ReleaseNoteItem("Issue 3", "#3", new Uri("http://github.com/org/repo/issues/3"),
-                        new[] {"bug"}, DateTimeOffset.Now)
+                        new[] {"bug"}, DateTimeOffset.Now, new Contributor[0])
                 }, new ReleaseDiffInfo
                 {
                     BeginningSha = "asdsadaf",
@@ -149,7 +150,7 @@ namespace GitReleaseNotes.Tests
             {
                 new SemanticRelease("", null, new List<ReleaseNoteItem>
                 {
-                    new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new[] {"bug"}, DateTimeOffset.Now)
+                    new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new[] {"bug"}, DateTimeOffset.Now, new Contributor[0])
                 }, new ReleaseDiffInfo
                 {
                     BeginningSha = "12345678",
@@ -175,7 +176,7 @@ namespace GitReleaseNotes.Tests
                 new SemanticRelease("", null, new List<ReleaseNoteItem>
                 {
                     new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"),
-                        new[] {"internal refactoring"}, DateTimeOffset.Now)
+                        new[] {"internal refactoring"}, DateTimeOffset.Now, new Contributor[0])
                 }, new ReleaseDiffInfo
                 {
                     BeginningSha = "12345678",

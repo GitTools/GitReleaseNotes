@@ -7,6 +7,7 @@ using GitReleaseNotes.IssueTrackers.GitHub;
 using LibGit2Sharp;
 using NSubstitute;
 using Octokit;
+using Shouldly;
 using Xunit;
 using Xunit.Extensions;
 
@@ -50,13 +51,21 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
                         Number = 1,
                         Title = "Issue Title",
                         Labels = new Collection<Label>(),
-                        ClosedAt = DateTimeOffset.Now
+                        ClosedAt = DateTimeOffset.Now,
+                        PullRequest = new PullRequest(),
+                        User = new User
+                        {
+                            Login = "User",
+                            Name = "Foo",
+                            Url = "http://github.com/foo"
+                        }
                     }
                 }.AsReadOnly()));
 
             var closedIssues = _sut.GetClosedIssues(DateTimeOffset.Now.AddDays(-2));
-
-            Assert.Equal("Issue Title", closedIssues.Single().Title);
+            var onlineIssue = closedIssues.Single();
+            onlineIssue.Title.ShouldBe("Issue Title");
+            onlineIssue.Contributors.ShouldContain(c => c.Username == "User" && c.Name == "Foo" && c.Url == "http://github.com/foo");
         }
 
         [Fact]
@@ -65,7 +74,7 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
             _arguments.Repo = null;
             var result = _sut.VerifyArgumentsAndWriteErrorsToConsole();
 
-            Assert.False(result);
+            result.ShouldBe(false);
             _log.Received().WriteLine("GitHub repository name must be specified [/Repo .../...]");
         }
 
@@ -81,11 +90,11 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
 
             if (success)
             {
-                Assert.True(result);
+                result.ShouldBe(true);
             }
             else
             {
-                Assert.False(result);
+                result.ShouldBe(false);
                 _log.Received().WriteLine("GitHub repository name should be in format Organisation/RepoName");
             }
         }
@@ -97,9 +106,7 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
 
             _sut.GetClosedIssues(DateTimeOffset.Now.AddDays(-2));
 
-            _issuesClient
-                .Received()
-                .GetForRepository("Org", "Repo.With.Dots", Arg.Any<RepositoryIssueRequest>());
+            _issuesClient.Received().GetForRepository("Org", "Repo.With.Dots", Arg.Any<RepositoryIssueRequest>());
         }
 
         [Fact]
@@ -110,7 +117,7 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
             _arguments.Publish = true;
             var result = _sut.VerifyArgumentsAndWriteErrorsToConsole();
 
-            Assert.False(result);
+            result.ShouldBe(false);
             _log.Received().WriteLine("You must specifiy the version [/Version ...] (will be tag) when using the /Publish flag");
         }
 
@@ -122,10 +129,8 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
             const string releaseNotesOutput = " - A thingy was fixed";
             _sut.PublishRelease(releaseNotesOutput);
 
-            _gitHubClient.Release
-                .Received()
-                .CreateRelease("Foo", "Baz",
-                    Arg.Is<ReleaseUpdate>(r => r.TagName == "1.2.0" && r.Body == releaseNotesOutput && r.Name == "1.2.0"));
+            var releaseUpdateSpec = Arg.Is<ReleaseUpdate>(r => r.TagName == "1.2.0" && r.Body == releaseNotesOutput && r.Name == "1.2.0");
+            _gitHubClient.Release.Received().CreateRelease("Foo", "Baz", releaseUpdateSpec);
         }
     }
 }

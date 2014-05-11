@@ -69,7 +69,7 @@ namespace GitReleaseNotes
                 {
                     // This picks up comments and such
                     var title = line.StartsWith(" - ") ? line.Substring(3) : line;
-                    var releaseNoteItem = new ReleaseNoteItem(title, null, null, null, currentRelease.When);
+                    var releaseNoteItem = new ReleaseNoteItem(title, null, null, null, currentRelease.When, new Contributor[0]);
                     currentRelease.ReleaseNoteItems.Add(releaseNoteItem);
                 }
             }
