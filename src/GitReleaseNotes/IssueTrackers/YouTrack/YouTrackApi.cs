@@ -12,6 +12,17 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
 {
     public sealed class YouTrackApi : IYouTrackApi
     {
+        public IEnumerable<OnlineIssue> GetClosedIssues(GitReleaseNotesArguments arguments, DateTimeOffset? since)
+        {
+            var authenticationCookies = ConnectToYouTrack(arguments.Username, arguments.Password, arguments.YouTrackServer);
+            return IssuesClosedSinceDate(
+                authenticationCookies,
+                arguments.YouTrackFilter,
+                arguments.YouTrackServer,
+                arguments.ProjectId,
+                since);
+        }
+
         private static CookieCollection ConnectToYouTrack(string userName, string password, string youtrackHostUrl)
         {
             var loginUrl = string.Format(
@@ -64,9 +75,9 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
             if (since.HasValue)
             {
                 query = string.Format(
-                    "{0} updated: {1:yyyy-MM-ddTHH:mm:ss} .. {2:yyyy-MM-ddTHH:mm:ss}", 
+                    "{0} updated: {1:yyyy-MM-ddTHH:mm:ss} .. {2:yyyy-MM-ddTHH:mm:ss}",
                     filter,
-                    since.Value, 
+                    since.Value,
                     DateTimeOffset.Now);
             }
             else
@@ -101,9 +112,9 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
                 }
 
                 string rawText;
-                using(var responseStream = response.GetResponseStream())
+                using (var responseStream = response.GetResponseStream())
                 {
-                    using(var responseReader = new StreamReader(responseStream))
+                    using (var responseReader = new StreamReader(responseStream))
                     {
                         rawText = responseReader.ReadToEnd();
                     }
@@ -121,8 +132,8 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
                                             where string.Equals("summary", subElement.Attribute("name").Value, StringComparison.OrdinalIgnoreCase)
                                             select subElement.Element("value").Value).FirstOrDefault(),
                                  Resolved = (from subElement in element.Descendants("field")
-                                            where string.Equals("resolved", subElement.Attribute("name").Value, StringComparison.InvariantCultureIgnoreCase)
-                                            select subElement.Element("value").Value).FirstOrDefault(),
+                                             where string.Equals("resolved", subElement.Attribute("name").Value, StringComparison.InvariantCultureIgnoreCase)
+                                             select subElement.Element("value").Value).FirstOrDefault(),
                              };
 
                 int count = 0;
@@ -157,17 +168,6 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
             }
 
             return result;
-        }
-
-        public IEnumerable<OnlineIssue> GetClosedIssues(GitReleaseNotesArguments arguments, DateTimeOffset? since)
-        {
-            var authenticationCookies = ConnectToYouTrack(arguments.Username, arguments.Password, arguments.YouTrackServer);
-            return IssuesClosedSinceDate(
-                authenticationCookies,
-                arguments.YouTrackFilter,
-                arguments.YouTrackServer,
-                arguments.YouTrackProjectId,
-                since);
         }
     }
 }
