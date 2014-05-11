@@ -15,7 +15,7 @@ namespace GitReleaseNotes.IssueTrackers.Jira
         {
             _jiraApi = jiraApi;
             _arguments = arguments;
-            _issueNumberRegex = new Regex(string.Format(@"(?<issueNumber>{0}-\d+)", arguments.JiraProjectId));
+            _issueNumberRegex = new Regex(string.Format(@"(?<issueNumber>{0}-\d+)", arguments.ProjectId));
         }
 
         public bool VerifyArgumentsAndWriteErrorsToConsole()
@@ -27,7 +27,7 @@ namespace GitReleaseNotes.IssueTrackers.Jira
                 return false;
             }
 
-            if (string.IsNullOrEmpty(_arguments.JiraProjectId))
+            if (string.IsNullOrEmpty(_arguments.ProjectId))
             {
                 Console.WriteLine("/JiraProjectId is a required parameter for Jira");
                 return false;
@@ -48,7 +48,7 @@ namespace GitReleaseNotes.IssueTrackers.Jira
             {
                 _arguments.Jql = string.Format("project = {0} AND " +
                                "(issuetype = Bug OR issuetype = Story OR issuetype = \"New Feature\") AND " +
-                               "status in (Closed, Done, Resolved)", _arguments.JiraProjectId);
+                               "status in (Closed, Done, Resolved)", _arguments.ProjectId);
             }
 
             return true;

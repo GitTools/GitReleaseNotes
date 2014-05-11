@@ -166,7 +166,7 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
                 authenticationCookies,
                 arguments.YouTrackFilter,
                 arguments.YouTrackServer,
-                arguments.YouTrackProjectId,
+                arguments.ProjectId,
                 since);
         }
     }

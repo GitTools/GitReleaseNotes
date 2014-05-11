@@ -15,7 +15,7 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
         {
             _youTrackApi = youTrackApi;
             _arguments = arguments;
-            _issueNumberRegex = new Regex(string.Format(@"(?<issueNumber>{0}-\d+)", arguments.JiraProjectId));
+            _issueNumberRegex = new Regex(string.Format(@"(?<issueNumber>{0}-\d+)", arguments.ProjectId));
         }
 
         public bool VerifyArgumentsAndWriteErrorsToConsole()
@@ -27,9 +27,9 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
                 return false;
             }
 
-            if (string.IsNullOrEmpty(_arguments.YouTrackProjectId))
+            if (string.IsNullOrEmpty(_arguments.ProjectId))
             {
-                Console.WriteLine("/YouTrackProjectId is a required parameter for YouTrack");
+                Console.WriteLine("/ProjectId is a required parameter for YouTrack");
                 return false;
             }
 
@@ -48,7 +48,7 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
             {
                 _arguments.YouTrackFilter = string.Format(
                     "project:{0} State:Resolved State:-{{Won't fix}} State:-{{Can't Reproduce}} State:-Duplicate", 
-                    _arguments.YouTrackProjectId);
+                    _arguments.ProjectId);
             }
 
             return true;

@@ -33,8 +33,8 @@ namespace GitReleaseNotes
         [Description("Issue tracker password")]
         public string Password { get; set; }
 
-        [Description("Jira project ID")]
-        public string JiraProjectId { get; set; }
+        [Description("Issue tracker project ID")]
+        public string ProjectId { get; set; }
 
         [Description("Jql query for closed issues you would like included if mentioned. Defaults to project = <YOURPROJECTID> AND (issuetype = Bug OR issuetype = Story OR issuetype = \"New Feature\") AND status in (Closed, Done, Resolved)")]
         public string Jql { get; set; }
@@ -44,9 +44,6 @@ namespace GitReleaseNotes
 
         [Description("Url of YouTrack server")]
         public string YouTrackServer { get; set; }
-
-        [Description("YouTrack project ID")]
-        public string YouTrackProjectId { get; set; }
 
         [Description("YouTrack filter for closed issues that you would like included if mentioned. Defaults to project:<YOURPROJECTID> State:Resolved State:-{{Won't fix}} State:-{{Can't Reproduce}} State:-Duplicate")]
         public string YouTrackFilter { get; set; }
