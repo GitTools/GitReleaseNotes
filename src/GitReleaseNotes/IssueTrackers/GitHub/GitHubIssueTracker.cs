@@ -119,7 +119,8 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
             string repository;
             GetRepository(_arguments, out organisation, out repository);
 
-            var forRepository = _gitHubClientFactory().Issue.GetForRepository(organisation, repository, new RepositoryIssueRequest
+            var gitHubClient = _gitHubClientFactory();
+            var forRepository = gitHubClient.Issue.GetForRepository(organisation, repository, new RepositoryIssueRequest
             {
                 Filter = IssueFilter.All,
                 Since = since,
@@ -127,6 +128,20 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
             });
             var readOnlyList = forRepository.Result;
 
+            var userCache = new Dictionary<string, User>();
+            Func<User, string> getUserName = u =>
+            {
+                var login = u.Login;
+                if (!userCache.ContainsKey(login))
+                {
+                    userCache.Add(login, string.IsNullOrEmpty(u.Name) ? gitHubClient.User.Get(login).Result : u);
+                }
+
+                var user = userCache[login];
+                if (user != null) 
+                    return user.Name;
+                return null;
+            };
             return readOnlyList.Select(i => new OnlineIssue
             {
                 HtmlUrl = i.HtmlUrl,
@@ -135,7 +150,7 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
                 Labels = i.Labels.Select(l => l.Name).ToArray(),
                 Title = i.Title,
                 DateClosed = i.ClosedAt.Value,
-                Contributors = i.PullRequest == null ? new Contributor[0] : new[] { new Contributor(i.User.Name, i.User.Login, i.User.Url) }
+                Contributors = i.PullRequest == null ? new Contributor[0] : new[] { new Contributor(getUserName(i.User), i.User.Login, i.User.HtmlUrl) }
             });
         }
     }

@@ -57,7 +57,7 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
                         {
                             Login = "User",
                             Name = "Foo",
-                            Url = "http://github.com/foo"
+                            HtmlUrl = "http://github.com/foo"
                         }
                     }
                 }.AsReadOnly()));
