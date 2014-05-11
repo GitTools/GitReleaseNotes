@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Reflection;
 using GitReleaseNotes.IssueTrackers;
+using Shouldly;
 using Xunit;
 
 namespace GitReleaseNotes.Tests
@@ -16,7 +17,7 @@ namespace GitReleaseNotes.Tests
 
             foreach (IssueTracker issueTracker in Enum.GetValues(typeof(IssueTracker)))
             {
-                Assert.True(description.Description.Contains(issueTracker.ToString()));
+                description.Description.ShouldContain(issueTracker.ToString());
             }
         }
     }

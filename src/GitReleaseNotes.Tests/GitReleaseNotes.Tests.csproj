@@ -47,8 +47,9 @@
     <Reference Include="Octokit">
       <HintPath>..\packages\Octokit.0.1.8\lib\net45\Octokit.dll</HintPath>
     </Reference>
-    <Reference Include="Shouldly">
-      <HintPath>..\packages\Shouldly.1.1.1.1\lib\35\Shouldly.dll</HintPath>
+    <Reference Include="Shouldly, Version=2.1.1.0, Culture=neutral, PublicKeyToken=6042cbcb05cbc941, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Shouldly.2.1.1\lib\net40\Shouldly.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

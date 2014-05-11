@@ -61,6 +61,7 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
         [Fact]
         public void ErrorLoggedWhenRepoIsNotSpecified()
         {
+            _arguments.Repo = null;
             var result = _sut.VerifyArgumentsAndWriteErrorsToConsole();
 
             Assert.False(result);
@@ -103,6 +104,8 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
         [Fact]
         public void CanCreateReleaseOnGitHub()
         {
+            _arguments.Version = "1.2.0";
+            _arguments.Repo = "Foo/Baz";
             const string releaseNotesOutput = " - A thingy was fixed";
             _sut.PublishRelease(releaseNotesOutput);
 

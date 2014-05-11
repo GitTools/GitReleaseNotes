@@ -18,7 +18,7 @@ namespace GitReleaseNotes
         [Description("Enables verbose logging")]
         public bool Verbose { get; set; }
 
-        [Description("Specifies the issue tracker used, possible Options: GitHub, Jira")]
+        [Description("Specifies the issue tracker used, possible Options: GitHub, Jira, YouTrack")]
         public IssueTracker? IssueTracker { get; set; }
 
         [Description("Specify the tag name to start from, default is the last tag on master")]
