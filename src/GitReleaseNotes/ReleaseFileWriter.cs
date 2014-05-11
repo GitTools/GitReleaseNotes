@@ -1,3 +1,5 @@
+using System;
+
 namespace GitReleaseNotes
 {
     public class ReleaseFileWriter
@@ -14,6 +16,7 @@ namespace GitReleaseNotes
             if (string.IsNullOrEmpty(outputFile))
                 return;
             _fileSystem.WriteAllText(outputFile, releaseNotesOutput);
+            Console.WriteLine("Release notes written to {0}", outputFile);
         }
     }
 }

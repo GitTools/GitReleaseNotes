@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using GitReleaseNotes.IssueTrackers;
 using GitReleaseNotes.IssueTrackers.Jira;
 using LibGit2Sharp;
 using NSubstitute;
-using Xunit;
 
 namespace GitReleaseNotes.Tests.IssueTrackers.Jira
 {
