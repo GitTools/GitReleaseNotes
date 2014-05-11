@@ -1,12 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
 using GitReleaseNotes.IssueTrackers.GitHub;
 using LibGit2Sharp;
 using NSubstitute;
 using Octokit;
 using Xunit;
 using Xunit.Extensions;
-using Commit = LibGit2Sharp.Commit;
-using Signature = LibGit2Sharp.Signature;
 
 namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
 {
@@ -14,49 +16,48 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
     {
         private readonly GitReleaseNotesArguments _arguments;
         private readonly IGitHubClient _gitHubClient;
+        private readonly IIssuesClient _issuesClient;
         private readonly GitHubIssueTracker _sut;
         private readonly ILog _log;
-        private IRepository _repo;
+        private readonly IRepository _repo;
 
         public GitHubIssueTrackerTests()
         {
             _log = Substitute.For<ILog>();
             _gitHubClient = Substitute.For<IGitHubClient>();
+            _issuesClient = Substitute.For<IIssuesClient>();
+            _gitHubClient.Issue.Returns(_issuesClient);
             _arguments = new GitReleaseNotesArguments
             {
                 Repo = "Org/Repo",
                 Token = "213"
             };
             _repo = Substitute.For<IRepository>();
+            _repo.Network.Returns(new NetworkEx());
 
             _sut = new GitHubIssueTracker(_repo, () => _gitHubClient, _log, _arguments);
         }
 
-        //[Fact]
-        //public void CreatesReleaseNotesForClosedGitHubIssues()
-        //{
-        //    var commit = CreateCommit("Fixes #1", DateTimeOffset.Now.AddDays(-1));
-        //    var commitsToScan = new List<Commit> { commit };
-        //    var toScan = new Dictionary<ReleaseInfo, List<Commit>>
-        //    {
-        //        {new ReleaseInfo(), commitsToScan}
-        //    };
-        //    _issuesClient
-        //        .GetForRepository("Org", "Repo", Arg.Any<RepositoryIssueRequest>())
-        //        .Returns(Task.FromResult<IReadOnlyList<Issue>>(new List<Issue>
-        //        {
-        //            new Issue
-        //            {
-        //                Number = 1,
-        //                Title = "Issue Title"
-        //            }
-        //        }.AsReadOnly()));
-        //    _gitHubClient.Issue.Returns(_issuesClient);
+        [Fact]
+        public void CreatesReleaseNotesForClosedGitHubIssues()
+        {
+            _issuesClient
+                .GetForRepository("Org", "Repo", Arg.Any<RepositoryIssueRequest>())
+                .Returns(Task.FromResult<IReadOnlyList<Issue>>(new List<Issue>
+                {
+                    new Issue
+                    {
+                        Number = 1,
+                        Title = "Issue Title",
+                        Labels = new Collection<Label>(),
+                        ClosedAt = DateTimeOffset.Now
+                    }
+                }.AsReadOnly()));
 
-        //    var releaseNotes = _sut.GetClosedIssues(_gitReleaseNotesArguments, toScan);
+            var closedIssues = _sut.GetClosedIssues(DateTimeOffset.Now.AddDays(-2));
 
-        //    Assert.Equal("Issue Title", releaseNotes.Releases[0].ReleaseNoteItems[0].Title);
-        //}
+            Assert.Equal("Issue Title", closedIssues.Single().Title);
+        }
 
         [Fact]
         public void ErrorLoggedWhenRepoIsNotSpecified()
@@ -90,6 +91,18 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
         }
 
         [Fact]
+        public void CanGetRepoFromRemote()
+        {
+            _repo.Network.Remotes.Add("upstream", "http://github.com/Org/Repo.With.Dots");
+
+            _sut.GetClosedIssues(DateTimeOffset.Now.AddDays(-2));
+
+            _issuesClient
+                .Received()
+                .GetForRepository("Org", "Repo.With.Dots", Arg.Any<RepositoryIssueRequest>());
+        }
+
+        [Fact]
         public void MustSpecifyVersionWhenPublishFlagIsSet()
         {
             _arguments.Repo = "Foo/Bar";
@@ -113,15 +126,6 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
                 .Received()
                 .CreateRelease("Foo", "Baz",
                     Arg.Is<ReleaseUpdate>(r => r.TagName == "1.2.0" && r.Body == releaseNotesOutput && r.Name == "1.2.0"));
-        }
-
-        private static Commit CreateCommit(string message, DateTimeOffset when)
-        {
-            var commit = Substitute.For<Commit>();
-            commit.Message.Returns(message);
-            var commitSignature = new Signature("Jake", "", when);
-            commit.Author.Returns(commitSignature);
-            return commit;
         }
     }
 }

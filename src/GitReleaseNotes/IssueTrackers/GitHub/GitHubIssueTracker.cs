@@ -11,9 +11,9 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
     public class GitHubIssueTracker : IIssueTracker
     {
         private readonly Func<IGitHubClient> _gitHubClientFactory;
+        private readonly GitReleaseNotesArguments _arguments;
         private readonly IRepository _repository;
         private readonly ILog _log;
-        private readonly GitReleaseNotesArguments _arguments;
 
         public GitHubIssueTracker(IRepository repository, Func<IGitHubClient> gitHubClientFactory, ILog log, GitReleaseNotesArguments arguments)
         {
@@ -88,6 +88,7 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
                 if (TryRemote(out organisation, out repository, remoteName))
                     return;
             }
+
             var repoParts = arguments.Repo.Split('/');
             organisation = repoParts[0];
             repository = repoParts[1];
@@ -95,10 +96,10 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
 
         private bool TryRemote(out string organisation, out string repository, string remoteName)
         {
-            var upstream = _repository.Network.Remotes[remoteName];
-            if (upstream != null && upstream.Url.ToLower().Contains("github.com"))
+            var remote = _repository.Network.Remotes[remoteName];
+            if (remote != null && remote.Url.ToLower().Contains("github.com"))
             {
-                var urlWithoutGitExtension = upstream.Url.EndsWith(".git") ? upstream.Url.Substring(0, upstream.Url.Length - 4) : upstream.Url;
+                var urlWithoutGitExtension = remote.Url.EndsWith(".git") ? remote.Url.Substring(0, remote.Url.Length - 4) : remote.Url;
                 var match = Regex.Match(urlWithoutGitExtension, "github.com[/:](?<org>.*?)/(?<repo>.*)");
                 if (match.Success)
                 {
