@@ -27,13 +27,13 @@ namespace GitReleaseNotes
         [Description("GitHub access token")]
         public string Token { get; set; }
 
-        [Description("Jira Username")]
+        [Description("Issue tracker username")]
         public string Username { get; set; }
 
-        [Description("Jira Password")]
+        [Description("Issue tracker password")]
         public string Password { get; set; }
 
-        [Description("Jira project Id")]
+        [Description("Jira project ID")]
         public string JiraProjectId { get; set; }
 
         [Description("Jql query for closed issues you would like included if mentioned. Defaults to project = <YOURPROJECTID> AND (issuetype = Bug OR issuetype = Story OR issuetype = \"New Feature\") AND status in (Closed, Done, Resolved)")]
@@ -41,6 +41,15 @@ namespace GitReleaseNotes
 
         [Description("Url of Jira server")]
         public string JiraServer { get; set; }
+
+        [Description("Url of YouTrack server")]
+        public string YouTrackServer { get; set; }
+
+        [Description("YouTrack project ID")]
+        public string YouTrackProjectId { get; set; }
+
+        [Description("YouTrack filter for closed issues that you would like included if mentioned. Defaults to project:<YOURPROJECTID> State:Resolved State:-{{Won't fix}} State:-{{Can't Reproduce}} State:-Duplicate")]
+        public string YouTrackFilter { get; set; }
 
         [Description("GitHub Repository name, in Organisation/Repository format")]
         public string Repo { get; set; }

@@ -12,6 +12,7 @@ using GitReleaseNotes.Git;
 using GitReleaseNotes.IssueTrackers;
 using GitReleaseNotes.IssueTrackers.GitHub;
 using GitReleaseNotes.IssueTrackers.Jira;
+using GitReleaseNotes.IssueTrackers.YouTrack;
 using LibGit2Sharp;
 using Octokit;
 using Credentials = Octokit.Credentials;
@@ -159,6 +160,10 @@ namespace GitReleaseNotes
                 {
                     IssueTracker.Jira, 
                     new JiraIssueTracker(new JiraApi(), arguments)
+                },
+                {
+                    IssueTracker.YouTrack,
+                    new YouTrackIssueTracker(new YouTrackApi(), arguments)
                 }
             };
         }

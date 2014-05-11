@@ -49,6 +49,7 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Web.Helpers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -73,6 +74,9 @@
     <Compile Include="Git\ITaggedCommitFinder.cs" />
     <Compile Include="IssueTrackers\IssueType.cs" />
     <Compile Include="IssueTrackers\OnlineIssue.cs" />
+    <Compile Include="IssueTrackers\YouTrack\IYouTrackApi.cs" />
+    <Compile Include="IssueTrackers\YouTrack\YouTrackApi.cs" />
+    <Compile Include="IssueTrackers\YouTrack\YouTrackIssueTracker.cs" />
     <Compile Include="ReleaseDiffInfo.cs" />
     <Compile Include="ReleaseNoteItem.cs" />
     <Compile Include="IssueTrackers\IIssueNumberExtractor.cs" />
@@ -101,6 +105,7 @@
     </None>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <PropertyGroup>
