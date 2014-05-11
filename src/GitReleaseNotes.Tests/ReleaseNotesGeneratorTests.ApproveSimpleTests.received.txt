@@ -1,4 +1,0 @@
-﻿ - Issue 1 [#1](http://github.com/org/repo/issues/1)
- - Issue 1
-
-Commits: 12345678...67890123
