@@ -67,9 +67,9 @@ namespace GitReleaseNotes
                     var url = htmlUrl == null ? null : string.Format("({0})", htmlUrl);
                     var contributors = releaseNoteItem.Contributors == null || releaseNoteItem.Contributors.Length == 0 ?
                         string.Empty : " contributed by " + string.Join(", ", releaseNoteItem.Contributors.Select(r => string.Format("{0} ([{1}]({2}))", r.Name, r.Username, r.Url)));
-                    var item = string.Format("{4}{0}{1}{2}{5}{3}", title, issueNum, url, category,
+                    var item = string.Format(" - {1}{2}{4}{0}{5}{3}", title, issueNum, url, category,
                         title.TrimStart().StartsWith("-") ? null : " - ",
-                        contributors);
+                        contributors).Replace("  ", " ").Replace("- -", "-");
                     builder.AppendLine(item);
                 }
 

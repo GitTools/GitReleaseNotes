@@ -144,11 +144,11 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
             };
             return readOnlyList.Select(i => new OnlineIssue
             {
+                Id = "#" + i.Number.ToString(CultureInfo.InvariantCulture),
                 HtmlUrl = i.HtmlUrl,
-                Id = i.Number.ToString(CultureInfo.InvariantCulture),
+                Title = i.Title,
                 IssueType = i.PullRequest == null ? IssueType.Issue : IssueType.PullRequest,
                 Labels = i.Labels.Select(l => l.Name).ToArray(),
-                Title = i.Title,
                 DateClosed = i.ClosedAt.Value,
                 Contributors = i.PullRequest == null ? new Contributor[0] : new[] { new Contributor(getUserName(i.User), i.User.Login, i.User.HtmlUrl) }
             });

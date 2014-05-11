@@ -65,6 +65,7 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
             var closedIssues = _sut.GetClosedIssues(DateTimeOffset.Now.AddDays(-2));
             var onlineIssue = closedIssues.Single();
             onlineIssue.Title.ShouldBe("Issue Title");
+            onlineIssue.Id.ShouldBe("#1");
             onlineIssue.Contributors.ShouldContain(c => c.Username == "User" && c.Name == "Foo" && c.Url == "http://github.com/foo");
         }
 
