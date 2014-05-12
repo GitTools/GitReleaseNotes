@@ -64,7 +64,7 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
             if (since.HasValue)
             {
                 query = string.Format(
-                    "{0} updated: {1:yyyy-MM-ddTHH:mm:ss} .. {2:yyyy-MM-ddTHH:mm:ss}", 
+                    "{0} resolved date: {1:yyyy-MM-ddTHH:mm:ss} .. {2:yyyy-MM-ddTHH:mm:ss}", 
                     filter,
                     since.Value, 
                     DateTimeOffset.Now);
