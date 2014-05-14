@@ -10,7 +10,7 @@ namespace GitReleaseNotes.GenerationStrategy
         public SemanticReleaseNotes GetReleaseNotes(Dictionary<ReleaseInfo, List<Commit>> releases, GitReleaseNotesArguments tagToStartFrom,
             IIssueTracker issueTracker)
         {
-            var closedIssues = issueTracker.GetClosedIssues(releases.Select(r => r.Key.When).Min()).ToArray();
+            var closedIssues = issueTracker.GetClosedIssues(releases.Select(r => r.Key.PreviousReleaseDate).Min()).ToArray();
 
             var semanticReleases = new List<SemanticRelease>();
             foreach (var release in releases)
