@@ -3,5 +3,7 @@
     public interface ITaggedCommitFinder
     {
         TaggedCommit GetLastTaggedCommit();
+
+        TaggedCommit FromFirstCommit();
     }
 }
