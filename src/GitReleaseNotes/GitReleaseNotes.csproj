@@ -59,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArgumentVerifier.cs" />
+    <Compile Include="Contributor.cs" />
     <Compile Include="GenerationStrategy\ByClosedIssues.cs" />
     <Compile Include="GenerationStrategy\ByMentionedCommits.cs" />
     <Compile Include="CommitGrouper.cs" />

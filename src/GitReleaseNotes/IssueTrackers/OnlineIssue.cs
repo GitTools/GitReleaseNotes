@@ -9,6 +9,7 @@ namespace GitReleaseNotes.IssueTrackers
         public Uri HtmlUrl { get; set; }
         public string Title { get; set; }
         public string[] Labels { get; set; }
+        public Contributor[] Contributors { get; set; }
         public DateTimeOffset DateClosed { get; set; }
     }
 }

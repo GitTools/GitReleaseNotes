@@ -101,9 +101,9 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
                 }
 
                 string rawText;
-                using(var responseStream = response.GetResponseStream())
+                using (var responseStream = response.GetResponseStream())
                 {
-                    using(var responseReader = new StreamReader(responseStream))
+                    using (var responseReader = new StreamReader(responseStream))
                     {
                         rawText = responseReader.ReadToEnd();
                     }
@@ -121,8 +121,8 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
                                             where string.Equals("summary", subElement.Attribute("name").Value, StringComparison.OrdinalIgnoreCase)
                                             select subElement.Element("value").Value).FirstOrDefault(),
                                  Resolved = (from subElement in element.Descendants("field")
-                                            where string.Equals("resolved", subElement.Attribute("name").Value, StringComparison.InvariantCultureIgnoreCase)
-                                            select subElement.Element("value").Value).FirstOrDefault(),
+                                             where string.Equals("resolved", subElement.Attribute("name").Value, StringComparison.InvariantCultureIgnoreCase)
+                                             select subElement.Element("value").Value).FirstOrDefault(),
                              };
 
                 int count = 0;
@@ -166,7 +166,7 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
                 authenticationCookies,
                 arguments.YouTrackFilter,
                 arguments.YouTrackServer,
-                arguments.YouTrackProjectId,
+                arguments.ProjectId,
                 since);
         }
     }

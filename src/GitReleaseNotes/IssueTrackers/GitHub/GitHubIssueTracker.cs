@@ -11,9 +11,9 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
     public class GitHubIssueTracker : IIssueTracker
     {
         private readonly Func<IGitHubClient> _gitHubClientFactory;
+        private readonly GitReleaseNotesArguments _arguments;
         private readonly IRepository _repository;
         private readonly ILog _log;
-        private readonly GitReleaseNotesArguments _arguments;
 
         public GitHubIssueTracker(IRepository repository, Func<IGitHubClient> gitHubClientFactory, ILog log, GitReleaseNotesArguments arguments)
         {
@@ -88,6 +88,7 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
                 if (TryRemote(out organisation, out repository, remoteName))
                     return;
             }
+
             var repoParts = arguments.Repo.Split('/');
             organisation = repoParts[0];
             repository = repoParts[1];
@@ -95,10 +96,11 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
 
         private bool TryRemote(out string organisation, out string repository, string remoteName)
         {
-            var upstream = _repository.Network.Remotes[remoteName];
-            if (upstream != null && upstream.Url.ToLower().Contains("github.com"))
+            var remote = _repository.Network.Remotes[remoteName];
+            if (remote != null && remote.Url.ToLower().Contains("github.com"))
             {
-                var match = Regex.Match(upstream.Url, "github.com[/:](?<org>.*?)/(?<repo>[^\\./]*)");
+                var urlWithoutGitExtension = remote.Url.EndsWith(".git") ? remote.Url.Substring(0, remote.Url.Length - 4) : remote.Url;
+                var match = Regex.Match(urlWithoutGitExtension, "github.com[/:](?<org>.*?)/(?<repo>.*)");
                 if (match.Success)
                 {
                     organisation = match.Groups["org"].Value;
@@ -117,21 +119,38 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
             string repository;
             GetRepository(_arguments, out organisation, out repository);
 
-            var forRepository = _gitHubClientFactory().Issue.GetForRepository(organisation, repository, new RepositoryIssueRequest
+            var gitHubClient = _gitHubClientFactory();
+            var forRepository = gitHubClient.Issue.GetForRepository(organisation, repository, new RepositoryIssueRequest
             {
                 Filter = IssueFilter.All,
                 Since = since,
                 State = ItemState.Closed
             });
             var readOnlyList = forRepository.Result;
+
+            var userCache = new Dictionary<string, User>();
+            Func<User, string> getUserName = u =>
+            {
+                var login = u.Login;
+                if (!userCache.ContainsKey(login))
+                {
+                    userCache.Add(login, string.IsNullOrEmpty(u.Name) ? gitHubClient.User.Get(login).Result : u);
+                }
+
+                var user = userCache[login];
+                if (user != null) 
+                    return user.Name;
+                return null;
+            };
             return readOnlyList.Select(i => new OnlineIssue
             {
+                Id = "#" + i.Number.ToString(CultureInfo.InvariantCulture),
                 HtmlUrl = i.HtmlUrl,
-                Id = i.Number.ToString(CultureInfo.InvariantCulture),
+                Title = i.Title,
                 IssueType = i.PullRequest == null ? IssueType.Issue : IssueType.PullRequest,
                 Labels = i.Labels.Select(l => l.Name).ToArray(),
-                Title = i.Title,
-                DateClosed = i.ClosedAt.Value
+                DateClosed = i.ClosedAt.Value,
+                Contributors = i.PullRequest == null ? new Contributor[0] : new[] { new Contributor(getUserName(i.User), i.User.Login, i.User.HtmlUrl) }
             });
         }
     }

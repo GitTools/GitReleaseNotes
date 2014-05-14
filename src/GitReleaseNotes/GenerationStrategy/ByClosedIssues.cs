@@ -20,7 +20,7 @@ namespace GitReleaseNotes.GenerationStrategy
                     .Where(i => 
                         (reloadLocal.Key.When == null || i.DateClosed < reloadLocal.Key.When) && 
                         (reloadLocal.Key.PreviousReleaseDate == null || i.DateClosed > reloadLocal.Key.PreviousReleaseDate))
-                    .Select(i => new ReleaseNoteItem(i.Title, i.Id, i.HtmlUrl, i.Labels, i.DateClosed))
+                    .Select(i => new ReleaseNoteItem(i.Title, i.Id, i.HtmlUrl, i.Labels, i.DateClosed, i.Contributors))
                     .ToList();
                 semanticReleases.Add(new SemanticRelease(release.Key.Name, release.Key.When, releaseNoteItems, new ReleaseDiffInfo
                 {

@@ -55,7 +55,7 @@ namespace GitReleaseNotes.GenerationStrategy
                 var releaseNoteItems = r.IssuesForRelease.Select(i =>
                 {
                     var labels = i.Labels ?? new string[0];
-                    return new ReleaseNoteItem(i.Title, string.Format("{0}", i.Id), i.HtmlUrl, labels, i.DateClosed);
+                    return new ReleaseNoteItem(i.Title, string.Format("{0}", i.Id), i.HtmlUrl, labels, i.DateClosed, i.Contributors);
                 }).ToList();
                 return new SemanticRelease(r.ReleaseInfo.Name, r.ReleaseInfo.When, releaseNoteItems, new ReleaseDiffInfo
                 {

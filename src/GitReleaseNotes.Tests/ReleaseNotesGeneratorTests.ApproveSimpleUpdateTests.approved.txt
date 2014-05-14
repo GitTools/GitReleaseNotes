@@ -1,4 +1,4 @@
-﻿ - Customised title for Issue 1 [#1](http://github.com/org/repo/issues/1)
- - Issue 2 [#2](http://github.com/org/repo/issues/2)
+﻿ - [#1](http://github.com/org/repo/issues/1) - Customised title for Issue 1
+ - [#2](http://github.com/org/repo/issues/2) - Issue 2
 
 Commits: 12345678...67890123

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Cleanup;Build;Package" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Cleanup;Build;Package" ToolsVersion="12" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Root>$(MSBuildProjectDirectory)\</Root>
     <BuildPlatform Condition="$(BuildPlatform) == ''">Any CPU</BuildPlatform>
@@ -38,15 +38,68 @@
     <xunit Assembly="$(Root)src\GitReleaseNotes.AcceptanceTests\bin\$(Configuration)\GitReleaseNotes.AcceptanceTests.dll" ShadowCopy="False" />
   </Target>
 
+  <UsingTask TaskName="ReplaceFileText" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v$(MSBuildToolsVersion).dll">
+    <ParameterGroup>
+      <InputFilename ParameterType="System.String" Required="true" />
+      <OutputFilename ParameterType="System.String" Required="true" />
+      <MatchExpression ParameterType="System.String" Required="true" />
+      <ReplacementText ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Reference Include="System.Core" />
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Text.RegularExpressions" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+            File.WriteAllText(
+                OutputFilename,
+                Regex.Replace(File.ReadAllText(InputFilename), MatchExpression, ReplacementText)
+                );
+          ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
   <Target Name="Package" DependsOnTargets="Test">
     <ItemGroup>
-      <BuildOutput Include="$(Root)src\GitHubFlowVersion\bin\$(Configuration)\**\*.*"/>
+      <BuildOutput Include="$(BuildOutputPath)\**\*.*" Exclude="$(BuildOutputPath)\**\*.vshost.exe"/>
     </ItemGroup>
 
-    <Copy SourceFiles="@(BuildOutput)"
-          DestinationFiles="@(BuildOutput->'$(DropPath)%(RecursiveDir)%(Filename)%(Extension)')" />
-    
     <MakeDir Directories="$(DropPath)" />
-    <Exec Command="$(Root)src\.NuGet\NuGet.exe pack $(Root)GitReleaseNotes.nuspec -BasePath $(BuildOutputPath) -OutputDirectory $(DropPath) -Properties Version=$(GitHubFlowVersion_SemVer) -Tool"/>
+    <MakeDir Directories="$(DropPath)\NuGet" />
+    <MakeDir Directories="$(DropPath)\Chocolatey" />
+    <MakeDir Directories="$(Root)\ChocolateyBackup" />
+    <Exec Command="$(Root)src\.NuGet\NuGet.exe pack $(Root)GitReleaseNotes.nuspec -BasePath $(BuildOutputPath) -OutputDirectory $(DropPath)NuGet -Properties Version=$(GitHubFlowVersion_SemVer) -Tool"/>
+
+    <Zip Files="@(BuildOutput)"
+         WorkingDirectory="$(BuildOutputPath)"
+         ZipFileName="$(DropPath)GitReleaseNotes.$(GitHubFlowVersion_SemVer).zip"
+         ZipLevel="9" />
+
+    <MakeDir Directories="$(Root)\ChocolateyBackup" />
+    <Copy SourceFiles="$(Root)Chocolatey\tools\chocolateyInstall.ps1"
+          DestinationFolder="$(Root)\ChocolateyBackup" />
+    <Copy SourceFiles="$(Root)Chocolatey\GitReleaseNotes.nuspec"
+          DestinationFolder="$(Root)\ChocolateyBackup" />
+    
+    <ReplaceFileText InputFilename="$(Root)Chocolatey\tools\chocolateyInstall.ps1"
+                     OutputFilename="$(Root)Chocolatey\tools\chocolateyInstall.ps1"
+                     MatchExpression="__version__"
+                     ReplacementText="$(GitHubFlowVersion_SemVer)" />
+    
+    <ReplaceFileText InputFilename="$(Root)Chocolatey\GitReleaseNotes.nuspec"
+                     OutputFilename="$(Root)Chocolatey\GitReleaseNotes.nuspec"
+                     MatchExpression="__version__"
+                     ReplacementText="$(GitHubFlowVersion_SemVer)" />
+    
+    <Exec Command="cpack $(Root)Chocolatey\GitReleaseNotes.nuspec" WorkingDirectory="$(DropPath)\Chocolatey" />
+
+    <Copy SourceFiles="$(Root)\ChocolateyBackup\chocolateyInstall.ps1"
+          DestinationFolder="$(Root)\Chocolatey\tools" />
+    <Copy SourceFiles="$(Root)ChocolateyBackup\GitReleaseNotes.nuspec"
+          DestinationFolder="$(Root)\Chocolatey" />
+    
+    <RemoveDir Directories="$(Root)ChocolateyBackup" />
   </Target>
 </Project>
