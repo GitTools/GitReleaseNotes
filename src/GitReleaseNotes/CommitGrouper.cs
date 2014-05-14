@@ -20,7 +20,7 @@ namespace GitReleaseNotes
                     var tag = tagLookup[commit.Sha];
                     var releaseDate = ((Commit) tag.Target).Author.When;
                     currentRelease.Item1.PreviousReleaseDate = releaseDate;
-                    var releaseInfo = new ReleaseInfo(tag.Name, releaseDate, null, commit.Sha);
+                    var releaseInfo = new ReleaseInfo(tag.Name, releaseDate, tagToStartFrom.Commit.Author.When, commit.Sha);
                     var commits = new List<Commit>();
                     currentRelease = new Tuple<ReleaseInfo, List<Commit>>(releaseInfo, commits);
                     releases.Add(releaseInfo, commits);
