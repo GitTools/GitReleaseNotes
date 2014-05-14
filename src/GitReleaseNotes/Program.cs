@@ -91,17 +91,15 @@ namespace GitReleaseNotes
             var taggedCommitFinder = new TaggedCommitFinder(gitRepo, gitHelper);
 
             TaggedCommit tagToStartFrom;
-            if (string.IsNullOrEmpty(arguments.FromTag))
-                tagToStartFrom = taggedCommitFinder.GetLastTaggedCommit();
-            else if (arguments.FromTag == "all")
-                tagToStartFrom = null;
+            if (arguments.AllTags)
+                tagToStartFrom = taggedCommitFinder.FromFirstCommit();
             else
-                tagToStartFrom = taggedCommitFinder.GetTag(arguments.FromTag);
+                tagToStartFrom = taggedCommitFinder.GetLastTaggedCommit();
 
             var releases = new CommitGrouper().GetCommitsByRelease(
                 gitRepo, 
                 tagToStartFrom,
-                !string.IsNullOrEmpty(arguments.Version) ? new ReleaseInfo(arguments.Version, DateTimeOffset.Now, null, null) : null);
+                !string.IsNullOrEmpty(arguments.Version) ? new ReleaseInfo(arguments.Version, DateTimeOffset.Now, tagToStartFrom.Commit.Author.When, null) : null);
 
             IReleaseNotesStrategy generationStrategy;
             if (arguments.FromClosedIssues)
