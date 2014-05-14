@@ -53,7 +53,7 @@ namespace GitReleaseNotes
                 return 1;
             }
 
-            var workingDirectory = arguments.WorkingDirectory ?? Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var workingDirectory = arguments.WorkingDirectory ?? Directory.GetCurrentDirectory();
 
             var gitDirectory = GitDirFinder.TreeWalkForGitDir(workingDirectory);
             if (string.IsNullOrEmpty(gitDirectory))
