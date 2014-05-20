@@ -12,17 +12,6 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
 {
     public sealed class YouTrackApi : IYouTrackApi
     {
-        public IEnumerable<OnlineIssue> GetClosedIssues(GitReleaseNotesArguments arguments, DateTimeOffset? since)
-        {
-            var authenticationCookies = ConnectToYouTrack(arguments.Username, arguments.Password, arguments.YouTrackServer);
-            return IssuesClosedSinceDate(
-                authenticationCookies,
-                arguments.YouTrackFilter,
-                arguments.YouTrackServer,
-                arguments.ProjectId,
-                since);
-        }
-
         private static CookieCollection ConnectToYouTrack(string userName, string password, string youtrackHostUrl)
         {
             var loginUrl = string.Format(
@@ -75,9 +64,9 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
             if (since.HasValue)
             {
                 query = string.Format(
-                    "{0} updated: {1:yyyy-MM-ddTHH:mm:ss} .. {2:yyyy-MM-ddTHH:mm:ss}",
+                    "{0} resolved date: {1:yyyy-MM-ddTHH:mm:ss} .. {2:yyyy-MM-ddTHH:mm:ss}", 
                     filter,
-                    since.Value,
+                    since.Value, 
                     DateTimeOffset.Now);
             }
             else
@@ -168,6 +157,17 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
             }
 
             return result;
+        }
+
+        public IEnumerable<OnlineIssue> GetClosedIssues(GitReleaseNotesArguments arguments, DateTimeOffset? since)
+        {
+            var authenticationCookies = ConnectToYouTrack(arguments.Username, arguments.Password, arguments.YouTrackServer);
+            return IssuesClosedSinceDate(
+                authenticationCookies,
+                arguments.YouTrackFilter,
+                arguments.YouTrackServer,
+                arguments.ProjectId,
+                since);
         }
     }
 }

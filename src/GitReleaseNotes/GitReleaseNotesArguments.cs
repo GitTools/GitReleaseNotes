@@ -21,8 +21,8 @@ namespace GitReleaseNotes
         [Description("Specifies the issue tracker used, possible Options: GitHub, Jira, YouTrack")]
         public IssueTracker? IssueTracker { get; set; }
 
-        [Description("Specify the tag name to start from, default is the last tag on master")]
-        public string FromTag { get; set; }
+        [Description("Specifies that all tags should be included in the release notes, if not specified then only the issues since the last tag are included.")]
+        public bool AllTags { get; set; }
 
         [Description("GitHub access token")]
         public string Token { get; set; }

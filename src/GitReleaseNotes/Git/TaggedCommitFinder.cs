@@ -22,6 +22,12 @@ namespace GitReleaseNotes.Git
             return GetTag(string.Empty);
         }
 
+        public TaggedCommit FromFirstCommit()
+        {
+            var branch = GetMasterBranch(_gitRepo, _gitHelper);
+            return new TaggedCommit(branch.Commits.Last(), "Initial Commit");
+        }
+
         public TaggedCommit GetTag(string fromTag)
         {
             if (!_cache.ContainsKey(fromTag))
@@ -32,7 +38,7 @@ namespace GitReleaseNotes.Git
 
         private static TaggedCommit GetLastTaggedCommit(IRepository gitRepo, IGitHelper gitHelper, Func<TaggedCommit, bool> filterTags)
         {
-            var branch = gitHelper.GetBranch(gitRepo, "master");
+            var branch = GetMasterBranch(gitRepo, gitHelper);
             var tags = gitRepo.Tags
                 .Select(t => new TaggedCommit((Commit)t.Target, t.Name))
                 .Where(filterTags)
@@ -45,6 +51,11 @@ namespace GitReleaseNotes.Git
                 return tags.Single(a => a.Commit.Sha == lastTaggedCommit.Sha);
 
             return new TaggedCommit(branch.Commits.Last(), "Initial Commit");
+        }
+
+        private static Branch GetMasterBranch(IRepository gitRepo, IGitHelper gitHelper)
+        {
+            return gitHelper.GetBranch(gitRepo, "master");
         }
     }
 }
