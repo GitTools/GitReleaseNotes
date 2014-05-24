@@ -16,7 +16,6 @@ namespace GitReleaseNotes.Tests
     {
         private readonly Dictionary<Commit, string> _tags;
         private readonly IRepository _repository;
-        private readonly CommitGrouper _sut;
         private readonly Random _random;
         private DateTimeOffset _nextCommitDate;
 
@@ -35,7 +34,6 @@ namespace GitReleaseNotes.Tests
             }).GetEnumerator());
             _repository.Tags.Returns(tagCollection);
             _random = new Random();
-            _sut = new CommitGrouper();
         }
 
         [Fact]
@@ -47,7 +45,7 @@ namespace GitReleaseNotes.Tests
             SubstituteCommitLog(commit1, startTagCommit, commit3);
             var startTag = new TaggedCommit(startTagCommit, "1.0.0");
 
-            var results = _sut.GetCommitsByRelease(_repository, startTag);
+            var results = CommitGrouper.GetCommitsByRelease(_repository, startTag);
 
             var firstRelease = results.First();
             firstRelease.Value.Count.ShouldBe(1);
@@ -65,7 +63,7 @@ namespace GitReleaseNotes.Tests
             _tags.Add(commit2, "1.1.0");
             var startTag = new TaggedCommit(startTagCommit, "1.0.0");
 
-            var results = _sut.GetCommitsByRelease(_repository, startTag);
+            var results = CommitGrouper.GetCommitsByRelease(_repository, startTag);
 
             results.Count.ShouldBe(2);
             results.ElementAt(0).Key.Name.ShouldBe(null);
@@ -89,7 +87,7 @@ namespace GitReleaseNotes.Tests
             _tags.Add(commit2, "1.1.0");
             _tags.Add(startTagCommit, "1.0.0");
 
-            var results = _sut.GetCommitsByRelease(_repository, null);
+            var results = CommitGrouper.GetCommitsByRelease(_repository, null);
 
             Assert.Equal(3, results.Count);
             Assert.Equal(null, results.ElementAt(0).Key.Name);

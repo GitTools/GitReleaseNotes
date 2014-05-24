@@ -1,4 +1,4 @@
-﻿namespace GitReleaseNotes
+﻿namespace GitReleaseNotes.FileSystem
 {
     public interface IFileSystem
     {

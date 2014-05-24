@@ -1,5 +1,6 @@
 ﻿using System;
-using GitReleaseNotes.GenerationStrategy;
+using System.Collections.Generic;
+using System.Linq;
 using GitReleaseNotes.Git;
 using GitReleaseNotes.IssueTrackers;
 using LibGit2Sharp;
@@ -8,30 +9,33 @@ namespace GitReleaseNotes
 {
     public class ReleaseNotesGenerator
     {
-        public static SemanticReleaseNotes GenerateReleaseNotes(IRepository gitRepo, IGitHelper gitHelper, GitReleaseNotesArguments arguments, IIssueTracker issueTracker, SemanticReleaseNotes previousReleaseNotes, string[] categories)
+        public static SemanticReleaseNotes GenerateReleaseNotes(IRepository gitRepo, IIssueTracker issueTracker, SemanticReleaseNotes previousReleaseNotes, string[] categories, TaggedCommit tagToStartFrom, ReleaseInfo currentReleaseInfo)
         {
-            var taggedCommitFinder = new TaggedCommitFinder(gitRepo, gitHelper);
-
-            var tagToStartFrom = arguments.AllTags
-                ? taggedCommitFinder.FromFirstCommit()
-                : taggedCommitFinder.GetLastTaggedCommit();
-
-            var releases = new CommitGrouper().GetCommitsByRelease(
+            var releases = CommitGrouper.GetCommitsByRelease(
                 gitRepo,
                 tagToStartFrom,
-                !string.IsNullOrEmpty(arguments.Version)
-                    ? new ReleaseInfo(arguments.Version, DateTimeOffset.Now, tagToStartFrom.Commit.Author.When, null)
-                    : null);
+                currentReleaseInfo);
 
-            IReleaseNotesStrategy generationStrategy;
-            if (arguments.FromClosedIssues)
-                generationStrategy = new ByClosedIssues();
-            else if (arguments.FromMentionedIssues)
-                generationStrategy = new ByMentionedCommits(new IssueNumberExtractor());
-            else
-                generationStrategy = new ByClosedIssues();
+            var closedIssues = issueTracker.GetClosedIssues(releases.Select(r => r.Key.PreviousReleaseDate).Min()).ToArray();
 
-            return generationStrategy.GetReleaseNotes(releases, arguments, issueTracker, categories);
+            var semanticReleases = new List<SemanticRelease>();
+            foreach (var release in releases)
+            {
+                var reloadLocal = release;
+                var releaseNoteItems = closedIssues
+                    .Where(i => 
+                        (reloadLocal.Key.When == null || i.DateClosed < reloadLocal.Key.When) && 
+                        (reloadLocal.Key.PreviousReleaseDate == null || i.DateClosed > reloadLocal.Key.PreviousReleaseDate))
+                    .Select(i => new ReleaseNoteItem(i.Title, i.Id, i.HtmlUrl, i.Labels, i.DateClosed, i.Contributors))
+                    .ToList();
+                semanticReleases.Add(new SemanticRelease(release.Key.Name, release.Key.When, releaseNoteItems, new ReleaseDiffInfo
+                {
+                    BeginningSha = release.Value.First().Sha.Substring(0, 10),
+                    EndSha = release.Value.Last().Sha.Substring(0, 10)
+                }));
+            }
+
+            return new SemanticReleaseNotes(semanticReleases, categories);
         }
     }
 }

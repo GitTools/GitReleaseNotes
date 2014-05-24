@@ -8,15 +8,9 @@ namespace GitReleaseNotes
 {
     public class CommitGrouper
     {
-        public Dictionary<ReleaseInfo, List<Commit>> GetCommitsByRelease(IRepository gitRepo, TaggedCommit tagToStartFrom, ReleaseInfo current = null)
+        public static Dictionary<ReleaseInfo, List<Commit>> GetCommitsByRelease(IRepository gitRepo, TaggedCommit tagToStartFrom, ReleaseInfo current = null)
         {
-            var previousReleaseDate = (tagToStartFrom != null)
-                ? (DateTimeOffset?)tagToStartFrom.Commit.Author.When
-                : null;
-            var currentRelease = new Tuple<ReleaseInfo, List<Commit>>(current ?? new ReleaseInfo
-            {
-                PreviousReleaseDate = previousReleaseDate
-            }, new List<Commit>());
+            var currentRelease = new Tuple<ReleaseInfo, List<Commit>>(current, new List<Commit>());
             var releases = new Dictionary<ReleaseInfo, List<Commit>> {{currentRelease.Item1, currentRelease.Item2}};
             var tagLookup = gitRepo.Tags.ToDictionary(t => t.Target.Sha, t => t);
             foreach (var commit in gitRepo.Commits.TakeWhile(c => tagToStartFrom == null || c != tagToStartFrom.Commit))

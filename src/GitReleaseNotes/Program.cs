@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http.Headers;
 using Args.Help;
 using Args.Help.Formatters;
+using GitReleaseNotes.FileSystem;
 using GitReleaseNotes.Git;
 using GitReleaseNotes.IssueTrackers;
 using GitReleaseNotes.IssueTrackers.GitHub;
@@ -88,7 +89,7 @@ namespace GitReleaseNotes
                 return 1;
             }
 
-            var fileSystem = new FileSystem();
+            var fileSystem = new FileSystem.FileSystem();
             var releaseFileWriter = new ReleaseFileWriter(fileSystem);
             string outputFile = null;
             var previousReleaseNotes = new SemanticReleaseNotes();
@@ -101,7 +102,13 @@ namespace GitReleaseNotes
             }
 
             var categories = arguments.Categories == null ? Categories : Categories.Concat(arguments.Categories.Split(',')).ToArray();
-            var releaseNotes = ReleaseNotesGenerator.GenerateReleaseNotes(gitRepo, gitHelper, arguments, issueTracker, previousReleaseNotes, categories);
+            ITaggedCommitFinder taggedCommitFinder = new TaggedCommitFinder(gitRepo, gitHelper);
+            TaggedCommit tagToStartFrom = arguments.AllTags
+                ? taggedCommitFinder.FromFirstCommit()
+                : taggedCommitFinder.GetLastTaggedCommit() ?? taggedCommitFinder.FromFirstCommit();
+            var releaseNotes = ReleaseNotesGenerator.GenerateReleaseNotes(gitRepo, issueTracker, previousReleaseNotes, categories, tagToStartFrom, !string.IsNullOrEmpty(arguments.Version)
+                ? new ReleaseInfo(arguments.Version, DateTimeOffset.Now, tagToStartFrom.Commit.Author.When, null)
+                : new ReleaseInfo { PreviousReleaseDate = tagToStartFrom.Commit.Author.When });
             var releaseNotesOutput = releaseNotes.ToString();
             releaseFileWriter.OutputReleaseNotesFile(releaseNotesOutput, outputFile);
 

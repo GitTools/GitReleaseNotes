@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using GitReleaseNotes.FileSystem;
 using NSubstitute;
 using Xunit;
 

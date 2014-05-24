@@ -1,6 +1,6 @@
 using System;
 
-namespace GitReleaseNotes
+namespace GitReleaseNotes.FileSystem
 {
     public class ReleaseFileWriter
     {

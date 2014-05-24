@@ -60,12 +60,9 @@
   <ItemGroup>
     <Compile Include="ArgumentVerifier.cs" />
     <Compile Include="Contributor.cs" />
-    <Compile Include="GenerationStrategy\ByClosedIssues.cs" />
-    <Compile Include="GenerationStrategy\ByMentionedCommits.cs" />
     <Compile Include="CommitGrouper.cs" />
-    <Compile Include="FileSystem.cs" />
-    <Compile Include="GenerationStrategy\IReleaseNotesStrategy.cs" />
-    <Compile Include="IFileSystem.cs" />
+    <Compile Include="FileSystem\FileSystem.cs" />
+    <Compile Include="FileSystem\IFileSystem.cs" />
     <Compile Include="ILog.cs" />
     <Compile Include="IssueTrackers\GitHub\GitHubIssueTracker.cs" />
     <Compile Include="GitReleaseNotesArguments.cs" />
@@ -93,9 +90,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Git\TaggedCommit.cs" />
     <Compile Include="Git\TaggedCommitFinder.cs" />
-    <Compile Include="ReleaseFileWriter.cs" />
+    <Compile Include="FileSystem\ReleaseFileWriter.cs" />
     <Compile Include="ReleaseInfo.cs" />
-    <Compile Include="ReleaseNotesFileReader.cs" />
+    <Compile Include="FileSystem\ReleaseNotesFileReader.cs" />
     <Compile Include="ReleaseNotesGenerator.cs" />
     <Compile Include="SemanticRelease.cs" />
     <Compile Include="SemanticReleaseNotes.cs" />

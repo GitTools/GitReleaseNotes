@@ -9,12 +9,6 @@ namespace GitReleaseNotes
                      "if unspecified it will search parent directories recursively until finding a Git repository.")]
         public string WorkingDirectory { get; set; }
 
-        [Description("Generates release notes based on issues closed since date of specified tag")]
-        public bool FromClosedIssues { get; set; }
-
-        [Description("Generates release notes from issues mentioned in commit messages")]
-        public bool FromMentionedIssues { get; set; }
-
         [Description("Enables verbose logging")]
         public bool Verbose { get; set; }
 
