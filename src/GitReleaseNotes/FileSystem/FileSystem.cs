@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace GitReleaseNotes
+namespace GitReleaseNotes.FileSystem
 {
     class FileSystem : IFileSystem
     {
