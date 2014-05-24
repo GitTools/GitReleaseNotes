@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitReleaseNotes", "GitReleaseNotes\GitReleaseNotes.csproj", "{61D661AC-DC68-4862-8830-FE730C9B15FE}"
 EndProject
@@ -24,8 +24,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitReleaseNotes.Tests", "GitReleaseNotes.Tests\GitReleaseNotes.Tests.csproj", "{CBA088EC-CF1D-43B6-A53D-ECCD89728AA9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitReleaseNotes.AcceptanceTests", "GitReleaseNotes.AcceptanceTests\GitReleaseNotes.AcceptanceTests.csproj", "{FF8FE94C-FF7D-498D-9AB6-1C8AD9A222D3}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,10 +38,6 @@ Global
 		{CBA088EC-CF1D-43B6-A53D-ECCD89728AA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CBA088EC-CF1D-43B6-A53D-ECCD89728AA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CBA088EC-CF1D-43B6-A53D-ECCD89728AA9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FF8FE94C-FF7D-498D-9AB6-1C8AD9A222D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FF8FE94C-FF7D-498D-9AB6-1C8AD9A222D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FF8FE94C-FF7D-498D-9AB6-1C8AD9A222D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FF8FE94C-FF7D-498D-9AB6-1C8AD9A222D3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
