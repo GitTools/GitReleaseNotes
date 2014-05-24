@@ -1,21 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace GitReleaseNotes.IssueTrackers.YouTrack
 {
     public sealed class YouTrackIssueTracker : IIssueTracker
     {
         private readonly GitReleaseNotesArguments _arguments;
-        private readonly Regex _issueNumberRegex;
         private readonly IYouTrackApi _youTrackApi;
 
         public YouTrackIssueTracker(IYouTrackApi youTrackApi, GitReleaseNotesArguments arguments)
         {
             _youTrackApi = youTrackApi;
             _arguments = arguments;
-            _issueNumberRegex = new Regex(string.Format(@"(?<issueNumber>{0}-\d+)", arguments.ProjectId));
         }
 
         public bool VerifyArgumentsAndWriteErrorsToConsole()
@@ -62,14 +59,6 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
         public IEnumerable<OnlineIssue> GetClosedIssues(DateTimeOffset? since)
         {
             return _youTrackApi.GetClosedIssues(_arguments, since).ToArray();
-        }
-
-        public Regex IssueNumberRegex
-        {
-            get
-            {
-                return _issueNumberRegex;
-            }
         }
 
         public bool RemotePresentWhichMatches

@@ -21,10 +21,7 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
             _log = log;
             _arguments = arguments;
             _gitHubClientFactory = gitHubClientFactory;
-            IssueNumberRegex = new Regex(@"#(?<issueNumber>\d+)", RegexOptions.Compiled);
         }
-
-        public Regex IssueNumberRegex { get; private set; }
 
         public bool RemotePresentWhichMatches
         {

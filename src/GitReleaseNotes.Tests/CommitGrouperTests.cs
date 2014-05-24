@@ -45,11 +45,13 @@ namespace GitReleaseNotes.Tests
             SubstituteCommitLog(commit1, startTagCommit, commit3);
             var startTag = new TaggedCommit(startTagCommit, "1.0.0");
 
-            var results = CommitGrouper.GetCommitsByRelease(_repository, startTag);
+            var results = CommitGrouper.GetCommitsByRelease(_repository, startTag, new ReleaseInfo
+            {
+                PreviousReleaseDate = startTagCommit.Author.When
+            });
 
             var firstRelease = results.First();
-            firstRelease.Value.Count.ShouldBe(1);
-            firstRelease.Key.PreviousReleaseDate.ShouldBe(startTagCommit.Author.When);
+            firstRelease.PreviousReleaseDate.ShouldBe(startTagCommit.Author.When);
         }
 
         [Fact]
@@ -63,16 +65,13 @@ namespace GitReleaseNotes.Tests
             _tags.Add(commit2, "1.1.0");
             var startTag = new TaggedCommit(startTagCommit, "1.0.0");
 
-            var results = CommitGrouper.GetCommitsByRelease(_repository, startTag);
+            var results = CommitGrouper.GetCommitsByRelease(_repository, startTag, new ReleaseInfo());
 
             results.Count.ShouldBe(2);
-            results.ElementAt(0).Key.Name.ShouldBe(null);
-            results.ElementAt(0).Value.Count.ShouldBe(1);
-            results.ElementAt(0).Key.PreviousReleaseDate.ShouldBe(commit2.Author.When);
-            results.ElementAt(1).Key.Name.ShouldBe("1.1.0");
-            results.ElementAt(1).Key.PreviousReleaseDate.ShouldBe(null);
-            results.ElementAt(1).Value.Count.ShouldBe(2);
-            results.ElementAt(1).Value.ElementAt(0).ShouldBe(commit2);
+            results.ElementAt(0).Name.ShouldBe(null);
+            results.ElementAt(0).PreviousReleaseDate.ShouldBe(commit2.Author.When);
+            results.ElementAt(1).Name.ShouldBe("1.1.0");
+            results.ElementAt(1).PreviousReleaseDate.ShouldBe(null);
         }
 
         [Fact]
@@ -87,17 +86,17 @@ namespace GitReleaseNotes.Tests
             _tags.Add(commit2, "1.1.0");
             _tags.Add(startTagCommit, "1.0.0");
 
-            var results = CommitGrouper.GetCommitsByRelease(_repository, null);
+            var results = CommitGrouper.GetCommitsByRelease(_repository, null, new ReleaseInfo());
 
             Assert.Equal(3, results.Count);
-            Assert.Equal(null, results.ElementAt(0).Key.Name);
-            Assert.Equal(null, results.ElementAt(0).Key.When);
-            Assert.Equal(commit2.Author.When, results.ElementAt(0).Key.PreviousReleaseDate);
-            Assert.Equal(commit2.Author.When, results.ElementAt(1).Key.When);
-            Assert.Equal(startTagCommit.Author.When, results.ElementAt(1).Key.PreviousReleaseDate);
-            Assert.Equal("1.0.0", results.ElementAt(2).Key.Name);
-            Assert.Equal(startTagCommit.Author.When, results.ElementAt(2).Key.When);
-            Assert.Equal(null, results.ElementAt(2).Key.PreviousReleaseDate);
+            Assert.Equal(null, results.ElementAt(0).Name);
+            Assert.Equal(null, results.ElementAt(0).When);
+            Assert.Equal(commit2.Author.When, results.ElementAt(0).PreviousReleaseDate);
+            Assert.Equal(commit2.Author.When, results.ElementAt(1).When);
+            Assert.Equal(startTagCommit.Author.When, results.ElementAt(1).PreviousReleaseDate);
+            Assert.Equal("1.0.0", results.ElementAt(2).Name);
+            Assert.Equal(startTagCommit.Author.When, results.ElementAt(2).When);
+            Assert.Equal(null, results.ElementAt(2).PreviousReleaseDate);
         }
 
         private Commit CreateCommit()

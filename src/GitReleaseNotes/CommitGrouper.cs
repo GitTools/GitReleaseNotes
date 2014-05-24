@@ -6,27 +6,23 @@ using LibGit2Sharp;
 
 namespace GitReleaseNotes
 {
-    public class CommitGrouper
+    public static class CommitGrouper
     {
-        public static Dictionary<ReleaseInfo, List<Commit>> GetCommitsByRelease(IRepository gitRepo, TaggedCommit tagToStartFrom, ReleaseInfo current = null)
+        public static List<ReleaseInfo> GetCommitsByRelease(IRepository gitRepo, TaggedCommit tagToStartFrom, ReleaseInfo current)
         {
-            var currentRelease = new Tuple<ReleaseInfo, List<Commit>>(current, new List<Commit>());
-            var releases = new Dictionary<ReleaseInfo, List<Commit>> {{currentRelease.Item1, currentRelease.Item2}};
+            var releases = new List<ReleaseInfo> { current };
             var tagLookup = gitRepo.Tags.ToDictionary(t => t.Target.Sha, t => t);
             foreach (var commit in gitRepo.Commits.TakeWhile(c => tagToStartFrom == null || c != tagToStartFrom.Commit))
             {
                 if (tagLookup.ContainsKey(commit.Sha))
                 {
                     var tag = tagLookup[commit.Sha];
-                    var releaseDate = ((Commit) tag.Target).Author.When;
-                    currentRelease.Item1.PreviousReleaseDate = releaseDate;
-                    var releaseInfo = new ReleaseInfo(tag.Name, releaseDate, null, commit.Sha);
-                    var commits = new List<Commit>();
-                    currentRelease = new Tuple<ReleaseInfo, List<Commit>>(releaseInfo, commits);
-                    releases.Add(releaseInfo, commits);
+                    var releaseDate = ((Commit)tag.Target).Author.When;
+                    current.PreviousReleaseDate = releaseDate;
+                    current = new ReleaseInfo(tag.Name, releaseDate, null, commit.Sha);
+                    releases.Add(new ReleaseInfo(tag.Name, releaseDate, null, commit.Sha));
                 }
-                currentRelease.Item1.LastCommit = commit.Sha;
-                currentRelease.Item2.Add(commit);
+                current.LastCommit = commit.Sha;
             }
 
             return releases;

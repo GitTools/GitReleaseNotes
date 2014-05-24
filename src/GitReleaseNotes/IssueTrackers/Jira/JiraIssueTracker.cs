@@ -1,21 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace GitReleaseNotes.IssueTrackers.Jira
 {
     public class JiraIssueTracker : IIssueTracker
     {
         private readonly GitReleaseNotesArguments _arguments;
-        private readonly Regex _issueNumberRegex;
         private readonly IJiraApi _jiraApi;
 
         public JiraIssueTracker(IJiraApi jiraApi, GitReleaseNotesArguments arguments)
         {
             _jiraApi = jiraApi;
             _arguments = arguments;
-            _issueNumberRegex = new Regex(string.Format(@"(?<issueNumber>{0}-\d+)", arguments.ProjectId));
         }
 
         public bool VerifyArgumentsAndWriteErrorsToConsole()
@@ -62,11 +59,6 @@ namespace GitReleaseNotes.IssueTrackers.Jira
         public IEnumerable<OnlineIssue> GetClosedIssues(DateTimeOffset? since)
         {
             return _jiraApi.GetClosedIssues(_arguments, since).ToArray();
-        }
-
-        public Regex IssueNumberRegex
-        {
-            get { return _issueNumberRegex; }
         }
 
         public bool RemotePresentWhichMatches { get { return false; }}
