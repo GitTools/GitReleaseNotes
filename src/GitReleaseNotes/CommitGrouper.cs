@@ -10,7 +10,13 @@ namespace GitReleaseNotes
     {
         public Dictionary<ReleaseInfo, List<Commit>> GetCommitsByRelease(IRepository gitRepo, TaggedCommit tagToStartFrom, ReleaseInfo current = null)
         {
-            var currentRelease = new Tuple<ReleaseInfo, List<Commit>>(current ?? new ReleaseInfo(), new List<Commit>());
+            var previousReleaseDate = (tagToStartFrom != null)
+                ? (DateTimeOffset?)tagToStartFrom.Commit.Author.When
+                : null;
+            var currentRelease = new Tuple<ReleaseInfo, List<Commit>>(current ?? new ReleaseInfo
+            {
+                PreviousReleaseDate = previousReleaseDate
+            }, new List<Commit>());
             var releases = new Dictionary<ReleaseInfo, List<Commit>> {{currentRelease.Item1, currentRelease.Item2}};
             var tagLookup = gitRepo.Tags.ToDictionary(t => t.Target.Sha, t => t);
             foreach (var commit in gitRepo.Commits.TakeWhile(c => tagToStartFrom == null || c != tagToStartFrom.Commit))
@@ -20,13 +26,7 @@ namespace GitReleaseNotes
                     var tag = tagLookup[commit.Sha];
                     var releaseDate = ((Commit) tag.Target).Author.When;
                     currentRelease.Item1.PreviousReleaseDate = releaseDate;
-                    var releaseInfo = new ReleaseInfo(
-                        tag.Name, 
-                        releaseDate, 
-                        (tagToStartFrom != null)
-                            ? (DateTimeOffset?)tagToStartFrom.Commit.Author.When
-                            : null, 
-                        commit.Sha);
+                    var releaseInfo = new ReleaseInfo(tag.Name,  releaseDate, previousReleaseDate, commit.Sha);
                     var commits = new List<Commit>();
                     currentRelease = new Tuple<ReleaseInfo, List<Commit>>(releaseInfo, commits);
                     releases.Add(releaseInfo, commits);
