@@ -1,1 +1,0 @@
-﻿ - Issue 1 [#1](http://github.com/org/repo/issues/1) +fix

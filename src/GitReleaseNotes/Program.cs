@@ -4,10 +4,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
-using System.Reflection;
 using Args.Help;
 using Args.Help.Formatters;
-using GitReleaseNotes.GenerationStrategy;
 using GitReleaseNotes.Git;
 using GitReleaseNotes.IssueTrackers;
 using GitReleaseNotes.IssueTrackers.GitHub;
@@ -22,6 +20,7 @@ namespace GitReleaseNotes
 {
     public static class Program
     {
+        private static readonly string[] Categories = { "bug", "enhancement", "feature" };
         private static Dictionary<IssueTracker, IIssueTracker> _issueTrackers;
 
         static int Main(string[] args)
@@ -88,41 +87,22 @@ namespace GitReleaseNotes
             {
                 return 1;
             }
-            var taggedCommitFinder = new TaggedCommitFinder(gitRepo, gitHelper);
-
-            TaggedCommit tagToStartFrom;
-            if (arguments.AllTags)
-                tagToStartFrom = taggedCommitFinder.FromFirstCommit();
-            else
-                tagToStartFrom = taggedCommitFinder.GetLastTaggedCommit();
-
-            var releases = new CommitGrouper().GetCommitsByRelease(
-                gitRepo, 
-                tagToStartFrom,
-                !string.IsNullOrEmpty(arguments.Version) ? new ReleaseInfo(arguments.Version, DateTimeOffset.Now, tagToStartFrom.Commit.Author.When, null) : null);
-
-            IReleaseNotesStrategy generationStrategy;
-            if (arguments.FromClosedIssues)
-                generationStrategy = new ByClosedIssues();
-            else if (arguments.FromMentionedIssues)
-                generationStrategy = new ByMentionedCommits(new IssueNumberExtractor());
-            else
-                generationStrategy = new ByClosedIssues();
-
-            var releaseNotes = generationStrategy.GetReleaseNotes(releases, arguments, issueTracker);
 
             var fileSystem = new FileSystem();
-            var releaseNotesWriter = new ReleaseNotesGenerator();
+            var releaseFileWriter = new ReleaseFileWriter(fileSystem);
             string outputFile = null;
             var previousReleaseNotes = new SemanticReleaseNotes();
-            var releaseFileWriter = new ReleaseFileWriter(fileSystem);
             if (!string.IsNullOrEmpty(arguments.OutputFile))
             {
-                outputFile = Path.IsPathRooted(arguments.OutputFile) ? arguments.OutputFile : Path.Combine(repositoryRoot, arguments.OutputFile);
+                outputFile = Path.IsPathRooted(arguments.OutputFile)
+                    ? arguments.OutputFile
+                    : Path.Combine(repositoryRoot, arguments.OutputFile);
                 previousReleaseNotes = new ReleaseNotesFileReader(fileSystem, repositoryRoot).ReadPreviousReleaseNotes(outputFile);
             }
 
-            var releaseNotesOutput = releaseNotesWriter.GenerateReleaseNotes(arguments, releaseNotes, previousReleaseNotes);
+            var categories = arguments.Categories == null ? Categories : Categories.Concat(arguments.Categories.Split(',')).ToArray();
+            var releaseNotes = ReleaseNotesGenerator.GenerateReleaseNotes(gitRepo, gitHelper, arguments, issueTracker, previousReleaseNotes, categories);
+            var releaseNotesOutput = releaseNotes.ToString();
             releaseFileWriter.OutputReleaseNotesFile(releaseNotesOutput, outputFile);
 
             PublishReleaseIfNeeded(releaseNotesOutput, arguments, issueTracker);

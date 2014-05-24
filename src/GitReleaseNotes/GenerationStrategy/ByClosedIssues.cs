@@ -7,8 +7,7 @@ namespace GitReleaseNotes.GenerationStrategy
 {
     public class ByClosedIssues : IReleaseNotesStrategy
     {
-        public SemanticReleaseNotes GetReleaseNotes(Dictionary<ReleaseInfo, List<Commit>> releases, GitReleaseNotesArguments tagToStartFrom,
-            IIssueTracker issueTracker)
+        public SemanticReleaseNotes GetReleaseNotes(Dictionary<ReleaseInfo, List<Commit>> releases, GitReleaseNotesArguments tagToStartFrom, IIssueTracker issueTracker, string[] categories)
         {
             var closedIssues = issueTracker.GetClosedIssues(releases.Select(r => r.Key.PreviousReleaseDate).Min()).ToArray();
 
@@ -29,7 +28,7 @@ namespace GitReleaseNotes.GenerationStrategy
                 }));
             }
 
-            return new SemanticReleaseNotes(semanticReleases);
+            return new SemanticReleaseNotes(semanticReleases, categories);
         }
     }
 }

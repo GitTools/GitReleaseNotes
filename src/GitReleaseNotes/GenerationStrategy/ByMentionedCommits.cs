@@ -15,7 +15,7 @@ namespace GitReleaseNotes.GenerationStrategy
             _issueNumberExtractor = issueNumberExtractor;
         }
 
-        public SemanticReleaseNotes GetReleaseNotes(Dictionary<ReleaseInfo, List<Commit>> releases, GitReleaseNotesArguments arguments, IIssueTracker issueTracker)
+        public SemanticReleaseNotes GetReleaseNotes(Dictionary<ReleaseInfo, List<Commit>> releases, GitReleaseNotesArguments arguments, IIssueTracker issueTracker, string[] categories)
         {
             Console.WriteLine("Scanning {0} commits over {1} releases for issue numbers", releases.Sum(r => r.Value.Count),
                 releases.Count);
@@ -62,7 +62,7 @@ namespace GitReleaseNotes.GenerationStrategy
                     BeginningSha = r.ReleaseInfo.FirstCommit.Substring(0, 10),
                     EndSha = r.ReleaseInfo.LastCommit.Substring(0, 10)
                 });
-            }));
+            }), categories);
         }
     }
 }

@@ -6,6 +6,6 @@ namespace GitReleaseNotes.GenerationStrategy
 {
     public interface IReleaseNotesStrategy
     {
-        SemanticReleaseNotes GetReleaseNotes(Dictionary<ReleaseInfo, List<Commit>> releases, GitReleaseNotesArguments tagToStartFrom, IIssueTracker issueTracker);
+        SemanticReleaseNotes GetReleaseNotes(Dictionary<ReleaseInfo, List<Commit>> releases, GitReleaseNotesArguments tagToStartFrom, IIssueTracker issueTracker, string[] categories);
     }
 }

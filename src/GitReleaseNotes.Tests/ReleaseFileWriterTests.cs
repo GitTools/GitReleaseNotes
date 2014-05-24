@@ -14,6 +14,7 @@ namespace GitReleaseNotes.Tests
             _fileSystem = Substitute.For<IFileSystem>();
             _sut = new ReleaseFileWriter(_fileSystem);
         }
+
         [Fact]
         public void AbsolutePathIsWrittenToRepositoryRoot()
         {
