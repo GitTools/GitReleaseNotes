@@ -7,6 +7,7 @@ using System.Text;
 using GitReleaseNotes.Git;
 using LibGit2Sharp;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace GitReleaseNotes.Tests
@@ -48,7 +49,9 @@ namespace GitReleaseNotes.Tests
 
             var results = _sut.GetCommitsByRelease(_repository, startTag);
 
-            Assert.Equal(1, results.First().Value.Count);
+            var firstRelease = results.First();
+            firstRelease.Value.Count.ShouldBe(1);
+            firstRelease.Key.PreviousReleaseDate.ShouldBe(startTagCommit.Author.When);
         }
 
         [Fact]
@@ -64,12 +67,14 @@ namespace GitReleaseNotes.Tests
 
             var results = _sut.GetCommitsByRelease(_repository, startTag);
 
-            Assert.Equal(2, results.Count);
-            Assert.Equal(null, results.ElementAt(0).Key.Name);
-            Assert.Equal(1, results.ElementAt(0).Value.Count);
-            Assert.Equal("1.1.0", results.ElementAt(1).Key.Name);
-            Assert.Equal(2, results.ElementAt(1).Value.Count);
-            Assert.Equal(commit2, results.ElementAt(1).Value.ElementAt(0));
+            results.Count.ShouldBe(2);
+            results.ElementAt(0).Key.Name.ShouldBe(null);
+            results.ElementAt(0).Value.Count.ShouldBe(1);
+            results.ElementAt(0).Key.PreviousReleaseDate.ShouldBe(commit2.Author.When);
+            results.ElementAt(1).Key.Name.ShouldBe("1.1.0");
+            results.ElementAt(1).Key.PreviousReleaseDate.ShouldBe(null);
+            results.ElementAt(1).Value.Count.ShouldBe(2);
+            results.ElementAt(1).Value.ElementAt(0).ShouldBe(commit2);
         }
 
         [Fact]
