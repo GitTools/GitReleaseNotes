@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using GitReleaseNotes.Git;
 using GitReleaseNotes.IssueTrackers;
@@ -19,24 +18,18 @@ namespace GitReleaseNotes
 
             var closedIssues = issueTracker.GetClosedIssues(findIssuesSince).ToArray();
 
-            var semanticReleases = new List<SemanticRelease>();
-            foreach (var release in releases)
-            {
-                var reloadLocal = release;
-                var releaseNoteItems = closedIssues
-                    .Where(i => 
-                        (reloadLocal.When == null || i.DateClosed < reloadLocal.When) && 
-                        (reloadLocal.PreviousReleaseDate == null || i.DateClosed > reloadLocal.PreviousReleaseDate))
+            var semanticReleases = (
+                from release in releases
+                let releaseNoteItems = closedIssues
+                    .Where(i => (release.When == null || i.DateClosed < release.When) && (release.PreviousReleaseDate == null || i.DateClosed > release.PreviousReleaseDate))
                     .Select(i => new ReleaseNoteItem(i.Title, i.Id, i.HtmlUrl, i.Labels, i.DateClosed, i.Contributors))
-                    .ToList();
-                var beginningSha = release.FirstCommit == null ? null : release.FirstCommit.Substring(0, 10);
-                var endSha = release.LastCommit == null ? null : release.LastCommit.Substring(0, 10);
-                semanticReleases.Add(new SemanticRelease(release.Name, release.When, releaseNoteItems, new ReleaseDiffInfo
+                    .ToList()
+                let beginningSha = release.FirstCommit == null ? null : release.FirstCommit.Substring(0, 10)
+                let endSha = release.LastCommit == null ? null : release.LastCommit.Substring(0, 10)
+                select new SemanticRelease(release.Name, release.When, releaseNoteItems, new ReleaseDiffInfo
                 {
-                    BeginningSha = beginningSha,
-                    EndSha = endSha
-                }));
-            }
+                    BeginningSha = beginningSha, EndSha = endSha
+                })).ToList();
 
             return new SemanticReleaseNotes(semanticReleases, categories).Merge(previousReleaseNotes);
         }

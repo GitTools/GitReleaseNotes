@@ -21,7 +21,7 @@ namespace GitReleaseNotes
 
         public string ReleaseName { get; set; }
         public DateTimeOffset? When { get; set; }
-        public List<ReleaseNoteItem> ReleaseNoteItems { get; set; }
-        public ReleaseDiffInfo DiffInfo { get; set; }
+        public List<ReleaseNoteItem> ReleaseNoteItems { get; private set; }
+        public ReleaseDiffInfo DiffInfo { get; private set; }
     }
 }

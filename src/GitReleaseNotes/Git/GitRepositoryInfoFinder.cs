@@ -5,7 +5,7 @@ using LibGit2Sharp;
 
 namespace GitReleaseNotes.Git
 {
-    public class GitRepositoryInfoFinder
+    public static class GitRepositoryInfoFinder
     {
         private static readonly Dictionary<string, TaggedCommit> Cache = new Dictionary<string, TaggedCommit>();
 
