@@ -35,7 +35,6 @@
 
   <Target Name="Test" DependsOnTargets="Build">
     <xunit Assembly="$(Root)src\GitReleaseNotes.Tests\bin\$(Configuration)\GitReleaseNotes.Tests.dll" ShadowCopy="False" />
-    <xunit Assembly="$(Root)src\GitReleaseNotes.AcceptanceTests\bin\$(Configuration)\GitReleaseNotes.AcceptanceTests.dll" ShadowCopy="False" />
   </Target>
 
   <UsingTask TaskName="ReplaceFileText" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v$(MSBuildToolsVersion).dll">
@@ -82,7 +81,7 @@
           DestinationFolder="$(Root)\ChocolateyBackup" />
     <Copy SourceFiles="$(Root)Chocolatey\GitReleaseNotes.nuspec"
           DestinationFolder="$(Root)\ChocolateyBackup" />
-    
+
     <ReplaceFileText InputFilename="$(Root)Chocolatey\tools\chocolateyInstall.ps1"
                      OutputFilename="$(Root)Chocolatey\tools\chocolateyInstall.ps1"
                      MatchExpression="__version__"
@@ -92,14 +91,14 @@
                      OutputFilename="$(Root)Chocolatey\GitReleaseNotes.nuspec"
                      MatchExpression="__version__"
                      ReplacementText="$(GitHubFlowVersion_SemVer)" />
-    
+
     <Exec Command="cpack $(Root)Chocolatey\GitReleaseNotes.nuspec" WorkingDirectory="$(DropPath)\Chocolatey" />
 
     <Copy SourceFiles="$(Root)\ChocolateyBackup\chocolateyInstall.ps1"
           DestinationFolder="$(Root)\Chocolatey\tools" />
     <Copy SourceFiles="$(Root)ChocolateyBackup\GitReleaseNotes.nuspec"
           DestinationFolder="$(Root)\Chocolatey" />
-    
+
     <RemoveDir Directories="$(Root)ChocolateyBackup" />
   </Target>
 </Project>
