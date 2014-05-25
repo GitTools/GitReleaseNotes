@@ -202,7 +202,7 @@ Commits: asdsadaf...bfdsadre
             readReleaseNotes.Releases.Length.ShouldBe(2);
             readReleaseNotes.Releases[0].DiffInfo.BeginningSha.ShouldBe("12345678");
             readReleaseNotes.Releases[0].DiffInfo.EndSha.ShouldBe("67890123");
-            readReleaseNotes.Releases[0].ReleaseName.ShouldBe("vNext");
+            readReleaseNotes.Releases[0].ReleaseName.ShouldBe(null);
             readReleaseNotes.Releases[0].When.ShouldBe(null);
             readReleaseNotes.Releases[0].ReleaseNoteItems.Count.ShouldBe(1);
             readReleaseNotes.Releases[0].ReleaseNoteItems[0].Title.ShouldBe("Issue 1 [#1](http://github.com/org/repo/issues/1) +feature +new");

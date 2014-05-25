@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using GitReleaseNotes.Git;
 using GitReleaseNotes.IssueTrackers;
@@ -11,8 +12,12 @@ namespace GitReleaseNotes
         public static SemanticReleaseNotes GenerateReleaseNotes(IRepository gitRepo, IIssueTracker issueTracker, SemanticReleaseNotes previousReleaseNotes, string[] categories, TaggedCommit tagToStartFrom, ReleaseInfo currentReleaseInfo)
         {
             var releases = ReleaseFinder.FindReleases(gitRepo, tagToStartFrom, currentReleaseInfo);
+            var findIssuesSince = 
+                IssueStartDateBasedOnPreviousReleaseNotes(gitRepo, previousReleaseNotes)
+                ??
+                tagToStartFrom.Commit.Author.When;
 
-            var closedIssues = issueTracker.GetClosedIssues(releases.Select(r => r.PreviousReleaseDate).Min()).ToArray();
+            var closedIssues = issueTracker.GetClosedIssues(findIssuesSince).ToArray();
 
             var semanticReleases = new List<SemanticRelease>();
             foreach (var release in releases)
@@ -33,7 +38,31 @@ namespace GitReleaseNotes
                 }));
             }
 
-            return new SemanticReleaseNotes(semanticReleases, categories);
+            return new SemanticReleaseNotes(semanticReleases, categories).Merge(previousReleaseNotes);
+        }
+
+        private static DateTimeOffset? IssueStartDateBasedOnPreviousReleaseNotes(IRepository gitRepo,
+            SemanticReleaseNotes previousReleaseNotes)
+        {
+            var lastGeneratedRelease = previousReleaseNotes.Releases.FirstOrDefault();
+            if (lastGeneratedRelease == null) return null;
+            var endSha = lastGeneratedRelease.DiffInfo.EndSha;
+            if (string.IsNullOrEmpty(endSha))
+            {
+                lastGeneratedRelease = previousReleaseNotes.Releases.Skip(1).FirstOrDefault();
+                if (lastGeneratedRelease != null)
+                {
+                    endSha = lastGeneratedRelease.DiffInfo.EndSha;
+                }
+            }
+
+            if (string.IsNullOrEmpty(endSha)) return null;
+            var commitToStartFrom = gitRepo.Commits.FirstOrDefault(c => c.Sha.StartsWith(endSha));
+            if (commitToStartFrom != null)
+            {
+                return commitToStartFrom.Author.When;
+            }
+            return null;
         }
     }
 }

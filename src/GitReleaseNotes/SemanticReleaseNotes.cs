@@ -113,6 +113,8 @@ namespace GitReleaseNotes
                     {
                         ReleaseName = match.Groups["Title"].Value
                     };
+                    if (currentRelease.ReleaseName == "vNext")
+                        currentRelease.ReleaseName = null;
 
                     if (match.Groups["Date"].Success)
                         currentRelease.When = DateTime.ParseExact(match.Groups["Date"].Value, "dd MMMM yyyy", CultureInfo.CurrentCulture);
@@ -146,6 +148,38 @@ namespace GitReleaseNotes
             releases.Add(currentRelease);
 
             return new SemanticReleaseNotes(releases, new string[0]);
+        }
+
+        public SemanticReleaseNotes Merge(SemanticReleaseNotes previousReleaseNotes)
+        {
+            var mergedReleases =
+                previousReleaseNotes.Releases
+                .Where(r => Releases.All(r2 => r.ReleaseName != r2.ReleaseName))
+                .Select(CreateMergedSemanticRelease)
+                .Union(Releases.Select(CreateMergedSemanticRelease))
+                .ToArray();
+
+            foreach (var semanticRelease in mergedReleases)
+            {
+                var releaseFromThis = Releases.SingleOrDefault(r => r.ReleaseName == semanticRelease.ReleaseName);
+                var releaseFromPrevious = previousReleaseNotes.Releases.SingleOrDefault(r => r.ReleaseName == semanticRelease.ReleaseName);
+
+                if (releaseFromThis != null)
+                {
+                    semanticRelease.ReleaseNoteItems.AddRange(releaseFromThis.ReleaseNoteItems);
+                }
+                if (releaseFromPrevious != null)
+                {
+                    semanticRelease.ReleaseNoteItems.AddRange(releaseFromPrevious.ReleaseNoteItems);
+                }
+            }
+
+            return new SemanticReleaseNotes(mergedReleases, _categories.Union(previousReleaseNotes._categories).Distinct().ToArray());
+        }
+
+        private static SemanticRelease CreateMergedSemanticRelease(SemanticRelease r)
+        {
+            return new SemanticRelease(r.ReleaseName, r.When, new List<ReleaseNoteItem>(), r.DiffInfo);
         }
     }
 }
