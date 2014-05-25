@@ -34,15 +34,18 @@ namespace GitReleaseNotes
         public override string ToString()
         {
             var builder = new StringBuilder();
-            for (var index = 0; index < Releases.Length; index++)
+            var index = 0;
+            foreach (var release in Releases)
             {
-                if (index > 0)
+                if (release.ReleaseNoteItems.Count == 0)
+                    continue;
+
+                if (index++ > 0)
                 {
                     builder.AppendLine();
                     builder.AppendLine();
                 }
 
-                var release = Releases[index];
                 if (Releases.Length > 1)
                 {
                     var hasBeenReleased = String.IsNullOrEmpty(release.ReleaseName);
