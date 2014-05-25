@@ -60,16 +60,13 @@
   <ItemGroup>
     <Compile Include="ArgumentVerifier.cs" />
     <Compile Include="Contributor.cs" />
-    <Compile Include="CommitGrouper.cs" />
+    <Compile Include="ReleaseFinder.cs" />
     <Compile Include="FileSystem\FileSystem.cs" />
     <Compile Include="FileSystem\IFileSystem.cs" />
     <Compile Include="ILog.cs" />
     <Compile Include="IssueTrackers\GitHub\GitHubIssueTracker.cs" />
     <Compile Include="GitReleaseNotesArguments.cs" />
     <Compile Include="Git\GitDirFinder.cs" />
-    <Compile Include="Git\GitHelper.cs" />
-    <Compile Include="Git\IGitHelper.cs" />
-    <Compile Include="Git\ITaggedCommitFinder.cs" />
     <Compile Include="IssueTrackers\IssueType.cs" />
     <Compile Include="IssueTrackers\OnlineIssue.cs" />
     <Compile Include="IssueTrackers\YouTrack\IYouTrackApi.cs" />
@@ -89,7 +86,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Git\TaggedCommit.cs" />
-    <Compile Include="Git\TaggedCommitFinder.cs" />
+    <Compile Include="Git\GitRepositoryInfoFinder.cs" />
     <Compile Include="FileSystem\ReleaseFileWriter.cs" />
     <Compile Include="ReleaseInfo.cs" />
     <Compile Include="FileSystem\ReleaseNotesFileReader.cs" />

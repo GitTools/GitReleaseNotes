@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using GitReleaseNotes.Git;
 using LibGit2Sharp;
 
 namespace GitReleaseNotes
 {
-    public static class CommitGrouper
+    public static class ReleaseFinder
     {
-        public static List<ReleaseInfo> GetCommitsByRelease(IRepository gitRepo, TaggedCommit tagToStartFrom, ReleaseInfo current)
+        public static List<ReleaseInfo> FindReleases(IRepository gitRepo, TaggedCommit tagToStartFrom, ReleaseInfo current)
         {
             var releases = new List<ReleaseInfo> { current };
             var tagLookup = gitRepo.Tags.ToDictionary(t => t.Target.Sha, t => t);
@@ -19,10 +18,13 @@ namespace GitReleaseNotes
                     var tag = tagLookup[commit.Sha];
                     var releaseDate = ((Commit)tag.Target).Author.When;
                     current.PreviousReleaseDate = releaseDate;
-                    current = new ReleaseInfo(tag.Name, releaseDate, null, commit.Sha);
-                    releases.Add(new ReleaseInfo(tag.Name, releaseDate, null, commit.Sha));
+                    current = new ReleaseInfo(tag.Name, releaseDate, null)
+                    {
+                        LastCommit = commit.Sha
+                    };
+                    releases.Add(current);
                 }
-                current.LastCommit = commit.Sha;
+                current.FirstCommit = commit.Sha;
             }
 
             return releases;

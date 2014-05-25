@@ -1,0 +1,19 @@
+﻿# vNext
+
+
+Commits: ...
+
+
+# 0.2.0 (05 January 2012)
+
+ - [2] - Issue3
+
+Commits: F8C83FD88C...CD7A26452D
+
+
+# 0.1.0 (03 January 2012)
+
+ - [0] - Issue1
+ - [1] - Issue2
+
+Commits: 75B636A423...D2F38F9B38

@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using ApprovalTests;
-using ApprovalTests.Reporters;
 using Shouldly;
 using Xunit;
 
 namespace GitReleaseNotes.Tests
 {
-    [UseReporter(typeof(DiffReporter))]
     public class SemanticReleaseNotesTests
     {
         [Fact]

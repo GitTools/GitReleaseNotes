@@ -65,7 +65,6 @@ namespace GitReleaseNotes
 
             var repositoryRoot = Directory.GetParent(gitDirectory).FullName;
 
-            var gitHelper = new GitHelper();
             var gitRepo = new Repository(gitDirectory);
 
             CreateIssueTrackers(gitRepo, arguments);
@@ -102,13 +101,16 @@ namespace GitReleaseNotes
             }
 
             var categories = arguments.Categories == null ? Categories : Categories.Concat(arguments.Categories.Split(',')).ToArray();
-            ITaggedCommitFinder taggedCommitFinder = new TaggedCommitFinder(gitRepo, gitHelper);
             TaggedCommit tagToStartFrom = arguments.AllTags
-                ? taggedCommitFinder.FromFirstCommit()
-                : taggedCommitFinder.GetLastTaggedCommit() ?? taggedCommitFinder.FromFirstCommit();
-            var releaseNotes = ReleaseNotesGenerator.GenerateReleaseNotes(gitRepo, issueTracker, previousReleaseNotes, categories, tagToStartFrom, !string.IsNullOrEmpty(arguments.Version)
-                ? new ReleaseInfo(arguments.Version, DateTimeOffset.Now, tagToStartFrom.Commit.Author.When, null)
-                : new ReleaseInfo { PreviousReleaseDate = tagToStartFrom.Commit.Author.When });
+                ? GitRepositoryInfoFinder.GetFirstCommit(gitRepo)
+                : GitRepositoryInfoFinder.GetLastTaggedCommit(gitRepo) ?? GitRepositoryInfoFinder.GetFirstCommit(gitRepo);
+            var currentReleaseInfo = GitRepositoryInfoFinder.GetCurrentReleaseInfo(gitRepo);
+            if (!string.IsNullOrEmpty(arguments.Version))
+            {
+                currentReleaseInfo.Name = arguments.Version;
+                currentReleaseInfo.When = DateTimeOffset.Now;
+            }
+            var releaseNotes = ReleaseNotesGenerator.GenerateReleaseNotes(gitRepo, issueTracker, previousReleaseNotes, categories, tagToStartFrom, currentReleaseInfo);
             var releaseNotesOutput = releaseNotes.ToString();
             releaseFileWriter.OutputReleaseNotesFile(releaseNotesOutput, outputFile);
 

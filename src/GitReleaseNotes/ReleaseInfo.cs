@@ -8,18 +8,20 @@ namespace GitReleaseNotes
         {
         }
 
-        public ReleaseInfo(string name, DateTimeOffset? when, DateTimeOffset? previousReleaseDate, string firstCommit)
+        public ReleaseInfo(string name, DateTimeOffset? when, DateTimeOffset? previousReleaseDate)
         {
             Name = name;
             When = when;
             PreviousReleaseDate = previousReleaseDate;
-            FirstCommit = firstCommit;
         }
 
         public string Name { get; set; }
         public DateTimeOffset? When { get; set; }
         public DateTimeOffset? PreviousReleaseDate { get; set; }
         public string FirstCommit { get; set; }
+        /// <summary>
+        /// This is also the tagged commit
+        /// </summary>
         public string LastCommit { get; set; }
     }
 }

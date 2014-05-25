@@ -45,7 +45,7 @@ namespace GitReleaseNotes.Tests
             SubstituteCommitLog(commit1, startTagCommit, commit3);
             var startTag = new TaggedCommit(startTagCommit, "1.0.0");
 
-            var results = CommitGrouper.GetCommitsByRelease(_repository, startTag, new ReleaseInfo
+            var results = ReleaseFinder.FindReleases(_repository, startTag, new ReleaseInfo
             {
                 PreviousReleaseDate = startTagCommit.Author.When
             });
@@ -65,7 +65,7 @@ namespace GitReleaseNotes.Tests
             _tags.Add(commit2, "1.1.0");
             var startTag = new TaggedCommit(startTagCommit, "1.0.0");
 
-            var results = CommitGrouper.GetCommitsByRelease(_repository, startTag, new ReleaseInfo());
+            var results = ReleaseFinder.FindReleases(_repository, startTag, new ReleaseInfo());
 
             results.Count.ShouldBe(2);
             results.ElementAt(0).Name.ShouldBe(null);
@@ -86,7 +86,7 @@ namespace GitReleaseNotes.Tests
             _tags.Add(commit2, "1.1.0");
             _tags.Add(startTagCommit, "1.0.0");
 
-            var results = CommitGrouper.GetCommitsByRelease(_repository, null, new ReleaseInfo());
+            var results = ReleaseFinder.FindReleases(_repository, null, new ReleaseInfo());
 
             Assert.Equal(3, results.Count);
             Assert.Equal(null, results.ElementAt(0).Name);

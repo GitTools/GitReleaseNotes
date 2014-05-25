@@ -10,7 +10,7 @@ namespace GitReleaseNotes
     {
         public static SemanticReleaseNotes GenerateReleaseNotes(IRepository gitRepo, IIssueTracker issueTracker, SemanticReleaseNotes previousReleaseNotes, string[] categories, TaggedCommit tagToStartFrom, ReleaseInfo currentReleaseInfo)
         {
-            var releases = CommitGrouper.GetCommitsByRelease(gitRepo, tagToStartFrom, currentReleaseInfo);
+            var releases = ReleaseFinder.FindReleases(gitRepo, tagToStartFrom, currentReleaseInfo);
 
             var closedIssues = issueTracker.GetClosedIssues(releases.Select(r => r.PreviousReleaseDate).Min()).ToArray();
 
@@ -24,10 +24,12 @@ namespace GitReleaseNotes
                         (reloadLocal.PreviousReleaseDate == null || i.DateClosed > reloadLocal.PreviousReleaseDate))
                     .Select(i => new ReleaseNoteItem(i.Title, i.Id, i.HtmlUrl, i.Labels, i.DateClosed, i.Contributors))
                     .ToList();
+                var beginningSha = release.FirstCommit == null ? null : release.FirstCommit.Substring(0, 10);
+                var endSha = release.LastCommit == null ? null : release.LastCommit.Substring(0, 10);
                 semanticReleases.Add(new SemanticRelease(release.Name, release.When, releaseNoteItems, new ReleaseDiffInfo
                 {
-                    BeginningSha = release.FirstCommit.Substring(0, 10),
-                    EndSha = release.LastCommit.Substring(0, 10)
+                    BeginningSha = beginningSha,
+                    EndSha = endSha
                 }));
             }
 

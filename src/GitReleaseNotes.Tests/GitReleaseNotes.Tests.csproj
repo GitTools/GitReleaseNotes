@@ -77,7 +77,9 @@
     <Compile Include="IssueTrackers\Jira\JiraIssueTrackerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReleaseFileWriterTests.cs" />
+    <Compile Include="ReleaseNotesGeneratorTests.cs" />
     <Compile Include="SemanticReleaseNotesTests.cs" />
+    <Compile Include="TestDataCreator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
