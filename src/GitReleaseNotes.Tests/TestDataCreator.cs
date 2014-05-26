@@ -97,7 +97,7 @@ namespace GitReleaseNotes.Tests
         private Commit CreateCommit(DateTimeOffset when)
         {
             var commit = Substitute.For<Commit>();
-            var shaBasedOnDate = SHA1.Create().ComputeHash(Encoding.ASCII.GetBytes(when.ToString()));
+            var shaBasedOnDate = SHA1.Create().ComputeHash(Encoding.ASCII.GetBytes(when.DateTime.ToLongDateString()));
             commit.Author.Returns(new Signature("Some Dude", "some@dude.com", when));
             commit.Id.Returns(new ObjectId(shaBasedOnDate));
             commit.Sha.Returns(BitConverter.ToString(shaBasedOnDate).Replace("-", string.Empty));
