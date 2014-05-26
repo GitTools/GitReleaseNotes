@@ -2,14 +2,14 @@
 
  - [3] - Issue4
 
-Commits: 66E022FEDC...66E022FEDC
+Commits: E2A20B8F6C...E2A20B8F6C
 
 
 # 0.2.0 (05 January 2012)
 
  - [2] - Issue3
 
-Commits: 1DAD827848...EA6F7EA20E
+Commits: AC39885536...CA74E870F2
 
 
 # 0.1.0 (03 January 2012)
@@ -17,4 +17,4 @@ Commits: 1DAD827848...EA6F7EA20E
  - [0] - Issue1
  - [1] - Issue2
 
-Commits: B44B325984...D23E3668A8
+Commits: E413A880DB...F6924D7A0B

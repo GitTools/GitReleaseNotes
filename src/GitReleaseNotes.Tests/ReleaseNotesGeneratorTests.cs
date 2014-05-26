@@ -74,7 +74,7 @@ Commits: ...
 
  - [2] - Edited Issue3
 
-Commits: 1DAD827848...EA6F7EA20E
+Commits:  AC39885536...CA74E870F2
 
 
 # 0.1.0 (03 January 2012)
@@ -82,7 +82,7 @@ Commits: 1DAD827848...EA6F7EA20E
  - [0] - Edited Issue1
  - [1] - Edited Issue2
 
-Commits: B44B325984...D23E3668A8");
+Commits: E413A880DB...F6924D7A0B");
 
             var releaseNotes = ReleaseNotesGenerator.GenerateReleaseNotes(
                 repo, issueTracker, previousReleaseNotes, new string[0],
