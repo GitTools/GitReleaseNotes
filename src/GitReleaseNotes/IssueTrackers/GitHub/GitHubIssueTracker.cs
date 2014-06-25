@@ -135,7 +135,7 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
                 Since = since,
                 State = ItemState.Closed
             });
-            var readOnlyList = forRepository.Result;
+            var readOnlyList = forRepository.Result.Where(i => i.ClosedAt > since);
 
             var userCache = new Dictionary<string, User>();
             Func<User, string> getUserName = u =>
