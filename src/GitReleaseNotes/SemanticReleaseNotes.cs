@@ -102,7 +102,29 @@ namespace GitReleaseNotes
                         currentRelease.ReleaseName = null;
 
                     if (match.Groups["Date"].Success)
-                        currentRelease.When = DateTime.ParseExact(match.Groups["Date"].Value, "dd MMMM yyyy", CultureInfo.CurrentCulture);
+                    {
+                        DateTime parsed;
+                        var toParse = match.Groups["Date"].Value;
+                        if (DateTime.TryParse(toParse, out parsed))
+                        {
+                            currentRelease.When = parsed;
+                        }
+                        if (DateTime.TryParseExact(toParse, "dd MMMM yyyy", CultureInfo.InvariantCulture,
+                            DateTimeStyles.None, out parsed))
+                        {
+                            currentRelease.When = parsed;
+                        }
+                        else if (DateTime.TryParseExact(toParse, "MMMM dd, yyyy", CultureInfo.InvariantCulture,
+                            DateTimeStyles.None, out parsed))
+                        {
+                            currentRelease.When = parsed;
+                        }
+                        else
+                        {
+                            // We failed to parse the date, just append to the end
+                            currentRelease.ReleaseName += " (" + toParse + ")";
+                        }
+                    }
                 }
                 else if (line.StartsWith("Commits: "))
                 {
