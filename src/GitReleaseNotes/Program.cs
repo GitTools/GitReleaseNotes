@@ -110,7 +110,12 @@ namespace GitReleaseNotes
                 currentReleaseInfo.Name = arguments.Version;
                 currentReleaseInfo.When = DateTimeOffset.Now;
             }
-            var releaseNotes = ReleaseNotesGenerator.GenerateReleaseNotes(gitRepo, issueTracker, previousReleaseNotes, categories, tagToStartFrom, currentReleaseInfo);
+            var releaseNotes = ReleaseNotesGenerator.GenerateReleaseNotes(
+                gitRepo, issueTracker, 
+                previousReleaseNotes, categories,
+                tagToStartFrom, currentReleaseInfo,
+                issueTracker.DiffUrlFormat);
+
             var releaseNotesOutput = releaseNotes.ToString();
             releaseFileWriter.OutputReleaseNotesFile(releaseNotesOutput, outputFile);
 

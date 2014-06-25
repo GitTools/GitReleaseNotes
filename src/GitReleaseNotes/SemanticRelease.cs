@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GitReleaseNotes
 {
@@ -8,20 +9,21 @@ namespace GitReleaseNotes
         public SemanticRelease()
         {
             DiffInfo = new ReleaseDiffInfo();
-            ReleaseNoteItems = new List<ReleaseNoteItem>();
+            ReleaseNoteLines = new List<IReleaseNoteLine>();
         }
 
-        public SemanticRelease(string releaseName, DateTimeOffset? when, List<ReleaseNoteItem> releaseNoteItems, ReleaseDiffInfo diffInfo)
+        public SemanticRelease(string releaseName, DateTimeOffset? when, List<IReleaseNoteLine> releaseNoteLines, ReleaseDiffInfo diffInfo)
         {
             DiffInfo = diffInfo;
             ReleaseName = releaseName;
             When = when;
-            ReleaseNoteItems = releaseNoteItems;
+            ReleaseNoteLines = releaseNoteLines;
         }
 
         public string ReleaseName { get; set; }
         public DateTimeOffset? When { get; set; }
-        public List<ReleaseNoteItem> ReleaseNoteItems { get; private set; }
+        public List<IReleaseNoteLine> ReleaseNoteLines { get; private set; }
+        public ReleaseNoteItem[] ReleaseNoteItems { get { return ReleaseNoteLines.OfType<ReleaseNoteItem>().ToArray(); }}
         public ReleaseDiffInfo DiffInfo { get; private set; }
     }
 }

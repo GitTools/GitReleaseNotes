@@ -6,46 +6,46 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
 {
     public sealed class YouTrackIssueTracker : IIssueTracker
     {
-        private readonly GitReleaseNotesArguments _arguments;
-        private readonly IYouTrackApi _youTrackApi;
+        private readonly GitReleaseNotesArguments arguments;
+        private readonly IYouTrackApi youTrackApi;
 
         public YouTrackIssueTracker(IYouTrackApi youTrackApi, GitReleaseNotesArguments arguments)
         {
-            _youTrackApi = youTrackApi;
-            _arguments = arguments;
+            this.youTrackApi = youTrackApi;
+            this.arguments = arguments;
         }
 
         public bool VerifyArgumentsAndWriteErrorsToConsole()
         {
-            if (string.IsNullOrEmpty(_arguments.YouTrackServer) ||
-                !Uri.IsWellFormedUriString(_arguments.YouTrackServer, UriKind.Absolute))
+            if (string.IsNullOrEmpty(arguments.YouTrackServer) ||
+                !Uri.IsWellFormedUriString(arguments.YouTrackServer, UriKind.Absolute))
             {
                 Console.WriteLine("A valid YouTrack server must be specified [/YouTrackServer ]");
                 return false;
             }
 
-            if (string.IsNullOrEmpty(_arguments.ProjectId))
+            if (string.IsNullOrEmpty(arguments.ProjectId))
             {
                 Console.WriteLine("/ProjectId is a required parameter for YouTrack");
                 return false;
             }
 
-            if (string.IsNullOrEmpty(_arguments.Username))
+            if (string.IsNullOrEmpty(arguments.Username))
             {
                 Console.WriteLine("/Username is a required to authenticate with YouTrack");
                 return false;
             }
-            if (string.IsNullOrEmpty(_arguments.Password))
+            if (string.IsNullOrEmpty(arguments.Password))
             {
                 Console.WriteLine("/Password is a required to authenticate with YouTrack");
                 return false;
             }
 
-            if (string.IsNullOrEmpty(_arguments.YouTrackFilter))
+            if (string.IsNullOrEmpty(arguments.YouTrackFilter))
             {
-                _arguments.YouTrackFilter = string.Format(
+                arguments.YouTrackFilter = string.Format(
                     "project:{0} State:Resolved State:-{{Won't fix}} State:-{{Can't Reproduce}} State:-Duplicate", 
-                    _arguments.ProjectId);
+                    arguments.ProjectId);
             }
 
             return true;
@@ -58,7 +58,7 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
 
         public IEnumerable<OnlineIssue> GetClosedIssues(DateTimeOffset? since)
         {
-            return _youTrackApi.GetClosedIssues(_arguments, since).ToArray();
+            return youTrackApi.GetClosedIssues(arguments, since).ToArray();
         }
 
         public bool RemotePresentWhichMatches
@@ -68,5 +68,7 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
                 return false;
             }
         }
+
+        public string DiffUrlFormat { get { return string.Empty; }}
     }
 }

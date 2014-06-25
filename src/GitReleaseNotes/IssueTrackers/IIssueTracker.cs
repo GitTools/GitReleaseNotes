@@ -9,5 +9,6 @@ namespace GitReleaseNotes.IssueTrackers
         void PublishRelease(string releaseNotesOutput);
         IEnumerable<OnlineIssue> GetClosedIssues(DateTimeOffset? since);
         bool RemotePresentWhichMatches { get; }
+        string DiffUrlFormat { get; }
     }
 }

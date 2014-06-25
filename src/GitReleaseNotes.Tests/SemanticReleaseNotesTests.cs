@@ -13,7 +13,7 @@ namespace GitReleaseNotes.Tests
         {
             var releaseNotes = new SemanticReleaseNotes(new[]
             {
-                new SemanticRelease("", null, new List<ReleaseNoteItem>
+                new SemanticRelease("", null, new List<IReleaseNoteLine>
                 {
                     new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new string[0], DateTime.Now, new[]{ new Contributor("Foo Bar", "@foo", "http://url.com/foo") }),
                     new ReleaseNoteItem("Issue 1", null, null, new string[0], DateTime.Now, new Contributor[0])
@@ -34,7 +34,7 @@ namespace GitReleaseNotes.Tests
         {
             var releaseNotes = new SemanticReleaseNotes(new[]
             {
-                new SemanticRelease("", null, new List<ReleaseNoteItem>
+                new SemanticRelease("", null, new List<IReleaseNoteLine>
                 {
                     new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"),
                         new[] {"feature"}, DateTimeOffset.Now, new Contributor[0])
@@ -55,7 +55,7 @@ namespace GitReleaseNotes.Tests
         {
             var releaseNotes = new SemanticReleaseNotes(new[]
             {
-                new SemanticRelease("", null, new List<ReleaseNoteItem>
+                new SemanticRelease("", null, new List<IReleaseNoteLine>
                 {
                     new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"),
                         new[] {"feature"}, DateTimeOffset.Now, new Contributor[0])
@@ -64,7 +64,7 @@ namespace GitReleaseNotes.Tests
                     BeginningSha = "12345678",
                     EndSha = "67890123"
                 }),
-                new SemanticRelease("1.2.0", new DateTimeOffset(2013, 12, 06, 0,0,0, new TimeSpan()), new List<ReleaseNoteItem>
+                new SemanticRelease("1.2.0", new DateTimeOffset(2013, 12, 06, 0,0,0, new TimeSpan()), new List<IReleaseNoteLine>
                 {
                     new ReleaseNoteItem("Issue 2", "#2", new Uri("http://github.com/org/repo/issues/2"),
                         new[] {"feature"}, DateTimeOffset.Now, new Contributor[0]),
@@ -87,7 +87,7 @@ namespace GitReleaseNotes.Tests
         {
             var releaseNotes = new SemanticReleaseNotes(new[]
             {
-                new SemanticRelease("", null, new List<ReleaseNoteItem>
+                new SemanticRelease("", null, new List<IReleaseNoteLine>
                 {
                     new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"), new[] {"bug"}, DateTimeOffset.Now, new Contributor[0])
                 }, new ReleaseDiffInfo
@@ -107,7 +107,7 @@ namespace GitReleaseNotes.Tests
         {
             var releaseNotes = new SemanticReleaseNotes(new[]
             {
-                new SemanticRelease("", null, new List<ReleaseNoteItem>
+                new SemanticRelease("", null, new List<IReleaseNoteLine>
                 {
                     new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"),
                         new[] {"internal refactoring"}, DateTimeOffset.Now, new Contributor[0])
@@ -137,7 +137,7 @@ Commits: 1234567...6789012
             readReleaseNotes.Releases[0].DiffInfo.BeginningSha.ShouldBe("1234567");
             readReleaseNotes.Releases[0].DiffInfo.EndSha.ShouldBe("6789012");
             readReleaseNotes.Releases[0].ReleaseName.ShouldBe(null);
-            readReleaseNotes.Releases[0].ReleaseNoteItems.Count.ShouldBe(1);
+            readReleaseNotes.Releases[0].ReleaseNoteLines.Count.ShouldBe(1);
             readReleaseNotes.Releases[0].ReleaseNoteItems[0].Title.ShouldBe("Issue 1 [#1](http://github.com/org/repo/issues/1)");
         }
 
@@ -157,9 +157,10 @@ Commits: 1234567...6789012
             readReleaseNotes.Releases[0].DiffInfo.BeginningSha.ShouldBe("1234567");
             readReleaseNotes.Releases[0].DiffInfo.EndSha.ShouldBe("6789012");
             readReleaseNotes.Releases[0].ReleaseName.ShouldBe(null);
-            readReleaseNotes.Releases[0].ReleaseNoteItems.Count.ShouldBe(2); 
-            readReleaseNotes.Releases[0].ReleaseNoteItems[0].Title.ShouldBe("Issue 1 [#1](http://github.com/org/repo/issues/1)");
-            readReleaseNotes.Releases[0].ReleaseNoteItems[1].Title.ShouldBe("Note: Some shiz..");
+            readReleaseNotes.Releases[0].ReleaseNoteLines.Count.ShouldBe(3);
+            readReleaseNotes.Releases[0].ReleaseNoteLines[0].ToString(new string[0]).ShouldBe(" - Issue 1 [#1](http://github.com/org/repo/issues/1)");
+            readReleaseNotes.Releases[0].ReleaseNoteLines[1].ToString(new string[0]).ShouldBe(string.Empty);
+            readReleaseNotes.Releases[0].ReleaseNoteLines[2].ToString(new string[0]).ShouldBe("Note: Some shiz..");
         }
 
         [Fact]
@@ -176,7 +177,7 @@ Commits: 12345678...67890123
             readReleaseNotes.Releases[0].DiffInfo.BeginningSha.ShouldBe("12345678");
             readReleaseNotes.Releases[0].DiffInfo.EndSha.ShouldBe("67890123");
             readReleaseNotes.Releases[0].ReleaseName.ShouldBe(null);
-            readReleaseNotes.Releases[0].ReleaseNoteItems.Count.ShouldBe(1);
+            readReleaseNotes.Releases[0].ReleaseNoteItems.Length.ShouldBe(1);
             readReleaseNotes.Releases[0].ReleaseNoteItems[0].Title.ShouldBe("Issue 1 [#1](http://github.com/org/repo/issues/1) +feature +new");
         }
 
@@ -204,13 +205,13 @@ Commits: asdsadaf...bfdsadre
             readReleaseNotes.Releases[0].DiffInfo.EndSha.ShouldBe("67890123");
             readReleaseNotes.Releases[0].ReleaseName.ShouldBe(null);
             readReleaseNotes.Releases[0].When.ShouldBe(null);
-            readReleaseNotes.Releases[0].ReleaseNoteItems.Count.ShouldBe(1);
+            readReleaseNotes.Releases[0].ReleaseNoteLines.Count.ShouldBe(1);
             readReleaseNotes.Releases[0].ReleaseNoteItems[0].Title.ShouldBe("Issue 1 [#1](http://github.com/org/repo/issues/1) +feature +new");
             readReleaseNotes.Releases[1].DiffInfo.BeginningSha.ShouldBe("asdsadaf");
             readReleaseNotes.Releases[1].DiffInfo.EndSha.ShouldBe("bfdsadre");
             readReleaseNotes.Releases[1].ReleaseName.ShouldBe("1.2.0");
             readReleaseNotes.Releases[1].When.ShouldBe(new DateTimeOffset(new DateTime(2013, 12, 6)));
-            readReleaseNotes.Releases[1].ReleaseNoteItems.Count.ShouldBe(2);
+            readReleaseNotes.Releases[1].ReleaseNoteLines.Count.ShouldBe(2);
             readReleaseNotes.Releases[1].ReleaseNoteItems[0].Title.ShouldBe("Issue 2 [#2](http://github.com/org/repo/issues/2) +feature");
             readReleaseNotes.Releases[1].ReleaseNoteItems[1].Title.ShouldBe("Issue 3 [#3](http://github.com/org/repo/issues/3) +fix");
         }
