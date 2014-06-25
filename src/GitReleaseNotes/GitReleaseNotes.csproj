@@ -59,7 +59,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArgumentVerifier.cs" />
+    <Compile Include="BlankLine.cs" />
     <Compile Include="Contributor.cs" />
+    <Compile Include="IReleaseNoteLine.cs" />
     <Compile Include="ReleaseFinder.cs" />
     <Compile Include="FileSystem\FileSystem.cs" />
     <Compile Include="FileSystem\IFileSystem.cs" />
@@ -90,6 +92,7 @@
     <Compile Include="FileSystem\ReleaseFileWriter.cs" />
     <Compile Include="ReleaseInfo.cs" />
     <Compile Include="FileSystem\ReleaseNotesFileReader.cs" />
+    <Compile Include="ReleaseNoteLine.cs" />
     <Compile Include="ReleaseNotesGenerator.cs" />
     <Compile Include="SemanticRelease.cs" />
     <Compile Include="SemanticReleaseNotes.cs" />

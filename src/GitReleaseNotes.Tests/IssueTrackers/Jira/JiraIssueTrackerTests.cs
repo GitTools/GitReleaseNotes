@@ -42,7 +42,7 @@ namespace GitReleaseNotes.Tests.IssueTrackers.Jira
         //        JiraProjectId = "JIRA"
         //    }, toScan);
 
-        //    Assert.Equal("Issue Title", releaseNotes.Releases[0].ReleaseNoteItems[0].Title);
+        //    Assert.Equal("Issue Title", releaseNotes.Releases[0].ReleaseNoteLines[0].Title);
         //}
 
         private static Commit CreateCommit(string message, DateTimeOffset when)

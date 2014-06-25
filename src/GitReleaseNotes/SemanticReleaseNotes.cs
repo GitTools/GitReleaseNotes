@@ -11,24 +11,24 @@ namespace GitReleaseNotes
     {
         //readonly Regex _issueRegex = new Regex(" - (?<Issue>.*?)(?<IssueLink> \\[(?<IssueId>.*?)\\]\\((?<IssueUrl>.*?)\\))*( *\\+(?<Tag>[^ \\+]*))*", RegexOptions.Compiled);
         static readonly Regex ReleaseRegex = new Regex("# (?<Title>.*?)( \\((?<Date>.*?)\\))?$", RegexOptions.Compiled);
-        readonly string[] _categories;
-        readonly SemanticRelease[] _releases;
+        readonly string[] categories;
+        readonly SemanticRelease[] releases;
 
         public SemanticReleaseNotes()
         {
-            _categories = new string[0];
-            _releases = new SemanticRelease[0];
+            categories = new string[0];
+            releases = new SemanticRelease[0];
         }
 
         public SemanticReleaseNotes(IEnumerable<SemanticRelease> releaseNoteItems, string[] categories)
         {
-            _categories = categories;
-            _releases = releaseNoteItems.ToArray();
+            this.categories = categories;
+            releases = releaseNoteItems.ToArray();
         }
 
         public SemanticRelease[] Releases
         {
-            get { return _releases; }
+            get { return releases; }
         }
 
         public override string ToString()
@@ -37,7 +37,7 @@ namespace GitReleaseNotes
             var index = 0;
             foreach (var release in Releases)
             {
-                if (release.ReleaseNoteItems.Count == 0)
+                if (release.ReleaseNoteLines.Count == 0)
                     continue;
 
                 if (index++ > 0)
@@ -60,27 +60,10 @@ namespace GitReleaseNotes
                     builder.AppendLine();
                 }
 
-                IEnumerable<ReleaseNoteItem> releaseNoteItems = release.ReleaseNoteItems;
+                IEnumerable<IReleaseNoteLine> releaseNoteItems = release.ReleaseNoteLines;
                 foreach (var releaseNoteItem in releaseNoteItems)
                 {
-                    var taggedCategory = releaseNoteItem.Tags
-                        .FirstOrDefault(t => _categories.Any(c => c.Equals(t, StringComparison.InvariantCultureIgnoreCase)));
-                    var title = releaseNoteItem.Title;
-                    var issueNumber = releaseNoteItem.IssueNumber;
-                    var htmlUrl = releaseNoteItem.HtmlUrl;
-                    if ("bug".Equals(taggedCategory, StringComparison.InvariantCultureIgnoreCase))
-                        taggedCategory = "fix";
-                    var category = taggedCategory == null
-                        ? null
-                        : String.Format(" +{0}", taggedCategory.Replace(" ", "-"));
-                    var issueNum = issueNumber == null ? null : String.Format(" [{0}]", issueNumber);
-                    var url = htmlUrl == null ? null : String.Format("({0})", htmlUrl);
-                    var contributors = releaseNoteItem.Contributors == null || releaseNoteItem.Contributors.Length == 0 ?
-                        string.Empty : " contributed by " + String.Join(", ", releaseNoteItem.Contributors.Select(r => String.Format("{0} ([{1}]({2}))", r.Name, r.Username, r.Url)));
-                    var item = String.Format(" - {1}{2}{4}{0}{5}{3}", title, issueNum, url, category,
-                        title.TrimStart().StartsWith("-") ? null : " - ",
-                        contributors).Replace("  ", " ").Replace("- -", "-");
-                    builder.AppendLine(item);
+                    builder.AppendLine(releaseNoteItem.ToString(categories));
                 }
 
                 builder.AppendLine();
@@ -104,9 +87,6 @@ namespace GitReleaseNotes
             var currentRelease = new SemanticRelease();
             foreach (var line in lines)
             {
-                if (string.IsNullOrWhiteSpace(line))
-                    continue;
-
                 if (line.TrimStart().StartsWith("# "))
                 {
                     var match = ReleaseRegex.Match(line);
@@ -122,33 +102,52 @@ namespace GitReleaseNotes
                     if (match.Groups["Date"].Success)
                         currentRelease.When = DateTime.ParseExact(match.Groups["Date"].Value, "dd MMMM yyyy", CultureInfo.CurrentCulture);
                 }
-                //TODO Need to support multiple Url's in the release notes
-                //else if (line.StartsWith(" - "))
-                //{
-                //    var match = _issueRegex.Match(line);
-                //    var issue = match.Groups["Issue"].Value;
-                //    var issueNumber = match.Groups["IssueId"].Value;
-                //    var htmlUrl = match.Groups["IssueUrl"].Success ? new Uri(match.Groups["IssueUrl"].Value) : null;
-                //    var tags = match.Groups["Tag"].Captures.OfType<Capture>().Select(c => c.Value).ToArray();
-                //    var releaseNoteItem = new ReleaseNoteItem(issue, issueNumber, htmlUrl, tags, currentRelease.When);
-                //    currentRelease.ReleaseNoteItems.Add(releaseNoteItem);
-                //}
                 else if (line.StartsWith("Commits: "))
                 {
                     var commits = line.Replace("Commits: ", string.Empty).Split(new[] { "..." }, StringSplitOptions.None);
                     currentRelease.DiffInfo.BeginningSha = commits[0];
                     currentRelease.DiffInfo.EndSha = commits[1];
                 }
+                else if (line.StartsWith(" - "))
+                {
+                    // Improve this parsing to extract issue numbers etc
+                    var title = line.StartsWith(" - ") ? line.Substring(3) : line;
+                    var releaseNoteItem = new ReleaseNoteItem(title, null, null, null, currentRelease.When, new Contributor[0]);
+                    currentRelease.ReleaseNoteLines.Add(releaseNoteItem);
+                }
+                else if (string.IsNullOrWhiteSpace(line))
+                {
+                    currentRelease.ReleaseNoteLines.Add(new BlankLine());
+                }
                 else
                 {
                     // This picks up comments and such
                     var title = line.StartsWith(" - ") ? line.Substring(3) : line;
-                    var releaseNoteItem = new ReleaseNoteItem(title, null, null, null, currentRelease.When, new Contributor[0]);
-                    currentRelease.ReleaseNoteItems.Add(releaseNoteItem);
+                    var releaseNoteItem = new ReleaseNoteLine(title);
+                    currentRelease.ReleaseNoteLines.Add(releaseNoteItem);
                 }
             }
 
             releases.Add(currentRelease);
+
+            // Remove additional blank lines
+            foreach (var semanticRelease in releases)
+            {
+                for (int i = 0; i < semanticRelease.ReleaseNoteLines.Count; i++)
+                {
+                    if (semanticRelease.ReleaseNoteLines[i] is BlankLine)
+                        semanticRelease.ReleaseNoteLines.RemoveAt(i--);
+                    else
+                        break;
+                }
+                for (int i = semanticRelease.ReleaseNoteLines.Count - 1; i >= 0; i--)
+                {
+                    if (semanticRelease.ReleaseNoteLines[i] is BlankLine)
+                        semanticRelease.ReleaseNoteLines.RemoveAt(i);
+                    else
+                        break;
+                }
+            }
 
             return new SemanticReleaseNotes(releases, new string[0]);
         }
@@ -169,20 +168,20 @@ namespace GitReleaseNotes
 
                 if (releaseFromThis != null)
                 {
-                    semanticRelease.ReleaseNoteItems.AddRange(releaseFromThis.ReleaseNoteItems);
+                    semanticRelease.ReleaseNoteLines.AddRange(releaseFromThis.ReleaseNoteLines);
                 }
                 if (releaseFromPrevious != null)
                 {
-                    semanticRelease.ReleaseNoteItems.AddRange(releaseFromPrevious.ReleaseNoteItems);
+                    semanticRelease.ReleaseNoteLines.AddRange(releaseFromPrevious.ReleaseNoteLines);
                 }
             }
 
-            return new SemanticReleaseNotes(mergedReleases, _categories.Union(previousReleaseNotes._categories).Distinct().ToArray());
+            return new SemanticReleaseNotes(mergedReleases, categories.Union(previousReleaseNotes.categories).Distinct().ToArray());
         }
 
         private static SemanticRelease CreateMergedSemanticRelease(SemanticRelease r)
         {
-            return new SemanticRelease(r.ReleaseName, r.When, new List<ReleaseNoteItem>(), r.DiffInfo);
+            return new SemanticRelease(r.ReleaseName, r.When, new List<IReleaseNoteLine>(), r.DiffInfo);
         }
     }
 }
