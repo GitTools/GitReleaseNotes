@@ -24,7 +24,7 @@ namespace GitReleaseNotes.Tests
 
             var releaseNotes = ReleaseNotesGenerator.GenerateReleaseNotes(
                 repo, issueTracker, new SemanticReleaseNotes(), new string[0],
-                tagToStartFrom, currentReleaseInfo);
+                tagToStartFrom, currentReleaseInfo, issueTracker.DiffUrlFormat);
 
             Approvals.Verify(releaseNotes.ToString());
         }
@@ -45,7 +45,7 @@ namespace GitReleaseNotes.Tests
 
             var releaseNotes = ReleaseNotesGenerator.GenerateReleaseNotes(
                 repo, issueTracker, new SemanticReleaseNotes(), new string[0],
-                tagToStartFrom, currentReleaseInfo);
+                tagToStartFrom, currentReleaseInfo, string.Empty);
 
             Approvals.Verify(releaseNotes.ToString());
         }
@@ -86,7 +86,7 @@ Commits: E413A880DB...F6924D7A0B");
 
             var releaseNotes = ReleaseNotesGenerator.GenerateReleaseNotes(
                 repo, issueTracker, previousReleaseNotes, new string[0],
-                tagToStartFrom, currentReleaseInfo);
+                tagToStartFrom, currentReleaseInfo, string.Empty);
 
             Approvals.Verify(releaseNotes.ToString());
         }
@@ -143,7 +143,7 @@ Commits: E413A880DB...F6924D7A0B");
 
             var releaseNotes = ReleaseNotesGenerator.GenerateReleaseNotes(
                 repo, issueTracker, previousReleaseNotes, new string[0],
-                tagToStartFrom, currentReleaseInfo);
+                tagToStartFrom, currentReleaseInfo, "url/{0}...{1}");
 
             Approvals.Verify(releaseNotes.ToString());
         }

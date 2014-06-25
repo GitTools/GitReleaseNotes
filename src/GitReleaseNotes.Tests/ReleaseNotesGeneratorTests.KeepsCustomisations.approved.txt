@@ -7,7 +7,7 @@
 
 Another comment
 
-Commits: AC39885536...CA74E870F2
+Commits: [AC39885536...CA74E870F2](url/AC39885536...CA74E870F2)
 
 
 # 0.1.0 (03 January 2012)
@@ -25,4 +25,4 @@ This is a comment about the release
 
 Which spans multiple lines
 
-Commits: E413A880DB...F6924D7A0B
+Commits: [E413A880DB...F6924D7A0B](url/E413A880DB...F6924D7A0B)

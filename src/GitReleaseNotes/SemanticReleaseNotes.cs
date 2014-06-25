@@ -67,12 +67,13 @@ namespace GitReleaseNotes
                 }
 
                 builder.AppendLine();
-                if (release.DiffInfo.Url == null)
+                if (string.IsNullOrEmpty(release.DiffInfo.DiffUrlFormat))
                     builder.AppendLine(String.Format("Commits: {0}...{1}", release.DiffInfo.BeginningSha, release.DiffInfo.EndSha));
                 else
                 {
                     builder.AppendLine(String.Format("Commits: [{0}...{1}]({2})",
-                        release.DiffInfo.BeginningSha, release.DiffInfo.EndSha, release.DiffInfo.Url));
+                        release.DiffInfo.BeginningSha, release.DiffInfo.EndSha,
+                        string.Format(release.DiffInfo.DiffUrlFormat, release.DiffInfo.BeginningSha, release.DiffInfo.EndSha)));
                 }
             }
 

@@ -6,46 +6,46 @@ namespace GitReleaseNotes.IssueTrackers.Jira
 {
     public class JiraIssueTracker : IIssueTracker
     {
-        private readonly GitReleaseNotesArguments _arguments;
-        private readonly IJiraApi _jiraApi;
+        private readonly GitReleaseNotesArguments arguments;
+        private readonly IJiraApi jiraApi;
 
         public JiraIssueTracker(IJiraApi jiraApi, GitReleaseNotesArguments arguments)
         {
-            _jiraApi = jiraApi;
-            _arguments = arguments;
+            this.jiraApi = jiraApi;
+            this.arguments = arguments;
         }
 
         public bool VerifyArgumentsAndWriteErrorsToConsole()
         {
-            if (string.IsNullOrEmpty(_arguments.JiraServer) ||
-                !Uri.IsWellFormedUriString(_arguments.JiraServer, UriKind.Absolute))
+            if (string.IsNullOrEmpty(arguments.JiraServer) ||
+                !Uri.IsWellFormedUriString(arguments.JiraServer, UriKind.Absolute))
             {
                 Console.WriteLine("A valid Jira server must be specified [/JiraServer ]");
                 return false;
             }
 
-            if (string.IsNullOrEmpty(_arguments.ProjectId))
+            if (string.IsNullOrEmpty(arguments.ProjectId))
             {
                 Console.WriteLine("/JiraProjectId is a required parameter for Jira");
                 return false;
             }
 
-            if (string.IsNullOrEmpty(_arguments.Username))
+            if (string.IsNullOrEmpty(arguments.Username))
             {
                 Console.WriteLine("/Username is a required to authenticate with Jira");
                 return false;
             }
-            if (string.IsNullOrEmpty(_arguments.Password))
+            if (string.IsNullOrEmpty(arguments.Password))
             {
                 Console.WriteLine("/Password is a required to authenticate with Jira");
                 return false;
             }
 
-            if (string.IsNullOrEmpty(_arguments.Jql))
+            if (string.IsNullOrEmpty(arguments.Jql))
             {
-                _arguments.Jql = string.Format("project = {0} AND " +
+                arguments.Jql = string.Format("project = {0} AND " +
                                "(issuetype = Bug OR issuetype = Story OR issuetype = \"New Feature\") AND " +
-                               "status in (Closed, Done, Resolved)", _arguments.ProjectId);
+                               "status in (Closed, Done, Resolved)", arguments.ProjectId);
             }
 
             return true;
@@ -58,9 +58,10 @@ namespace GitReleaseNotes.IssueTrackers.Jira
 
         public IEnumerable<OnlineIssue> GetClosedIssues(DateTimeOffset? since)
         {
-            return _jiraApi.GetClosedIssues(_arguments, since).ToArray();
+            return jiraApi.GetClosedIssues(arguments, since).ToArray();
         }
 
         public bool RemotePresentWhichMatches { get { return false; }}
+        public string DiffUrlFormat { get { return string.Empty; } }
     }
 }
