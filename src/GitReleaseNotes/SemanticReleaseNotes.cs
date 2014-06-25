@@ -11,6 +11,7 @@ namespace GitReleaseNotes
     {
         //readonly Regex _issueRegex = new Regex(" - (?<Issue>.*?)(?<IssueLink> \\[(?<IssueId>.*?)\\]\\((?<IssueUrl>.*?)\\))*( *\\+(?<Tag>[^ \\+]*))*", RegexOptions.Compiled);
         static readonly Regex ReleaseRegex = new Regex("# (?<Title>.*?)( \\((?<Date>.*?)\\))?$", RegexOptions.Compiled);
+        static readonly Regex LinkRegex = new Regex(@"\[(?<Text>.*?)\]\((?<Link>.*?)\)$", RegexOptions.Compiled);
         readonly string[] categories;
         readonly SemanticRelease[] releases;
 
@@ -105,7 +106,14 @@ namespace GitReleaseNotes
                 }
                 else if (line.StartsWith("Commits: "))
                 {
-                    var commits = line.Replace("Commits: ", string.Empty).Split(new[] { "..." }, StringSplitOptions.None);
+                    var commitText = line.Replace("Commits: ", string.Empty);
+                    var linkMatch = LinkRegex.Match(commitText);
+                    if (linkMatch.Success)
+                    {
+                        commitText = linkMatch.Groups["Text"].Value;
+                        currentRelease.DiffInfo.DiffUrlFormat = linkMatch.Groups["Link"].Value;
+                    }
+                    var commits = commitText.Split(new[] { "..." }, StringSplitOptions.None);
                     currentRelease.DiffInfo.BeginningSha = commits[0];
                     currentRelease.DiffInfo.EndSha = commits[1];
                 }
