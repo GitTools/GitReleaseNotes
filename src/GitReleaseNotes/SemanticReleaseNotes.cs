@@ -185,11 +185,13 @@ namespace GitReleaseNotes
 
         public SemanticReleaseNotes Merge(SemanticReleaseNotes previousReleaseNotes)
         {
-            var mergedReleases =
-                previousReleaseNotes.Releases
+            var semanticReleases = previousReleaseNotes.Releases
                 .Where(r => Releases.All(r2 => r.ReleaseName != r2.ReleaseName))
-                .Select(CreateMergedSemanticRelease)
-                .Union(Releases.Select(CreateMergedSemanticRelease))
+                .Select(CreateMergedSemanticRelease);
+            var enumerable = Releases.Select(CreateMergedSemanticRelease);
+            var mergedReleases =
+                enumerable
+                .Union(semanticReleases)
                 .ToArray();
 
             foreach (var semanticRelease in mergedReleases)
