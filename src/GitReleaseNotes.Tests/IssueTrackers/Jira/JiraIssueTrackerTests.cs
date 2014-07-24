@@ -9,7 +9,7 @@ namespace GitReleaseNotes.Tests.IssueTrackers.Jira
     {
         private readonly IJiraApi _jiraApi;
         private readonly JiraIssueTracker _sut;
-        private readonly Log _log;
+        private readonly ILog _log;
 
         public JiraIssueTrackerTests()
         {
