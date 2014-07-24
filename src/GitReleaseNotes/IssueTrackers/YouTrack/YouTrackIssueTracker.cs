@@ -8,10 +8,12 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
     {
         private readonly GitReleaseNotesArguments arguments;
         private readonly IYouTrackApi youTrackApi;
+        private readonly ILog log;
 
-        public YouTrackIssueTracker(IYouTrackApi youTrackApi, GitReleaseNotesArguments arguments)
+        public YouTrackIssueTracker(IYouTrackApi youTrackApi, ILog log, GitReleaseNotesArguments arguments)
         {
             this.youTrackApi = youTrackApi;
+            this.log = log;
             this.arguments = arguments;
         }
 
@@ -20,24 +22,24 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
             if (string.IsNullOrEmpty(arguments.YouTrackServer) ||
                 !Uri.IsWellFormedUriString(arguments.YouTrackServer, UriKind.Absolute))
             {
-                Console.WriteLine("A valid YouTrack server must be specified [/YouTrackServer ]");
+                log.WriteLine("A valid YouTrack server must be specified [/YouTrackServer ]");
                 return false;
             }
 
             if (string.IsNullOrEmpty(arguments.ProjectId))
             {
-                Console.WriteLine("/ProjectId is a required parameter for YouTrack");
+                log.WriteLine("/ProjectId is a required parameter for YouTrack");
                 return false;
             }
 
             if (string.IsNullOrEmpty(arguments.Username))
             {
-                Console.WriteLine("/Username is a required to authenticate with YouTrack");
+                log.WriteLine("/Username is a required to authenticate with YouTrack");
                 return false;
             }
             if (string.IsNullOrEmpty(arguments.Password))
             {
-                Console.WriteLine("/Password is a required to authenticate with YouTrack");
+                log.WriteLine("/Password is a required to authenticate with YouTrack");
                 return false;
             }
 
@@ -53,7 +55,7 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
 
         public void PublishRelease(string releaseNotesOutput)
         {
-            Console.WriteLine("YouTrack does not support publishing releases");
+            log.WriteLine("YouTrack does not support publishing releases");
         }
 
         public IEnumerable<OnlineIssue> GetClosedIssues(DateTimeOffset? since)

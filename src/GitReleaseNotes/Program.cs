@@ -151,11 +151,11 @@ namespace GitReleaseNotes
                 },
                 {
                     IssueTracker.Jira, 
-                    new JiraIssueTracker(new JiraApi(), arguments)
+                    new JiraIssueTracker(new JiraApi(), new Log(), arguments)
                 },
                 {
                     IssueTracker.YouTrack,
-                    new YouTrackIssueTracker(new YouTrackApi(), arguments)
+                    new YouTrackIssueTracker(new YouTrackApi(), new Log(), arguments)
                 }
             };
         }
