@@ -23,6 +23,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -45,6 +46,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Octokit.0.1.8\lib\net45\Octokit.dll</HintPath>
     </Reference>
+    <Reference Include="RestSharp">
+      <HintPath>..\packages\RestSharp.104.4.0\lib\net4\RestSharp.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -62,6 +66,10 @@
     <Compile Include="BlankLine.cs" />
     <Compile Include="Contributor.cs" />
     <Compile Include="IReleaseNoteLine.cs" />
+    <Compile Include="IssueTrackers\BitBucket\BitBucketIssueTracker.cs" />
+    <Compile Include="IssueTrackers\BitBucket\IBitBucketApi.cs" />
+    <Compile Include="IssueTrackers\BitBucket\BitBucketApi.cs" />
+    <Compile Include="IssueTrackers\BitBucket\OAuthBase.cs" />
     <Compile Include="ReleaseFinder.cs" />
     <Compile Include="FileSystem\FileSystem.cs" />
     <Compile Include="FileSystem\IFileSystem.cs" />

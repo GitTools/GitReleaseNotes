@@ -5,6 +5,7 @@ namespace GitReleaseNotes.IssueTrackers
         GitHub,
         Jira,
         YouTrack,
-        //TODO Tfs
+        BitBucket,
+       //TODO Tfs
     }
 }
