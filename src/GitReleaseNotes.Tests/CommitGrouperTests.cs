@@ -118,5 +118,6 @@ namespace GitReleaseNotes.Tests
             commitLog.GetEnumerator().Returns(returnThis);
             _repository.Commits.Returns(commitLog);
         }
+
     }
 }
