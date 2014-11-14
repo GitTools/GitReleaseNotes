@@ -12,7 +12,7 @@ namespace GitReleaseNotes.Tests
 {
     public class CommitGrouperTestsMultipleTagsPerCommit
     {
-        private readonly Dictionary<Commit, string> _tags;
+        private readonly List<Tuple<Commit, string>> _tags;
         private readonly IRepository _repository;
         private readonly Random _random;
         private DateTimeOffset _nextCommitDate;
@@ -21,13 +21,13 @@ namespace GitReleaseNotes.Tests
         {
             _nextCommitDate = DateTimeOffset.Now;
             _repository = Substitute.For<IRepository>();
-            _tags = new Dictionary<Commit, string>();
+            _tags = new List<Tuple<Commit, string>>();
             var tagCollection = Substitute.For<TagCollection>();
             tagCollection.GetEnumerator().Returns(c => _tags.Select(p =>
                 {
                     var tag = Substitute.For<Tag>();
-                    tag.Target.Returns(p.Key);
-                    tag.Name.Returns(p.Value);
+                    tag.Target.Returns(p.Item1);
+                    tag.Name.Returns(p.Item2);
                     return tag;
                 }).GetEnumerator());
             _repository.Tags.Returns(tagCollection);
@@ -44,13 +44,10 @@ namespace GitReleaseNotes.Tests
             var startTagCommit = CreateCommit();
             var firstCommit = CreateCommit();
             SubstituteCommitLog(commit1, commit2, commit3, startTagCommit, firstCommit);
-            _tags.Add(commit2, "1.1.0");
-            _tags.Add(commit2, "second_tag_for_commit2");
+            _tags.Add(Tuple.Create(commit2, "1.1.0"));
+            _tags.Add(Tuple.Create(commit2, "second_tag_for_commit2"));
 
             var results = ReleaseFinder.FindReleases(_repository, null, new ReleaseInfo());
-
-
-
         }
 
         private Commit CreateCommit()

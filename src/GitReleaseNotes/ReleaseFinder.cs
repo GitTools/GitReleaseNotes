@@ -10,7 +10,7 @@ namespace GitReleaseNotes
         public static List<ReleaseInfo> FindReleases(IRepository gitRepo, TaggedCommit tagToStartFrom, ReleaseInfo current)
         {
             var releases = new List<ReleaseInfo> { current };
-            var tagLookup = gitRepo.Tags.ToDictionary(t => t.Target.Sha, t => t);
+            var tagLookup = TagsByShaMap(gitRepo);
             foreach (var commit in gitRepo.Commits.TakeWhile(c => tagToStartFrom == null || c != tagToStartFrom.Commit))
             {
                 if (tagLookup.ContainsKey(commit.Sha))
@@ -28,6 +28,17 @@ namespace GitReleaseNotes
             }
 
             return releases;
+        }
+
+        private static Dictionary<string, Tag> TagsByShaMap(IRepository gitRepo)
+        {
+            var tagLookup = new Dictionary<string, Tag>();
+            foreach (var tag in gitRepo.Tags)
+            {
+                if(!tagLookup.ContainsKey(tag.Target.Sha))
+                    tagLookup.Add(tag.Target.Sha, tag);
+            }
+            return tagLookup;
         }
     }
 }
