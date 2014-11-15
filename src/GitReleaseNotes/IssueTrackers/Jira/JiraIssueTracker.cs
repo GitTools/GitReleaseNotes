@@ -47,7 +47,7 @@ namespace GitReleaseNotes.IssueTrackers.Jira
             {
                 arguments.Jql = string.Format("project = {0} AND " +
                                "(issuetype = Bug OR issuetype = Story OR issuetype = \"New Feature\") AND " +
-                               "status in (Closed, Done, Resolved)", arguments.ProjectId);
+                               "status in (Closed, Resolved)", arguments.ProjectId);
             }
 
             return true;
