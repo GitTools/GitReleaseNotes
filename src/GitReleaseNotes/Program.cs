@@ -9,6 +9,7 @@ using Args.Help.Formatters;
 using GitReleaseNotes.FileSystem;
 using GitReleaseNotes.Git;
 using GitReleaseNotes.IssueTrackers;
+using GitReleaseNotes.IssueTrackers.BitBucket;
 using GitReleaseNotes.IssueTrackers.GitHub;
 using GitReleaseNotes.IssueTrackers.Jira;
 using GitReleaseNotes.IssueTrackers.YouTrack;
@@ -157,6 +158,10 @@ namespace GitReleaseNotes
                 {
                     IssueTracker.YouTrack,
                     new YouTrackIssueTracker(new YouTrackApi(), log, arguments)
+                },
+                {
+                   IssueTracker.BitBucket,
+                   new BitBucketIssueTracker(repository, new BitBucketApi(), log, arguments)
                 }
             };
         }

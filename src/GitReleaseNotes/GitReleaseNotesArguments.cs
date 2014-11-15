@@ -12,7 +12,7 @@ namespace GitReleaseNotes
         [Description("Enables verbose logging")]
         public bool Verbose { get; set; }
 
-        [Description("Specifies the issue tracker used, possible Options: GitHub, Jira, YouTrack")]
+        [Description("Specifies the issue tracker used, possible Options: GitHub, Jira, YouTrack, BitBucket")]
         public IssueTracker? IssueTracker { get; set; }
 
         [Description("Specifies that all tags should be included in the release notes, if not specified then only the issues since the last tag are included.")]
@@ -56,5 +56,11 @@ namespace GitReleaseNotes
 
         [Description("Specifies the version to publish")]
         public string Version { get; set; }
+
+        [Description("BitBuckets Consumer Key used for Oauth authentication")]
+        public string ConsumerKey { get; set; }
+
+        [Description("BitBuckets Consumer Secret Key used for Oauth authentication")]
+        public string ConsumerSecretKey { get; set; }
     }
 }
