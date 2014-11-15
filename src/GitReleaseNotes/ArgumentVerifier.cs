@@ -6,7 +6,7 @@ namespace GitReleaseNotes
     {
         public static bool VerifyArguments(GitReleaseNotesArguments arguments)
         {
-            if (string.IsNullOrEmpty(arguments.OutputFile) && !arguments.Publish)
+            if (string.IsNullOrEmpty(arguments.OutputFile))
             {
                 Console.WriteLine("WARN: No Output file specified (*.md) [/OutputFile ...]");
             }

@@ -52,11 +52,6 @@ namespace GitReleaseNotes.IssueTrackers.BitBucket
                 repoSlug = split[5];
             }
 
-            if (arguments.Publish && string.IsNullOrEmpty(arguments.Version))
-            {
-                log.WriteLine("You must specifiy the version [/Version ...] (will be tag) when using the /Publish flag");
-                return false;
-            }
             if (string.IsNullOrEmpty(arguments.ConsumerKey) && string.IsNullOrEmpty(arguments.ConsumerSecretKey))
             {
                 if (string.IsNullOrEmpty(arguments.Username))
@@ -86,11 +81,6 @@ namespace GitReleaseNotes.IssueTrackers.BitBucket
             }
 
             return true;
-        }
-
-        public void PublishRelease(string releaseNotesOutput)
-        {
-            log.WriteLine("Bitbucket does not support publishing releases");
         }
 
         public IEnumerable<OnlineIssue> GetClosedIssues(DateTimeOffset? since)

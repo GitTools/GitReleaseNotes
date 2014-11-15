@@ -15,34 +15,34 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
 {
     public class GitHubIssueTrackerTests
     {
-        private readonly GitReleaseNotesArguments _arguments;
-        private readonly IGitHubClient _gitHubClient;
-        private readonly IIssuesClient _issuesClient;
-        private readonly GitHubIssueTracker _sut;
-        private readonly ILog _log;
-        private readonly IRepository _repo;
+        private readonly GitReleaseNotesArguments arguments;
+        private readonly IGitHubClient gitHubClient;
+        private readonly IIssuesClient issuesClient;
+        private readonly GitHubIssueTracker sut;
+        private readonly ILog log;
+        private readonly IRepository repo;
 
         public GitHubIssueTrackerTests()
         {
-            _log = Substitute.For<ILog>();
-            _gitHubClient = Substitute.For<IGitHubClient>();
-            _issuesClient = Substitute.For<IIssuesClient>();
-            _gitHubClient.Issue.Returns(_issuesClient);
-            _arguments = new GitReleaseNotesArguments
+            log = Substitute.For<ILog>();
+            gitHubClient = Substitute.For<IGitHubClient>();
+            issuesClient = Substitute.For<IIssuesClient>();
+            gitHubClient.Issue.Returns(issuesClient);
+            arguments = new GitReleaseNotesArguments
             {
                 Repo = "Org/Repo",
                 Token = "213"
             };
-            _repo = Substitute.For<IRepository>();
-            _repo.Network.Returns(new NetworkEx());
+            repo = Substitute.For<IRepository>();
+            repo.Network.Returns(new NetworkEx());
 
-            _sut = new GitHubIssueTracker(_repo, () => _gitHubClient, _log, _arguments);
+            sut = new GitHubIssueTracker(repo, () => gitHubClient, log, arguments);
         }
 
         [Fact]
         public void CreatesReleaseNotesForClosedGitHubIssues()
         {
-            _issuesClient
+            issuesClient
                 .GetForRepository("Org", "Repo", Arg.Any<RepositoryIssueRequest>())
                 .Returns(Task.FromResult<IReadOnlyList<Issue>>(new List<Issue>
                 {
@@ -62,7 +62,7 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
                     }
                 }.AsReadOnly()));
 
-            var closedIssues = _sut.GetClosedIssues(DateTimeOffset.Now.AddDays(-2));
+            var closedIssues = sut.GetClosedIssues(DateTimeOffset.Now.AddDays(-2));
             var onlineIssue = closedIssues.Single();
             onlineIssue.Title.ShouldBe("Issue Title");
             onlineIssue.Id.ShouldBe("#1");
@@ -72,22 +72,22 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
         [Fact]
         public void ErrorLoggedWhenRepoIsNotSpecified()
         {
-            _arguments.Repo = null;
-            var result = _sut.VerifyArgumentsAndWriteErrorsToConsole();
+            arguments.Repo = null;
+            var result = sut.VerifyArgumentsAndWriteErrorsToConsole();
 
             result.ShouldBe(false);
-            _log.Received().WriteLine("GitHub repository name must be specified [/Repo .../...]");
+            log.Received().WriteLine("GitHub repository name must be specified [/Repo .../...]");
         }
 
         [Theory]
         [InlineData("Foo", false)]
         [InlineData("Org/Repo", true)]
         [InlineData("Org/Repo/SomethingElse", false)]
-        public void RepositoryMustBeInCorrectFormat(string repo, bool success)
+        public void RepositoryMustBeInCorrectFormat(string repository, bool success)
         {
-            _arguments.Repo = repo;
-            _arguments.Token = "Foo";
-            var result = _sut.VerifyArgumentsAndWriteErrorsToConsole();
+            arguments.Repo = repository;
+            arguments.Token = "Foo";
+            var result = sut.VerifyArgumentsAndWriteErrorsToConsole();
 
             if (success)
             {
@@ -96,42 +96,18 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
             else
             {
                 result.ShouldBe(false);
-                _log.Received().WriteLine("GitHub repository name should be in format Organisation/RepoName");
+                log.Received().WriteLine("GitHub repository name should be in format Organisation/RepoName");
             }
         }
 
         [Fact]
         public void CanGetRepoFromRemote()
         {
-            _repo.Network.Remotes.Add("upstream", "http://github.com/Org/Repo.With.Dots");
+            repo.Network.Remotes.Add("upstream", "http://github.com/Org/Repo.With.Dots");
 
-            _sut.GetClosedIssues(DateTimeOffset.Now.AddDays(-2));
+            sut.GetClosedIssues(DateTimeOffset.Now.AddDays(-2));
 
-            _issuesClient.Received().GetForRepository("Org", "Repo.With.Dots", Arg.Any<RepositoryIssueRequest>());
-        }
-
-        [Fact]
-        public void MustSpecifyVersionWhenPublishFlagIsSet()
-        {
-            _arguments.Repo = "Foo/Bar";
-            _arguments.Token = "Baz";
-            _arguments.Publish = true;
-            var result = _sut.VerifyArgumentsAndWriteErrorsToConsole();
-
-            result.ShouldBe(false);
-            _log.Received().WriteLine("You must specifiy the version [/Version ...] (will be tag) when using the /Publish flag");
-        }
-
-        [Fact]
-        public void CanCreateReleaseOnGitHub()
-        {
-            _arguments.Version = "1.2.0";
-            _arguments.Repo = "Foo/Baz";
-            const string releaseNotesOutput = " - A thingy was fixed";
-            _sut.PublishRelease(releaseNotesOutput);
-
-            var releaseUpdateSpec = Arg.Is<ReleaseUpdate>(r => r.TagName == "1.2.0" && r.Body == releaseNotesOutput && r.Name == "1.2.0");
-            _gitHubClient.Release.Received().CreateRelease("Foo", "Baz", releaseUpdateSpec);
+            issuesClient.Received().GetForRepository("Org", "Repo.With.Dots", Arg.Any<RepositoryIssueRequest>());
         }
     }
 }

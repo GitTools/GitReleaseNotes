@@ -120,17 +120,7 @@ namespace GitReleaseNotes
             var releaseNotesOutput = releaseNotes.ToString();
             releaseFileWriter.OutputReleaseNotesFile(releaseNotesOutput, outputFile);
 
-            PublishReleaseIfNeeded(releaseNotesOutput, arguments, issueTracker);
             return 0;
-        }
-
-        private static void PublishReleaseIfNeeded(string releaseNotesOutput, GitReleaseNotesArguments arguments, IIssueTracker issueTracker)
-        {
-            if (!arguments.Publish)
-                return;
-
-            Console.WriteLine("Publishing release {0} to {1}", arguments.Version, arguments.IssueTracker);
-            issueTracker.PublishRelease(releaseNotesOutput);
         }
 
         private static void CreateIssueTrackers(IRepository repository, GitReleaseNotesArguments arguments)

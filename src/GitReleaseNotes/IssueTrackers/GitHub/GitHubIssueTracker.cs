@@ -61,28 +61,7 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
                 }
             }
 
-            if (arguments.Publish && string.IsNullOrEmpty(arguments.Version))
-            {
-                log.WriteLine("You must specifiy the version [/Version ...] (will be tag) when using the /Publish flag");
-                return false;
-            }
-
             return true;
-        }
-
-        public void PublishRelease(string releaseNotesOutput)
-        {
-            string organisation;
-            string repository;
-            GetRepository(arguments, out organisation, out repository);
-
-            var releaseUpdate = new ReleaseUpdate(arguments.Version)
-            {
-                Name = arguments.Version,
-                Body = releaseNotesOutput
-            };
-            var release = gitHubClientFactory().Release.CreateRelease(organisation, repository, releaseUpdate);
-            release.Wait();
         }
 
         private void GetRepository(GitReleaseNotesArguments arguments, out string organisation, out string repository)

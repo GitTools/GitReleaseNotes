@@ -53,11 +53,6 @@ namespace GitReleaseNotes.IssueTrackers.Jira
             return true;
         }
 
-        public void PublishRelease(string releaseNotesOutput)
-        {
-            log.WriteLine("Jira does not support publishing releases");
-        }
-
         public IEnumerable<OnlineIssue> GetClosedIssues(DateTimeOffset? since)
         {
             return jiraApi.GetClosedIssues(arguments, since).ToArray();

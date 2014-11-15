@@ -53,11 +53,6 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
             return true;
         }
 
-        public void PublishRelease(string releaseNotesOutput)
-        {
-            log.WriteLine("YouTrack does not support publishing releases");
-        }
-
         public IEnumerable<OnlineIssue> GetClosedIssues(DateTimeOffset? since)
         {
             return youTrackApi.GetClosedIssues(arguments, since).ToArray();
