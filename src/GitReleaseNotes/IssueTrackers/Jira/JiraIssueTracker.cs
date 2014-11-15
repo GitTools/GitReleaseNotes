@@ -8,10 +8,12 @@ namespace GitReleaseNotes.IssueTrackers.Jira
     {
         private readonly GitReleaseNotesArguments arguments;
         private readonly IJiraApi jiraApi;
+        private readonly ILog log;
 
-        public JiraIssueTracker(IJiraApi jiraApi, GitReleaseNotesArguments arguments)
+        public JiraIssueTracker(IJiraApi jiraApi, ILog log, GitReleaseNotesArguments arguments)
         {
             this.jiraApi = jiraApi;
+            this.log = log;
             this.arguments = arguments;
         }
 
@@ -20,24 +22,24 @@ namespace GitReleaseNotes.IssueTrackers.Jira
             if (string.IsNullOrEmpty(arguments.JiraServer) ||
                 !Uri.IsWellFormedUriString(arguments.JiraServer, UriKind.Absolute))
             {
-                Console.WriteLine("A valid Jira server must be specified [/JiraServer ]");
+                log.WriteLine("A valid Jira server must be specified [/JiraServer ]");
                 return false;
             }
 
             if (string.IsNullOrEmpty(arguments.ProjectId))
             {
-                Console.WriteLine("/JiraProjectId is a required parameter for Jira");
+                log.WriteLine("/JiraProjectId is a required parameter for Jira");
                 return false;
             }
 
             if (string.IsNullOrEmpty(arguments.Username))
             {
-                Console.WriteLine("/Username is a required to authenticate with Jira");
+                log.WriteLine("/Username is a required to authenticate with Jira");
                 return false;
             }
             if (string.IsNullOrEmpty(arguments.Password))
             {
-                Console.WriteLine("/Password is a required to authenticate with Jira");
+                log.WriteLine("/Password is a required to authenticate with Jira");
                 return false;
             }
 
@@ -53,7 +55,7 @@ namespace GitReleaseNotes.IssueTrackers.Jira
 
         public void PublishRelease(string releaseNotesOutput)
         {
-            Console.WriteLine("Jira does not support publishing releases");
+            log.WriteLine("Jira does not support publishing releases");
         }
 
         public IEnumerable<OnlineIssue> GetClosedIssues(DateTimeOffset? since)

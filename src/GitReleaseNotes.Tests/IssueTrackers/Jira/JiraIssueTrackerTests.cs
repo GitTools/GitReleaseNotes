@@ -9,11 +9,12 @@ namespace GitReleaseNotes.Tests.IssueTrackers.Jira
     {
         private readonly IJiraApi _jiraApi;
         private readonly JiraIssueTracker _sut;
+        private readonly ILog _log;
 
         public JiraIssueTrackerTests()
         {
             _jiraApi = Substitute.For<IJiraApi>();
-            _sut = new JiraIssueTracker(_jiraApi, new GitReleaseNotesArguments());
+            _sut = new JiraIssueTracker(_jiraApi, _log, new GitReleaseNotesArguments());
         }
 
         //[Fact]

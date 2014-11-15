@@ -134,6 +134,7 @@ namespace GitReleaseNotes
 
         private static void CreateIssueTrackers(IRepository repository, GitReleaseNotesArguments arguments)
         {
+            var log = new Log();
             _issueTrackers = new Dictionary<IssueTracker, IIssueTracker>
             {
                 {
@@ -147,15 +148,15 @@ namespace GitReleaseNotes
                         }
 
                         return gitHubClient;
-                    }, new Log(), arguments)
+                    }, log, arguments)
                 },
                 {
                     IssueTracker.Jira, 
-                    new JiraIssueTracker(new JiraApi(), arguments)
+                    new JiraIssueTracker(new JiraApi(), log, arguments)
                 },
                 {
                     IssueTracker.YouTrack,
-                    new YouTrackIssueTracker(new YouTrackApi(), arguments)
+                    new YouTrackIssueTracker(new YouTrackApi(), log, arguments)
                 }
             };
         }
