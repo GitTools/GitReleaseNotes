@@ -132,7 +132,7 @@ namespace GitReleaseNotes
                     IssueTracker.GitHub,
                     new GitHubIssueTracker(repository, () =>
                     {
-                        var gitHubClient = new GitHubClient(new ProductHeaderValue("GitReleaseNotes"));
+                        var gitHubClient = new GitHubClient(new Octokit.ProductHeaderValue("GitReleaseNotes"));
                         if (arguments.Token != null)
                         {
                             gitHubClient.Credentials = new Credentials(arguments.Token);
