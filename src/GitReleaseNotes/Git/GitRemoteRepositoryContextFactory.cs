@@ -26,10 +26,10 @@ namespace GitReleaseNotes.Git
 
             var gitRootDirectory = Path.Combine(args.DestinationPath);
             var gitDirectory = Path.Combine(gitRootDirectory, ".git");
-            if (Directory.Exists(gitRootDirectory))
+            if (Directory.Exists(gitDirectory))
             {
-                logger.WriteLine(string.Format("Deleting existing .git folder from '{0}' to force new checkout from url", gitRootDirectory));
-                DeleteGitDirectory(gitRootDirectory);
+                logger.WriteLine(string.Format("Deleting existing .git folder from '{0}' to force new checkout from url", gitDirectory));
+                DeleteGitDirectory(gitDirectory);
             }
 
             Credentials credentials = args.Credentials;            
