@@ -65,6 +65,11 @@
     <Compile Include="ArgumentVerifier.cs" />
     <Compile Include="BlankLine.cs" />
     <Compile Include="Contributor.cs" />
+    <Compile Include="Git\GitBranchNameInfo.cs" />
+    <Compile Include="Git\GitLocalRepositoryContextFactory.cs" />
+    <Compile Include="Git\GitRemoteRepositoryContextFactory.cs" />
+    <Compile Include="Git\GitRepositoryContext.cs" />
+    <Compile Include="Git\IGitRepositoryContextFactory.cs" />
     <Compile Include="IReleaseNoteLine.cs" />
     <Compile Include="IssueTrackers\BitBucket\BitBucketIssueTracker.cs" />
     <Compile Include="IssueTrackers\BitBucket\IBitBucketApi.cs" />

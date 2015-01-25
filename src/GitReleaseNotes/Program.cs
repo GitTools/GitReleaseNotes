@@ -52,75 +52,78 @@ namespace GitReleaseNotes
             if (!ArgumentVerifier.VerifyArguments(arguments))
             {
                 return 1;
-            }
+            }          
 
-            var workingDirectory = arguments.WorkingDirectory ?? Directory.GetCurrentDirectory();
-
-            var gitDirectory = GitDirFinder.TreeWalkForGitDir(workingDirectory);
-            if (string.IsNullOrEmpty(gitDirectory))
+            using (var gitRepoContext = GetRepository(arguments))
             {
-                throw new Exception("Failed to find .git directory.");
+                // Remote repo's require some additional preparation before first use.
+                if (gitRepoContext.IsRemote)
+                {
+                    gitRepoContext.PrepareRemoteRepoForUse(arguments.RepoBranch);
+                    if (!string.IsNullOrWhiteSpace(arguments.OutputFile))
+                    {
+                        gitRepoContext.CheckoutFilesIfExist(arguments.OutputFile);
+                    }                   
+                }
+                var gitRepo = gitRepoContext.Repository;
+
+                CreateIssueTrackers(gitRepo, arguments);
+
+                IIssueTracker issueTracker = null;
+                if (arguments.IssueTracker == null)
+                {
+                    var firstOrDefault = _issueTrackers.FirstOrDefault(i => i.Value.RemotePresentWhichMatches);
+                    if (firstOrDefault.Value != null)
+                        issueTracker = firstOrDefault.Value;
+                }
+                if (issueTracker == null)
+                {
+                    if (!_issueTrackers.ContainsKey(arguments.IssueTracker.Value))
+                        throw new Exception(string.Format("{0} is not a known issue tracker", arguments.IssueTracker.Value));
+
+                    issueTracker = _issueTrackers[arguments.IssueTracker.Value];
+                }
+                if (!issueTracker.VerifyArgumentsAndWriteErrorsToConsole())
+                {
+                    return 1;
+                }
+
+                var fileSystem = new FileSystem.FileSystem();
+                var releaseFileWriter = new ReleaseFileWriter(fileSystem);
+                string outputFile = null;
+                var previousReleaseNotes = new SemanticReleaseNotes();
+
+                var gitRepoPath = gitRepo.Info.Path;
+                if (!string.IsNullOrEmpty(arguments.OutputFile))
+                {
+                    outputFile = Path.IsPathRooted(arguments.OutputFile)
+                        ? arguments.OutputFile
+                        : Path.Combine(gitRepoPath, arguments.OutputFile);
+                    previousReleaseNotes = new ReleaseNotesFileReader(fileSystem, gitRepoPath).ReadPreviousReleaseNotes(outputFile);
+                }
+
+                var categories = arguments.Categories == null ? Categories : Categories.Concat(arguments.Categories.Split(',')).ToArray();
+                TaggedCommit tagToStartFrom = arguments.AllTags
+                    ? GitRepositoryInfoFinder.GetFirstCommit(gitRepo)
+                    : GitRepositoryInfoFinder.GetLastTaggedCommit(gitRepo) ?? GitRepositoryInfoFinder.GetFirstCommit(gitRepo);
+                var currentReleaseInfo = GitRepositoryInfoFinder.GetCurrentReleaseInfo(gitRepo);
+                if (!string.IsNullOrEmpty(arguments.Version))
+                {
+                    currentReleaseInfo.Name = arguments.Version;
+                    currentReleaseInfo.When = DateTimeOffset.Now;
+                }
+                var releaseNotes = ReleaseNotesGenerator.GenerateReleaseNotes(
+                    gitRepo, issueTracker,
+                    previousReleaseNotes, categories,
+                    tagToStartFrom, currentReleaseInfo,
+                    issueTracker.DiffUrlFormat);
+
+                var releaseNotesOutput = releaseNotes.ToString();
+                releaseFileWriter.OutputReleaseNotesFile(releaseNotesOutput, outputFile);
+
+                return 0;
+
             }
-
-            Console.WriteLine("Git directory found at {0}", gitDirectory);
-
-            var repositoryRoot = Directory.GetParent(gitDirectory).FullName;
-
-            var gitRepo = new Repository(gitDirectory);
-
-            CreateIssueTrackers(gitRepo, arguments);
-
-            IIssueTracker issueTracker = null;
-            if (arguments.IssueTracker == null)
-            {
-                var firstOrDefault = _issueTrackers.FirstOrDefault(i => i.Value.RemotePresentWhichMatches);
-                if (firstOrDefault.Value != null)
-                    issueTracker = firstOrDefault.Value;
-            }
-            if (issueTracker == null)
-            {
-                if (!_issueTrackers.ContainsKey(arguments.IssueTracker.Value))
-                    throw new Exception(string.Format("{0} is not a known issue tracker", arguments.IssueTracker.Value));
-
-                issueTracker = _issueTrackers[arguments.IssueTracker.Value];
-            }
-            if (!issueTracker.VerifyArgumentsAndWriteErrorsToConsole())
-            {
-                return 1;
-            }
-
-            var fileSystem = new FileSystem.FileSystem();
-            var releaseFileWriter = new ReleaseFileWriter(fileSystem);
-            string outputFile = null;
-            var previousReleaseNotes = new SemanticReleaseNotes();
-            if (!string.IsNullOrEmpty(arguments.OutputFile))
-            {
-                outputFile = Path.IsPathRooted(arguments.OutputFile)
-                    ? arguments.OutputFile
-                    : Path.Combine(repositoryRoot, arguments.OutputFile);
-                previousReleaseNotes = new ReleaseNotesFileReader(fileSystem, repositoryRoot).ReadPreviousReleaseNotes(outputFile);
-            }
-
-            var categories = arguments.Categories == null ? Categories : Categories.Concat(arguments.Categories.Split(',')).ToArray();
-            TaggedCommit tagToStartFrom = arguments.AllTags
-                ? GitRepositoryInfoFinder.GetFirstCommit(gitRepo)
-                : GitRepositoryInfoFinder.GetLastTaggedCommit(gitRepo) ?? GitRepositoryInfoFinder.GetFirstCommit(gitRepo);
-            var currentReleaseInfo = GitRepositoryInfoFinder.GetCurrentReleaseInfo(gitRepo);
-            if (!string.IsNullOrEmpty(arguments.Version))
-            {
-                currentReleaseInfo.Name = arguments.Version;
-                currentReleaseInfo.When = DateTimeOffset.Now;
-            }
-            var releaseNotes = ReleaseNotesGenerator.GenerateReleaseNotes(
-                gitRepo, issueTracker, 
-                previousReleaseNotes, categories,
-                tagToStartFrom, currentReleaseInfo,
-                issueTracker.DiffUrlFormat);
-
-            var releaseNotesOutput = releaseNotes.ToString();
-            releaseFileWriter.OutputReleaseNotesFile(releaseNotesOutput, outputFile);
-
-            return 0;
         }
 
         private static void CreateIssueTrackers(IRepository repository, GitReleaseNotesArguments arguments)
@@ -154,6 +157,41 @@ namespace GitReleaseNotes
                    new BitBucketIssueTracker(repository, new BitBucketApi(), log, arguments)
                 }
             };
+        }
+
+        private static GitRepositoryContext GetRepository(GitReleaseNotesArguments args)
+        {
+            var workingDir = args.WorkingDirectory ?? Directory.GetCurrentDirectory();
+            bool isRemote = !string.IsNullOrWhiteSpace(args.RepoUrl);
+            ILog log = new Log();
+            IGitRepositoryContextFactory repoFactory = GetRepositoryFactory(log, isRemote, workingDir, args);
+            var repo = repoFactory.GetRepositoryContext();
+            return repo;
+        }
+
+        private static IGitRepositoryContextFactory GetRepositoryFactory(ILog log, bool isRemote, string workingDir, GitReleaseNotesArguments args)
+        {
+            IGitRepositoryContextFactory gitRepoFactory = null;
+            if (isRemote)
+            {
+
+                // clone repo from the remote url
+                var cloneRepoArgs = new GitReleaseNotes.Git.GitRemoteRepositoryContextFactory.RemoteRepoArgs();
+                cloneRepoArgs.Url = args.RepoUrl;
+                var credentials = new UsernamePasswordCredentials();
+                credentials.Username = args.RepoUsername;
+                credentials.Password = args.RepoPassword;
+                cloneRepoArgs.Credentials = credentials;
+                cloneRepoArgs.DestinationPath = workingDir;
+               
+                Console.WriteLine("Cloning a git repo from {0}", cloneRepoArgs.Url);
+                gitRepoFactory = new GitRemoteRepositoryContextFactory(log, cloneRepoArgs);
+            }
+            else
+            {
+                gitRepoFactory = new GitLocalRepositoryContextFactory(log, workingDir);
+            }
+            return gitRepoFactory;
         }
     }
 }
