@@ -93,13 +93,19 @@ namespace GitReleaseNotes
                 string outputFile = null;
                 var previousReleaseNotes = new SemanticReleaseNotes();
 
-                var gitRepoPath = gitRepo.Info.Path;
+                var outputPath = gitRepo.Info.Path;
+                var outputDirectory = new DirectoryInfo(outputPath);
+                if (outputDirectory.Name == ".git")
+                {
+                    outputPath = outputDirectory.Parent.FullName;
+                }
+
                 if (!string.IsNullOrEmpty(arguments.OutputFile))
                 {
                     outputFile = Path.IsPathRooted(arguments.OutputFile)
                         ? arguments.OutputFile
-                        : Path.Combine(gitRepoPath, arguments.OutputFile);
-                    previousReleaseNotes = new ReleaseNotesFileReader(fileSystem, gitRepoPath).ReadPreviousReleaseNotes(outputFile);
+                        : Path.Combine(outputPath, arguments.OutputFile);
+                    previousReleaseNotes = new ReleaseNotesFileReader(fileSystem, outputPath).ReadPreviousReleaseNotes(outputFile);
                 }
 
                 var categories = arguments.Categories == null ? Categories : Categories.Concat(arguments.Categories.Split(',')).ToArray();
