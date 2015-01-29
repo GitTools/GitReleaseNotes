@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
-using System.Web.Helpers;
 using RestSharp;
 
 namespace GitReleaseNotes.IssueTrackers.BitBucket
@@ -16,7 +15,7 @@ namespace GitReleaseNotes.IssueTrackers.BitBucket
         {
             var baseUrl = new Uri(ApiUrl, UriKind.Absolute);
             var restClient = new RestClient(baseUrl.AbsoluteUri);
-            var issuesUrl = String.Format("repositories/{0}/{1}/issues/", accountName, repoSlug);
+            var issuesUrl = string.Format("repositories/{0}/{1}/issues/", accountName, repoSlug);
             var request = new RestRequest(issuesUrl);
             if (oauth)
             {
@@ -31,7 +30,7 @@ namespace GitReleaseNotes.IssueTrackers.BitBucket
             {
                 throw new Exception("Failed to query BitBucket: " + response.StatusDescription);
             }
-            var responseObject = Json.Decode(response.Content);
+            dynamic responseObject = SimpleJson.DeserializeObject(response.Content);
             var issues = new List<OnlineIssue>();
             foreach (var issue in responseObject.issues)
             {

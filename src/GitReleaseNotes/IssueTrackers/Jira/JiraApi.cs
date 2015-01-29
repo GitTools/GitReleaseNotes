@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
-using System.Web.Helpers;
+using RestSharp;
 
 namespace GitReleaseNotes.IssueTrackers.Jira
 {
@@ -51,7 +51,7 @@ namespace GitReleaseNotes.IssueTrackers.Jira
             using (var responseStream = response.GetResponseStream())
             using (var responseReader = new StreamReader(responseStream))
             {
-                var responseObject = Json.Decode(responseReader.ReadToEnd());
+                dynamic responseObject = SimpleJson.DeserializeObject(responseReader.ReadToEnd());
                 foreach (var issue in responseObject.issues)
                 {
                     string summary = issue.fields.summary;
