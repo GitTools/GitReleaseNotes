@@ -1,3 +1,20 @@
+# vNext
+
+ - [#60](https://github.com/JakeGinnivan/GitReleaseNotes/pull/60) - Multiple tags per sha contributed by Marijn van der Zee ([serra](https://github.com/serra))
+ - [#59](https://github.com/JakeGinnivan/GitReleaseNotes/issues/59) - When a commit is tagged more than once, we get an unhandled exception
+ - [#58](https://github.com/JakeGinnivan/GitReleaseNotes/issues/58) - System.AggregateException when trying to /Publish
+ - [#57](https://github.com/JakeGinnivan/GitReleaseNotes/pull/57) - Initial BitBucket implementation. contributed by Mitja Bezenšek ([MitjaBezensek](https://github.com/MitjaBezensek))
+ - [#56](https://github.com/JakeGinnivan/GitReleaseNotes/pull/56) - Improved logging in JiraIssueTracker and YouTrackIssueTracker. contributed by Mitja Bezenšek ([MitjaBezensek](https://github.com/MitjaBezensek))
+ - [#52](https://github.com/JakeGinnivan/GitReleaseNotes/issues/52) - Use Costura
+ - [#51](https://github.com/JakeGinnivan/GitReleaseNotes/issues/51) - FieldAccessException when parsing JIRA results
+ - [#50](https://github.com/JakeGinnivan/GitReleaseNotes/issues/50) - Default JQL will not work on default JIRA instances +fix
+ - [#49](https://github.com/JakeGinnivan/GitReleaseNotes/issues/49) - Readme is outdated for Jira setup
+ - [#46](https://github.com/JakeGinnivan/GitReleaseNotes/issues/46) - Not able to install
+ - [#16](https://github.com/JakeGinnivan/GitReleaseNotes/issues/16) - BitBucket Support
+
+Commits: [eddb6c086d...e325f92485](https://github.com/JakeGinnivan/GitReleaseNotes/compare/eddb6c086d...e325f92485)
+
+
 # 0.4.0 (25 May 2014)
 
  - [#35](https://github.com/JakeGinnivan/GitReleaseNotes/pull/35) - When specifying 'FromTag all' the issues closed for the first tag aren't included contributed by Petrik van der Velde ([pvandervelde](https://github.com/pvandervelde))
