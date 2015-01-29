@@ -10,16 +10,13 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>The easy way to generate release notes for your Git projects</description>
     <releaseNotes>Initial release</releaseNotes>
-    <copyright>Copyright Jake Ginnivan 2013</copyright>
-    <tags>Release notes</tags>
+    <copyright>Copyright Jake Ginnivan 2015</copyright>
+    <tags>Release notes generate github git</tags>
   </metadata>
   <files>
     <file src="GitReleaseNotes.exe" target="tools"/>
     <file src="GitReleaseNotes.pdb" target="tools"/>
-    <file src="Args.dll" target="tools"/>
-    <file src="Octokit.dll" target="tools"/>
-    <file src="LibGit2Sharp.dll" target="tools"/>
-    <file src="NativeBinaries/amd64/git2-65e9dc6.dll" target="tools/NativeBinaries/amd64/"/>
-    <file src="NativeBinaries/x86/git2-65e9dc6.dll" target="tools/NativeBinaries/x86/"/>
+    <file src="NativeBinaries/amd64/git2-4a30c53.dll" target="tools/NativeBinaries/amd64/"/>
+    <file src="NativeBinaries/x86/git2-4a30c53.dll" target="tools/NativeBinaries/x86/"/>
   </files>
 </package>
