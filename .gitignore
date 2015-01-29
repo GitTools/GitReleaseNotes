@@ -111,3 +111,4 @@ src/GitReleaseNotes.sln.ide/graph
 *.orig
 src/_NCrunch_GitReleaseNotes
 *.received.txt
+src/GitReleaseNotes.sln.ide/
