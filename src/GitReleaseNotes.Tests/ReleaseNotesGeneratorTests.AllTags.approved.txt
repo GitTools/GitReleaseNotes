@@ -2,14 +2,14 @@
 
  - [3] - Issue4
 
-Commits: E2A20B8F6C...E2A20B8F6C
+Commits: AAAAAAAAAA...BBBBBBBBBB
 
 
 # 0.2.0 (05 January 2012)
 
  - [2] - Issue3
 
-Commits: AC39885536...CA74E870F2
+Commits: AAAAAAAAAA...BBBBBBBBBB
 
 
 # 0.1.0 (03 January 2012)
@@ -17,4 +17,4 @@ Commits: AC39885536...CA74E870F2
  - [0] - Issue1
  - [1] - Issue2
 
-Commits: E413A880DB...F6924D7A0B
+Commits: AAAAAAAAAA...BBBBBBBBBB

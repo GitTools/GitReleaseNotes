@@ -40,7 +40,7 @@ namespace GitReleaseNotes.Git
                 branch.Commits.FirstOrDefault(c => c.Author.When <= olderThan && tags.Any(a => a.Commit == c));
 
             if (lastTaggedCommit != null)
-                return tags.Single(a => a.Commit.Sha == lastTaggedCommit.Sha);
+                return tags.FirstOrDefault(a => a.Commit.Sha == lastTaggedCommit.Sha);
 
             return new TaggedCommit(branch.Commits.Last(), "Initial Commit");
         }
