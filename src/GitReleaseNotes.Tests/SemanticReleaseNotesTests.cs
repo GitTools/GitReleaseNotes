@@ -22,7 +22,7 @@ namespace GitReleaseNotes.Tests
                     BeginningSha = "12345678",
                     EndSha = "67890123"
                 })
-            }, new string[0]);
+            }, new Categories());
 
             var result = releaseNotes.ToString();
 
@@ -43,7 +43,49 @@ namespace GitReleaseNotes.Tests
                     BeginningSha = "12345678",
                     EndSha = "67890123"
                 })
-            }, new[] { "feature" });
+            }, new Categories(new[] { "feature" }));
+
+            var result = releaseNotes.ToString();
+
+            Approvals.Verify(result);
+        }
+
+        [Fact]
+        public void ItemIsCategorisedWithMultipleCategoriesIfAllLabelsIsTrue()
+        {
+            var releaseNotes = new SemanticReleaseNotes(new[]
+            {
+                new SemanticRelease("", null, new List<IReleaseNoteLine>
+                {
+                    new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"),
+                        new[] {"feature", "enhancement", "breaking-change"}, DateTimeOffset.Now, new Contributor[0])
+                }, new ReleaseDiffInfo
+                {
+                    BeginningSha = "12345678",
+                    EndSha = "67890123"
+                })
+            }, new Categories("feature", true));
+
+            var result = releaseNotes.ToString();
+
+            Approvals.Verify(result);
+        }
+
+        [Fact]
+        public void ItemIsNotCategorisedWithMultipleCategoriesIfAllLabelsIsFalse()
+        {
+            var releaseNotes = new SemanticReleaseNotes(new[]
+            {
+                new SemanticRelease("", null, new List<IReleaseNoteLine>
+                {
+                    new ReleaseNoteItem("Issue 1", "#1", new Uri("http://github.com/org/repo/issues/1"),
+                        new[] {"feature", "enhancement", "breaking-change"}, DateTimeOffset.Now, new Contributor[0])
+                }, new ReleaseDiffInfo
+                {
+                    BeginningSha = "12345678",
+                    EndSha = "67890123"
+                })
+            }, new Categories("feature", false));
 
             var result = releaseNotes.ToString();
 
@@ -75,7 +117,7 @@ namespace GitReleaseNotes.Tests
                     BeginningSha = "asdsadaf",
                     EndSha = "bfdsadre"
                 })
-            }, new[] { "bug", "enhancement", "feature" });
+            }, new Categories(new[] { "bug", "enhancement", "feature" }));
 
             var result = releaseNotes.ToString();
 
@@ -95,7 +137,7 @@ namespace GitReleaseNotes.Tests
                     BeginningSha = "12345678",
                     EndSha = "67890123"
                 })
-            }, new[] { "bug", "enhancement", "feature" });
+            }, new Categories(new[] { "bug", "enhancement", "feature" }));
 
             var result = releaseNotes.ToString();
 
@@ -116,7 +158,7 @@ namespace GitReleaseNotes.Tests
                     BeginningSha = "12345678",
                     EndSha = "67890123"
                 })
-            }, new[] { "internal refactoring" });
+            }, new Categories(new[] { "internal refactoring" }));
 
             var result = releaseNotes.ToString();
 
@@ -158,9 +200,9 @@ Commits: 1234567...6789012
             readReleaseNotes.Releases[0].DiffInfo.EndSha.ShouldBe("6789012");
             readReleaseNotes.Releases[0].ReleaseName.ShouldBe(null);
             readReleaseNotes.Releases[0].ReleaseNoteLines.Count.ShouldBe(3);
-            readReleaseNotes.Releases[0].ReleaseNoteLines[0].ToString(new string[0]).ShouldBe(" - Issue 1 [#1](http://github.com/org/repo/issues/1)");
-            readReleaseNotes.Releases[0].ReleaseNoteLines[1].ToString(new string[0]).ShouldBe(string.Empty);
-            readReleaseNotes.Releases[0].ReleaseNoteLines[2].ToString(new string[0]).ShouldBe("Note: Some shiz..");
+            readReleaseNotes.Releases[0].ReleaseNoteLines[0].ToString(new Categories()).ShouldBe(" - Issue 1 [#1](http://github.com/org/repo/issues/1)");
+            readReleaseNotes.Releases[0].ReleaseNoteLines[1].ToString(new Categories()).ShouldBe(string.Empty);
+            readReleaseNotes.Releases[0].ReleaseNoteLines[2].ToString(new Categories()).ShouldBe("Note: Some shiz..");
         }
 
         [Fact]

@@ -59,5 +59,9 @@ namespace GitReleaseNotes
 
         [Description("BitBuckets Consumer Secret Key used for Oauth authentication")]
         public string ConsumerSecretKey { get; set; }
+
+        [Description("Specifies that all labels should be included in the release notes, if not specified then only the defaults (bug, enhancement, feature) are included.")]
+        public bool AllLabels { get; set; }
+
     }
 }

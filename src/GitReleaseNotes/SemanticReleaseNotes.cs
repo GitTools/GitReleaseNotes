@@ -12,16 +12,16 @@ namespace GitReleaseNotes
         //readonly Regex _issueRegex = new Regex(" - (?<Issue>.*?)(?<IssueLink> \\[(?<IssueId>.*?)\\]\\((?<IssueUrl>.*?)\\))*( *\\+(?<Tag>[^ \\+]*))*", RegexOptions.Compiled);
         static readonly Regex ReleaseRegex = new Regex("# (?<Title>.*?)( \\((?<Date>.*?)\\))?$", RegexOptions.Compiled);
         static readonly Regex LinkRegex = new Regex(@"\[(?<Text>.*?)\]\((?<Link>.*?)\)$", RegexOptions.Compiled);
-        readonly string[] categories;
+        readonly Categories categories;
         readonly SemanticRelease[] releases;
 
         public SemanticReleaseNotes()
         {
-            categories = new string[0];
+            categories = new Categories();
             releases = new SemanticRelease[0];
         }
 
-        public SemanticReleaseNotes(IEnumerable<SemanticRelease> releaseNoteItems, string[] categories)
+        public SemanticReleaseNotes(IEnumerable<SemanticRelease> releaseNoteItems, Categories categories)
         {
             this.categories = categories;
             releases = releaseNoteItems.ToArray();
@@ -180,7 +180,7 @@ namespace GitReleaseNotes
                 }
             }
 
-            return new SemanticReleaseNotes(releases, new string[0]);
+            return new SemanticReleaseNotes(releases, new Categories());
         }
 
         public SemanticReleaseNotes Merge(SemanticReleaseNotes previousReleaseNotes)
@@ -208,8 +208,8 @@ namespace GitReleaseNotes
                     semanticRelease.ReleaseNoteLines.AddRange(releaseFromPrevious.ReleaseNoteLines);
                 }
             }
-
-            return new SemanticReleaseNotes(mergedReleases, categories.Union(previousReleaseNotes.categories).Distinct().ToArray());
+            
+            return new SemanticReleaseNotes(mergedReleases, new Categories(categories.AvailableCategories.Union(previousReleaseNotes.categories.AvailableCategories).Distinct().ToArray(), categories.AllLabels));
         }
 
         private static SemanticRelease CreateMergedSemanticRelease(SemanticRelease r)

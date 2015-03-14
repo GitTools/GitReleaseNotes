@@ -22,7 +22,6 @@ namespace GitReleaseNotes
 {
     public static class Program
     {
-        private static readonly string[] Categories = { "bug", "enhancement", "feature" };
         private static Dictionary<IssueTracker, IIssueTracker> _issueTrackers;
 
         static int Main(string[] args)
@@ -101,7 +100,7 @@ namespace GitReleaseNotes
                 previousReleaseNotes = new ReleaseNotesFileReader(fileSystem, repositoryRoot).ReadPreviousReleaseNotes(outputFile);
             }
 
-            var categories = arguments.Categories == null ? Categories : Categories.Concat(arguments.Categories.Split(',')).ToArray();
+            var categories = new Categories(arguments.Categories, arguments.AllLabels);
             TaggedCommit tagToStartFrom = arguments.AllTags
                 ? GitRepositoryInfoFinder.GetFirstCommit(gitRepo)
                 : GitRepositoryInfoFinder.GetLastTaggedCommit(gitRepo) ?? GitRepositoryInfoFinder.GetFirstCommit(gitRepo);

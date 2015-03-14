@@ -62,6 +62,7 @@
   <ItemGroup>
     <Compile Include="ArgumentVerifier.cs" />
     <Compile Include="BlankLine.cs" />
+    <Compile Include="Categories.cs" />
     <Compile Include="Contributor.cs" />
     <Compile Include="IReleaseNoteLine.cs" />
     <Compile Include="IssueTrackers\BitBucket\BitBucketIssueTracker.cs" />
