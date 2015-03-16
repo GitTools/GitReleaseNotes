@@ -24,7 +24,7 @@ namespace GitReleaseNotes.Tests
             var currentReleaseInfo = GitRepositoryInfoFinder.GetCurrentReleaseInfo(repo); 
 
             var releaseNotes = ReleaseNotesGenerator.GenerateReleaseNotes(
-                repo, issueTracker, new SemanticReleaseNotes(), new string[0],
+                repo, issueTracker, new SemanticReleaseNotes(), new Categories(),
                 tagToStartFrom, currentReleaseInfo, issueTracker.DiffUrlFormat);
 
             Approvals.Verify(releaseNotes.ToString(), Scrubber);
@@ -45,7 +45,7 @@ namespace GitReleaseNotes.Tests
             var currentReleaseInfo = GitRepositoryInfoFinder.GetCurrentReleaseInfo(repo); 
 
             var releaseNotes = ReleaseNotesGenerator.GenerateReleaseNotes(
-                repo, issueTracker, new SemanticReleaseNotes(), new string[0],
+                repo, issueTracker, new SemanticReleaseNotes(), new Categories(),
                 tagToStartFrom, currentReleaseInfo, string.Empty);
 
             Approvals.Verify(releaseNotes.ToString(), Scrubber);
@@ -86,7 +86,7 @@ Commits:  AC39885536...CA74E870F2
 Commits: E413A880DB...F6924D7A0B");
 
             var releaseNotes = ReleaseNotesGenerator.GenerateReleaseNotes(
-                repo, issueTracker, previousReleaseNotes, new string[0],
+                repo, issueTracker, previousReleaseNotes, new Categories(),
                 tagToStartFrom, currentReleaseInfo, string.Empty);
 
             Approvals.Verify(releaseNotes.ToString(), Scrubber);
@@ -143,7 +143,7 @@ Which spans multiple lines
 Commits: E413A880DB...F6924D7A0B");
 
             var releaseNotes = ReleaseNotesGenerator.GenerateReleaseNotes(
-                repo, issueTracker, previousReleaseNotes, new string[0],
+                repo, issueTracker, previousReleaseNotes, new Categories(),
                 tagToStartFrom, currentReleaseInfo, "url/{0}...{1}");
 
             Approvals.Verify(releaseNotes.ToString(), Scrubber);

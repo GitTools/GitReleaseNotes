@@ -2,7 +2,7 @@ namespace GitReleaseNotes
 {
     public class BlankLine : IReleaseNoteLine
     {
-        public string ToString(string[] categories)
+        public string ToString(Categories categories)
         {
             return string.Empty;
         }

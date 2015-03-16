@@ -9,7 +9,7 @@ namespace GitReleaseNotes
             this.line = line;
         }
 
-        public string ToString(string[] categories)
+        public string ToString(Categories categories)
         {
             return line;
         }

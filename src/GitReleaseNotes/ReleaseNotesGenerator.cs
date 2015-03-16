@@ -10,7 +10,7 @@ namespace GitReleaseNotes
     {
         public static SemanticReleaseNotes GenerateReleaseNotes(
             IRepository gitRepo, IIssueTracker issueTracker, SemanticReleaseNotes previousReleaseNotes, 
-            string[] categories, TaggedCommit tagToStartFrom, ReleaseInfo currentReleaseInfo, 
+            Categories categories, TaggedCommit tagToStartFrom, ReleaseInfo currentReleaseInfo, 
             string diffUrlFormat)
         {
             var releases = ReleaseFinder.FindReleases(gitRepo, tagToStartFrom, currentReleaseInfo);
