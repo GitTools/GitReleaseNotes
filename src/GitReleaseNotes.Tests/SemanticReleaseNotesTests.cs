@@ -43,7 +43,7 @@ namespace GitReleaseNotes.Tests
                     BeginningSha = "12345678",
                     EndSha = "67890123"
                 })
-            }, new Categories(new[] { "feature" }));
+            }, new Categories(new[] { "feature" }, true));
 
             var result = releaseNotes.ToString();
 
@@ -117,7 +117,7 @@ namespace GitReleaseNotes.Tests
                     BeginningSha = "asdsadaf",
                     EndSha = "bfdsadre"
                 })
-            }, new Categories(new[] { "bug", "enhancement", "feature" }));
+            }, new Categories(new[] { "bug", "enhancement", "feature" }, true));
 
             var result = releaseNotes.ToString();
 
@@ -137,7 +137,7 @@ namespace GitReleaseNotes.Tests
                     BeginningSha = "12345678",
                     EndSha = "67890123"
                 })
-            }, new Categories(new[] { "bug", "enhancement", "feature" }));
+            }, new Categories(new[] { "bug", "enhancement", "feature" }, true));
 
             var result = releaseNotes.ToString();
 
@@ -158,7 +158,7 @@ namespace GitReleaseNotes.Tests
                     BeginningSha = "12345678",
                     EndSha = "67890123"
                 })
-            }, new Categories(new[] { "internal refactoring" }));
+            }, new Categories(new[] { "internal refactoring" }, true));
 
             var result = releaseNotes.ToString();
 
