@@ -6,9 +6,12 @@ using RestSharp;
 
 namespace GitReleaseNotes.IssueTrackers.BitBucket
 {
+    using Newtonsoft.Json;
+
     public class BitBucketApi : IBitBucketApi
     {
-        private const string IssueClosed = "resolved";
+        private const string IssueClosed = "closed";
+        private const string IssueResolved = "resolved";
         private const string ApiUrl = "https://bitbucket.org/api/1.0/";
 
         public IEnumerable<OnlineIssue> GetClosedIssues(GitReleaseNotesArguments arguments, DateTimeOffset? since, string accountName, string repoSlug, bool oauth)
@@ -30,12 +33,13 @@ namespace GitReleaseNotes.IssueTrackers.BitBucket
             {
                 throw new Exception("Failed to query BitBucket: " + response.StatusDescription);
             }
-            dynamic responseObject = SimpleJson.DeserializeObject(response.Content);
+            dynamic responseObject = JsonConvert.DeserializeObject<dynamic>(response.Content);
+            
             var issues = new List<OnlineIssue>();
             foreach (var issue in responseObject.issues)
             {
-                DateTimeOffset lastChange = DateTimeOffset.Parse(issue.utc_last_updated);
-                if (issue.status != IssueClosed || lastChange <= since)
+                DateTimeOffset lastChange = DateTimeOffset.Parse(issue.utc_last_updated.ToString());
+                if ((issue.status != IssueClosed && issue.status != IssueResolved) || lastChange <= since)
                 {
                     continue;
                 }
@@ -64,8 +68,8 @@ namespace GitReleaseNotes.IssueTrackers.BitBucket
 
         private static void GenerateOauthRequest(GitReleaseNotesArguments arguments, Uri baseUrl, string MethodLocation, RestRequest request)
         {
-            var consumerKey = arguments.Username;
-            var consumerSecret = arguments.Password;
+            var consumerKey = string.IsNullOrEmpty(arguments.Username) ? arguments.ConsumerKey : arguments.Username;
+            var consumerSecret = string.IsNullOrEmpty(arguments.Password) ? arguments.ConsumerSecretKey : arguments.Password;
             var oAuth = new OAuthBase();
             var nonce = oAuth.GenerateNonce();
             var timeStamp = oAuth.GenerateTimeStamp();
