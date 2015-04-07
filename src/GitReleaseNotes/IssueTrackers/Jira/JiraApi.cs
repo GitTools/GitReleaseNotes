@@ -47,9 +47,8 @@ namespace GitReleaseNotes.IssueTrackers.Jira
                 var id = issue.Key.Value;
                 //var issueType = issue.Type.Name;
 
-                yield return new OnlineIssue
+                yield return new OnlineIssue(id, issue.GetResolutionDate().Value)
                 {
-                    Id = id,
                     Title = summary,
                     IssueType = IssueType.Issue,
                     HtmlUrl = new Uri(new Uri(context.Jira.JiraServer), string.Format("browse/{0}", id))

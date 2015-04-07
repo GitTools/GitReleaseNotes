@@ -138,13 +138,11 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
 
                     var epochTime = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero) + TimeSpan.FromMilliseconds(milliSecondsSinceEpochStart);
                     result.Add(
-                        new OnlineIssue
+                        new OnlineIssue(issue.Id, epochTime)
                         {
-                            Id = issue.Id,
                             Title = issue.Summary,
                             IssueType = IssueType.Issue,
-                            HtmlUrl = new Uri(new Uri(youtrackHostUrl, UriKind.Absolute), string.Format("issue/{0}", issue.Id)),
-                            DateClosed = epochTime,
+                            HtmlUrl = new Uri(new Uri(youtrackHostUrl, UriKind.Absolute), string.Format("issue/{0}", issue.Id))
                         });
 
                     count++;

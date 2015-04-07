@@ -50,13 +50,11 @@ namespace GitReleaseNotes.IssueTrackers.BitBucket
                 string summary = issue.content;
                 string id = issue.local_id.ToString();
                 string title = issue.title;
-                issues.Add(new OnlineIssue
+                issues.Add(new OnlineIssue(id, lastChange)
                 {
-                    Id = id,
                     Title = summary,
                     IssueType = IssueType.Issue,
-                    HtmlUrl = new Uri(baseUrl, string.Format("/repositories/{0}/{1}/issue/{2}/{3}", accountName, repoSlug, id, title)),
-                    DateClosed = lastChange
+                    HtmlUrl = new Uri(baseUrl, string.Format("/repositories/{0}/{1}/issue/{2}/{3}", accountName, repoSlug, id, title))
                 });
             }
             return issues;
