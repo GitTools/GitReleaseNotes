@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GitReleaseNotes.Git
 {
@@ -64,7 +60,10 @@ namespace GitReleaseNotes.Git
         {
             var unknownBranchSuffix = branchName.Split('-', '/');
             if (unknownBranchSuffix.Length == 1)
+            {
                 return branchName;
+            }
+
             return unknownBranchSuffix[1];
         }
 
@@ -89,6 +88,7 @@ namespace GitReleaseNotes.Git
             {
                 return value;
             }
+
             var startIndex = toTrim.Length;
             return value.Substring(startIndex);
         }

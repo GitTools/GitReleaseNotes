@@ -6,41 +6,41 @@ namespace GitReleaseNotes.IssueTrackers.Jira
 {
     public class JiraIssueTracker : IIssueTracker
     {
+        private static readonly ILog Log = GitReleaseNotesEnvironment.Log;
+
         private readonly Context context;
         private readonly IJiraApi jiraApi;
-        private readonly ILog log;
 
-        public JiraIssueTracker(IJiraApi jiraApi, ILog log, Context context)
+        public JiraIssueTracker(IJiraApi jiraApi, Context context)
         {
             this.jiraApi = jiraApi;
-            this.log = log;
             this.context = context;
         }
 
-        public bool VerifyArgumentsAndWriteErrorsToConsole()
+        public bool VerifyArgumentsAndWriteErrorsToLog()
         {
             if (string.IsNullOrEmpty(context.Jira.JiraServer) ||
                 !Uri.IsWellFormedUriString(context.Jira.JiraServer, UriKind.Absolute))
             {
-                log.WriteLine("A valid Jira server must be specified [/JiraServer ]");
+                Log.WriteLine("A valid Jira server must be specified [/JiraServer ]");
                 return false;
             }
 
             if (string.IsNullOrEmpty(context.ProjectId))
             {
-                log.WriteLine("/ProjectId is a required parameter for Jira");
+                Log.WriteLine("/ProjectId is a required parameter for Jira");
                 return false;
             }
 
             if (string.IsNullOrEmpty(context.Authentication.Username))
             {
-                log.WriteLine("/Username is a required to authenticate with Jira");
+                Log.WriteLine("/Username is a required to authenticate with Jira");
                 return false;
             }
 
             if (string.IsNullOrEmpty(context.Authentication.Password))
             {
-                log.WriteLine("/Password is a required to authenticate with Jira");
+                Log.WriteLine("/Password is a required to authenticate with Jira");
                 return false;
             }
 

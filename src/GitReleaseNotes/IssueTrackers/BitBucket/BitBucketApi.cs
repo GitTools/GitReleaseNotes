@@ -10,6 +10,8 @@ namespace GitReleaseNotes.IssueTrackers.BitBucket
 
     public class BitBucketApi : IBitBucketApi
     {
+        private static readonly ILog Log = GitReleaseNotesEnvironment.Log;
+
         private const string IssueClosed = "closed";
         private const string IssueResolved = "resolved";
         private const string ApiUrl = "https://bitbucket.org/api/1.0/";
@@ -28,11 +30,13 @@ namespace GitReleaseNotes.IssueTrackers.BitBucket
             {
                 GenerateClassicalRequest(context, request, issuesUrl);
             }
+
             var response = restClient.Execute(request);
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 throw new Exception("Failed to query BitBucket: " + response.StatusDescription);
             }
+
             dynamic responseObject = JsonConvert.DeserializeObject<dynamic>(response.Content);
             
             var issues = new List<OnlineIssue>();

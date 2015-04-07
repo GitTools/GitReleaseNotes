@@ -8,6 +8,8 @@ namespace GitReleaseNotes
 {
     public static class ReleaseNotesGenerator
     {
+        private static readonly ILog Log = GitReleaseNotesEnvironment.Log;
+
         public static SemanticReleaseNotes GenerateReleaseNotes(
             IRepository gitRepo, IIssueTracker issueTracker, SemanticReleaseNotes previousReleaseNotes, 
             Categories categories, TaggedCommit tagToStartFrom, ReleaseInfo currentReleaseInfo, 

@@ -12,6 +12,8 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
 {
     public sealed class YouTrackApi : IYouTrackApi
     {
+        private static readonly ILog Log = GitReleaseNotesEnvironment.Log;
+
         private static CookieCollection ConnectToYouTrack(string userName, string password, string youtrackHostUrl)
         {
             var loginUrl = string.Format(
@@ -43,9 +45,9 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
             }
 
             var result = new CookieCollection
-                {
-                    response.Cookies
-                };
+            {
+                response.Cookies
+            };
             return result;
         }
 
@@ -64,9 +66,9 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
             if (since.HasValue)
             {
                 query = string.Format(
-                    "{0} resolved date: {1:yyyy-MM-ddTHH:mm:ss} .. {2:yyyy-MM-ddTHH:mm:ss}", 
+                    "{0} resolved date: {1:yyyy-MM-ddTHH:mm:ss} .. {2:yyyy-MM-ddTHH:mm:ss}",
                     filter,
-                    since.Value, 
+                    since.Value,
                     DateTimeOffset.Now);
             }
             else

@@ -6,40 +6,40 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
 {
     public sealed class YouTrackIssueTracker : IIssueTracker
     {
+        private static readonly ILog Log = GitReleaseNotesEnvironment.Log;
+
         private readonly Context context;
         private readonly IYouTrackApi youTrackApi;
-        private readonly ILog log;
 
-        public YouTrackIssueTracker(IYouTrackApi youTrackApi, ILog log, Context context)
+        public YouTrackIssueTracker(IYouTrackApi youTrackApi, Context context)
         {
             this.youTrackApi = youTrackApi;
-            this.log = log;
             this.context = context;
         }
 
-        public bool VerifyArgumentsAndWriteErrorsToConsole()
+        public bool VerifyArgumentsAndWriteErrorsToLog()
         {
             if (string.IsNullOrEmpty(context.YouTrack.YouTrackServer) ||
                 !Uri.IsWellFormedUriString(context.YouTrack.YouTrackServer, UriKind.Absolute))
             {
-                log.WriteLine("A valid YouTrack server must be specified [/YouTrackServer ]");
+                Log.WriteLine("A valid YouTrack server must be specified [/YouTrackServer ]");
                 return false;
             }
 
             if (string.IsNullOrEmpty(context.ProjectId))
             {
-                log.WriteLine("/ProjectId is a required parameter for YouTrack");
+                Log.WriteLine("/ProjectId is a required parameter for YouTrack");
                 return false;
             }
 
             if (string.IsNullOrEmpty(context.Authentication.Username))
             {
-                log.WriteLine("/Username is a required to authenticate with YouTrack");
+                Log.WriteLine("/Username is a required to authenticate with YouTrack");
                 return false;
             }
             if (string.IsNullOrEmpty(context.Authentication.Password))
             {
-                log.WriteLine("/Password is a required to authenticate with YouTrack");
+                Log.WriteLine("/Password is a required to authenticate with YouTrack");
                 return false;
             }
 

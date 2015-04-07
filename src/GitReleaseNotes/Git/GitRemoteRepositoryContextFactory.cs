@@ -1,22 +1,18 @@
-﻿using LibGit2Sharp;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using LibGit2Sharp;
 
 namespace GitReleaseNotes.Git
-{  
+{
 
     public class GitRemoteRepositoryContextFactory : IGitRepositoryContextFactory
     {
-        private ILog logger;
-        private RemoteRepoArgs args;
+        private static readonly ILog Log = GitReleaseNotesEnvironment.Log;
 
-        public GitRemoteRepositoryContextFactory(ILog logger, RemoteRepoArgs args)
+        private readonly RemoteRepoArgs args;
+
+        public GitRemoteRepositoryContextFactory(RemoteRepoArgs args)
         {
-            this.logger = logger;
             this.args = args;
         }
 
@@ -28,13 +24,13 @@ namespace GitReleaseNotes.Git
             var gitDirectory = Path.Combine(gitRootDirectory, ".git");
             if (Directory.Exists(gitDirectory))
             {
-                logger.WriteLine(string.Format("Deleting existing .git folder from '{0}' to force new checkout from url", gitDirectory));
+                Log.WriteLine("Deleting existing .git folder from '{0}' to force new checkout from url", gitDirectory);
                 DeleteGitDirectory(gitDirectory);
             }
 
-            Credentials credentials = args.Credentials;            
+            var credentials = args.Credentials;
 
-            logger.WriteLine(string.Format("Retrieving git info from url '{0}'", args.Url));
+            Log.WriteLine("Retrieving git info from url '{0}'", args.Url);
 
             var cloneOptions = new CloneOptions();
             cloneOptions.IsBare = true;
@@ -43,7 +39,7 @@ namespace GitReleaseNotes.Git
 
             var repoPath = Repository.Clone(args.Url, gitDirectory, cloneOptions);
             var repository = new Repository(repoPath);
-            var repoContext = new GitRepositoryContext(repository, logger, credentials, true, args.Url);          
+            var repoContext = new GitRepositoryContext(repository, credentials, true, args.Url);
             return repoContext;
         }
 
@@ -53,15 +49,21 @@ namespace GitReleaseNotes.Git
         /// <param name="path"></param>
         private static void DeleteGitDirectory(string path)
         {
-            var directory = new DirectoryInfo(path) { Attributes = FileAttributes.Normal };
+            var directory = new DirectoryInfo(path)
+            {
+                Attributes = FileAttributes.Normal
+            };
+
             if (directory.Name != ".git")
             {
                 throw new ArgumentException("Cannot delete a diretory that isn't a git repository.");
             }
+
             foreach (var info in directory.GetFileSystemInfos("*", SearchOption.AllDirectories))
             {
                 info.Attributes = FileAttributes.Normal;
             }
+
             directory.Delete(true);
         }
 
@@ -69,7 +71,7 @@ namespace GitReleaseNotes.Git
         {
             public string DestinationPath { get; set; }
             public string Url { get; set; }
-            public Credentials Credentials { get; set; }           
+            public Credentials Credentials { get; set; }
 
             internal void Validate()
             {
@@ -77,6 +79,7 @@ namespace GitReleaseNotes.Git
                 {
                     throw new ArgumentException("Url of git repository must be specified.");
                 }
+
                 if (string.IsNullOrEmpty(DestinationPath))
                 {
                     throw new ArgumentException("DestinationPath to place the cloned repository must be specified.");
@@ -88,8 +91,6 @@ namespace GitReleaseNotes.Git
                 return Credentials != null;
             }
         }
-
     }
-
 }
 

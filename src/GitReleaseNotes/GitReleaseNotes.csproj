@@ -82,7 +82,10 @@
     <Compile Include="Context\RepositoryContext.cs" />
     <Compile Include="Context\YouTrackContext.cs" />
     <Compile Include="Contributor.cs" />
+    <Compile Include="Exceptions\GitReleaseNotesException.cs" />
     <Compile Include="Extensions\GitReleaseNotesArgumentsExtensions.cs" />
+    <Compile Include="Extensions\ILogExtensions.cs" />
+    <Compile Include="GitReleaseNotesEnvironment.cs" />
     <Compile Include="Git\GitBranchNameInfo.cs" />
     <Compile Include="Git\GitLocalRepositoryContextFactory.cs" />
     <Compile Include="Git\GitRemoteRepositoryContextFactory.cs" />
@@ -93,10 +96,11 @@
     <Compile Include="IssueTrackers\BitBucket\IBitBucketApi.cs" />
     <Compile Include="IssueTrackers\BitBucket\BitBucketApi.cs" />
     <Compile Include="IssueTrackers\BitBucket\OAuthBase.cs" />
+    <Compile Include="Logging\CustomLog.cs" />
     <Compile Include="ReleaseFinder.cs" />
     <Compile Include="FileSystem\FileSystem.cs" />
     <Compile Include="FileSystem\IFileSystem.cs" />
-    <Compile Include="ILog.cs" />
+    <Compile Include="Logging\ILog.cs" />
     <Compile Include="IssueTrackers\GitHub\GitHubIssueTracker.cs" />
     <Compile Include="GitReleaseNotesArguments.cs" />
     <Compile Include="Git\GitDirFinder.cs" />
@@ -115,7 +119,7 @@
     <Compile Include="IssueTrackers\Jira\JiraApi.cs" />
     <Compile Include="IssueTrackers\Jira\JiraIssue.cs" />
     <Compile Include="IssueTrackers\Jira\JiraIssueTracker.cs" />
-    <Compile Include="Log.cs" />
+    <Compile Include="Logging\ConsoleLog.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Git\TaggedCommit.cs" />

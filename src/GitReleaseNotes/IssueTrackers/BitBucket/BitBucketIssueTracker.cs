@@ -7,38 +7,38 @@ namespace GitReleaseNotes.IssueTrackers.BitBucket
 {
     public class BitBucketIssueTracker : IIssueTracker
     {
+        private static readonly ILog Log = GitReleaseNotesEnvironment.Log;
+
         private readonly IRepository gitRepository;
 
         private readonly Context context;
         private readonly BitBucketApi bitBucketApi;
-        private readonly ILog log;
         private string accountName;
         private string repoSlug;
         private bool oauth;
 
-        public BitBucketIssueTracker(IRepository gitRepository, BitBucketApi bitBucketApi, ILog log, Context context)
+        public BitBucketIssueTracker(IRepository gitRepository, BitBucketApi bitBucketApi, Context context)
         {
             this.gitRepository = gitRepository;
             this.bitBucketApi = bitBucketApi;
-            this.log = log;
             this.context = context;
         }
 
-        public bool VerifyArgumentsAndWriteErrorsToConsole()
+        public bool VerifyArgumentsAndWriteErrorsToLog()
         {
             if (!RemotePresentWhichMatches)
             {
                 var repo = context.BitBucket.Repo;
                 if (repo == null)
                 {
-                    log.WriteLine("Bitbucket repository name must be specified [/Repo .../...]");
+                    Log.WriteLine("Bitbucket repository name must be specified [/Repo .../...]");
                     return false;
                 }
 
                 var repoParts = repo.Split('/');
                 if (repoParts.Length != 2)
                 {
-                    log.WriteLine("Bitbucket repository name should be in format Organisation/RepoName");
+                    Log.WriteLine("Bitbucket repository name should be in format Organisation/RepoName");
                     return false;
                 }
 
@@ -58,12 +58,13 @@ namespace GitReleaseNotes.IssueTrackers.BitBucket
             {
                 if (string.IsNullOrEmpty(context.Authentication.Username))
                 {
-                    Console.WriteLine("/Username is a required to authenticate with BitBucket");
+                    Log.WriteLine("/Username is a required to authenticate with BitBucket");
                     return false;
                 }
+
                 if (string.IsNullOrEmpty(context.Authentication.Password))
                 {
-                    Console.WriteLine("/Password is a required to authenticate with BitBucket");
+                    Log.WriteLine("/Password is a required to authenticate with BitBucket");
                     return false;
                 }
             }
@@ -71,14 +72,16 @@ namespace GitReleaseNotes.IssueTrackers.BitBucket
             {
                 if (string.IsNullOrEmpty(context.BitBucket.ConsumerKey))
                 {
-                    Console.WriteLine("/Consumer Key is a required to authenticate with BitBucket");
+                    Log.WriteLine("/Consumer Key is a required to authenticate with BitBucket");
                     return false;
                 }
+
                 if (string.IsNullOrEmpty(context.BitBucket.ConsumerSecretKey))
                 {
-                    Console.WriteLine("/Consumer Secret Key is a required to authenticate with BitBucket");
+                    Log.WriteLine("/Consumer Secret Key is a required to authenticate with BitBucket");
                     return false;
                 }
+
                 oauth = true;
             }
 

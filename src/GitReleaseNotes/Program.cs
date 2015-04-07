@@ -20,13 +20,17 @@ namespace GitReleaseNotes
 {
     public static class Program
     {
+        private static readonly ILog Log = GitReleaseNotesEnvironment.Log;
+
         private static Dictionary<IssueTracker, IIssueTracker> _issueTrackers;
 
         static int Main(string[] args)
         {
+            GitReleaseNotesEnvironment.Log = new ConsoleLog();
+
             var main = GenerateReleaseNotes(args);
 
-            Console.WriteLine("Done");
+            Log.WriteLine("Done");
 
             if (Debugger.IsAttached)
             {
@@ -91,7 +95,7 @@ namespace GitReleaseNotes
                     issueTracker = _issueTrackers[context.IssueTracker.Value];
                 }
 
-                if (!issueTracker.VerifyArgumentsAndWriteErrorsToConsole())
+                if (!issueTracker.VerifyArgumentsAndWriteErrorsToLog())
                 {
                     return 1;
                 }
@@ -142,7 +146,6 @@ namespace GitReleaseNotes
 
         private static void CreateIssueTrackers(IRepository repository, Context context)
         {
-            var log = new Log();
             _issueTrackers = new Dictionary<IssueTracker, IIssueTracker>
             {
                 {
@@ -156,19 +159,19 @@ namespace GitReleaseNotes
                         }
 
                         return gitHubClient;
-                    }, log, context)
+                    }, context)
                 },
                 {
                     IssueTracker.Jira, 
-                    new JiraIssueTracker(new JiraApi(), log, context)
+                    new JiraIssueTracker(new JiraApi(), context)
                 },
                 {
                     IssueTracker.YouTrack,
-                    new YouTrackIssueTracker(new YouTrackApi(), log, context)
+                    new YouTrackIssueTracker(new YouTrackApi(), context)
                 },
                 {
                    IssueTracker.BitBucket,
-                   new BitBucketIssueTracker(repository, new BitBucketApi(), log, context)
+                   new BitBucketIssueTracker(repository, new BitBucketApi(), context)
                 }
             };
         }
@@ -177,18 +180,17 @@ namespace GitReleaseNotes
         {
             var workingDir = context.WorkingDirectory ?? Directory.GetCurrentDirectory();
             var isRemote = !string.IsNullOrWhiteSpace(context.Repository.Url);
-            var log = new Log();
-            var repoFactory = GetRepositoryFactory(log, isRemote, workingDir, context);
+            var repoFactory = GetRepositoryFactory(isRemote, workingDir, context);
             var repo = repoFactory.GetRepositoryContext();
+
             return repo;
         }
 
-        private static IGitRepositoryContextFactory GetRepositoryFactory(ILog log, bool isRemote, string workingDir, Context context)
+        private static IGitRepositoryContextFactory GetRepositoryFactory(bool isRemote, string workingDir, Context context)
         {
             IGitRepositoryContextFactory gitRepoFactory = null;
             if (isRemote)
             {
-
                 // clone repo from the remote url
                 var cloneRepoArgs = new GitRemoteRepositoryContextFactory.RemoteRepoArgs();
                 cloneRepoArgs.Url = context.Repository.Url;
@@ -200,12 +202,12 @@ namespace GitReleaseNotes
                 cloneRepoArgs.Credentials = credentials;
                 cloneRepoArgs.DestinationPath = workingDir;
 
-                Console.WriteLine("Cloning a git repo from {0}", cloneRepoArgs.Url);
-                gitRepoFactory = new GitRemoteRepositoryContextFactory(log, cloneRepoArgs);
+                Log.WriteLine("Cloning a git repo from {0}", cloneRepoArgs.Url);
+                gitRepoFactory = new GitRemoteRepositoryContextFactory(cloneRepoArgs);
             }
             else
             {
-                gitRepoFactory = new GitLocalRepositoryContextFactory(log, workingDir);
+                gitRepoFactory = new GitLocalRepositoryContextFactory(workingDir);
             }
 
             return gitRepoFactory;

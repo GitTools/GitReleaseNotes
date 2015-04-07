@@ -1,15 +1,20 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net;
-using System.Text;
-using RestSharp;
 
 namespace GitReleaseNotes.IssueTrackers.Jira
 {
     public class JiraApi : IJiraApi
     {
+        private static readonly ILog Log = GitReleaseNotesEnvironment.Log;
+
+        private readonly HashSet<string> _knownIssueStatuses = new HashSet<string>(new[] { "closed", "resolved", "done" });
+        //private readonly Dictionary<string, IssueType> _issueTypeMappings = new Dictionary<string, IssueType>();
+
+        public JiraApi()
+        {
+        }
+
         public IEnumerable<OnlineIssue> GetClosedIssues(Context context, DateTimeOffset? since)
         {
             var jira = new Atlassian.Jira.Jira(context.Jira.JiraServer, context.Authentication.Username, context.Authentication.Password);
@@ -22,10 +27,8 @@ namespace GitReleaseNotes.IssueTrackers.Jira
                 var issueTypes = jira.GetIssueTypes(context.ProjectId);
                 jql += string.Format(" AND issuetype in ({0})", string.Join(", ", issueTypes.Select(x => string.Format("\"{0}\"", x.Name))));
 
-                var knownIssueStatuses = new HashSet<string>(new[] { "closed", "resolved", "done" });
-
                 var issueStatuses = jira.GetIssueStatuses();
-                jql += string.Format(" AND status in ({0})", string.Join(", ", issueStatuses.Where(x => knownIssueStatuses.Contains(x.Name.ToLower())).Select(x => string.Format("\"{0}\"", x.Name))));
+                jql += string.Format(" AND status in ({0})", string.Join(", ", issueStatuses.Where(x => _knownIssueStatuses.Contains(x.Name.ToLower())).Select(x => string.Format("\"{0}\"", x.Name))));
             }
 
             if (since.HasValue)
@@ -42,7 +45,7 @@ namespace GitReleaseNotes.IssueTrackers.Jira
             {
                 var summary = issue.Summary;
                 var id = issue.Key.Value;
-                var issueType = issue.Type.Name;
+                //var issueType = issue.Type.Name;
 
                 yield return new OnlineIssue
                 {

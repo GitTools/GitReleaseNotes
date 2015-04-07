@@ -8,6 +8,8 @@ namespace GitReleaseNotes.IssueTrackers
 {
     public class IssueNumberExtractor : IIssueNumberExtractor
     {
+        private static readonly ILog Log = GitReleaseNotesEnvironment.Log;
+
         public Dictionary<ReleaseInfo, List<string>> GetIssueNumbers(GitReleaseNotesArguments arguments, Dictionary<ReleaseInfo, List<Commit>> releases, Regex issueRegex)
         {
             var result = new Dictionary<ReleaseInfo, List<string>>();
@@ -23,7 +25,10 @@ namespace GitReleaseNotes.IssueTrackers
                     {
                         var issueNumber = match.Groups["issueNumber"].Value;
                         if (arguments.Verbose)
-                            Console.WriteLine("Found issues {0} in commit {1}", issueNumber, commit.Sha);
+                        {
+                            Log.WriteLine("Found issues {0} in commit {1}", issueNumber, commit.Sha);
+                        }
+
                         issueNumbersToScan.Add(issueNumber);
                     }
                 }

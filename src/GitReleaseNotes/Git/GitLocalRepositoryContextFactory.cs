@@ -1,22 +1,18 @@
-﻿using LibGit2Sharp;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using LibGit2Sharp;
 
 namespace GitReleaseNotes.Git
 { 
 
     public class GitLocalRepositoryContextFactory : IGitRepositoryContextFactory
     {
-        private ILog logger;
+        private static readonly ILog Log = GitReleaseNotesEnvironment.Log;
+
         private string workingDir;
 
-        public GitLocalRepositoryContextFactory(ILog logger, string workingDir)
+        public GitLocalRepositoryContextFactory(string workingDir)
         {
-            this.logger = logger;
             this.workingDir = workingDir;
         }
 
@@ -29,10 +25,10 @@ namespace GitReleaseNotes.Git
                 throw new Exception("Failed to find a .git folder in the working directory.");
             }
 
-            Console.WriteLine("Git directory found at {0}", gitDirectory);
-            var repositoryRoot = Directory.GetParent(gitDirectory).FullName;
+            Log.WriteLine("Git directory found at {0}", gitDirectory);
+
             var gitRepo = new Repository(gitDirectory);
-            var context = new GitRepositoryContext(gitRepo, logger, null, false, string.Empty);
+            var context = new GitRepositoryContext(gitRepo, null, false, string.Empty);
             return context;
         }
     }
