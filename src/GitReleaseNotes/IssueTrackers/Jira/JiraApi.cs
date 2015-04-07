@@ -9,23 +9,23 @@ namespace GitReleaseNotes.IssueTrackers.Jira
 {
     public class JiraApi : IJiraApi
     {
-        public IEnumerable<OnlineIssue> GetClosedIssues(GitReleaseNotesArguments arguments, DateTimeOffset? since)
+        public IEnumerable<OnlineIssue> GetClosedIssues(Context context, DateTimeOffset? since)
         {
             string jql;
             if (since.HasValue)
             {
                 var sinceFormatted = since.Value.ToString("yyyy-MM-d HH:mm");
-                jql = string.Format("{0} AND updated > '{1}'", arguments.Jql, sinceFormatted).Replace("\"", "\\\"");
+                jql = string.Format("{0} AND updated > '{1}'", context.Jira.Jql, sinceFormatted).Replace("\"", "\\\"");
             }
             else
             {
-                jql = arguments.Jql;
+                jql = context.Jira.Jql;
             }
 
-            var baseUrl = new Uri(arguments.JiraServer, UriKind.Absolute);
+            var baseUrl = new Uri(context.Jira.JiraServer, UriKind.Absolute);
             var searchUri = new Uri(baseUrl, "/rest/api/latest/search");
             var httpRequest = WebRequest.CreateHttp(searchUri);
-            var usernameAndPass = string.Format("{0}:{1}", arguments.Username, arguments.Password);
+            var usernameAndPass = string.Format("{0}:{1}", context.Authentication.Username, context.Authentication.Password);
             var token = Convert.ToBase64String(Encoding.UTF8.GetBytes(usernameAndPass));
             httpRequest.Headers.Add("Authorization", string.Format("Basic {0}", token));
             httpRequest.Method = "POST";

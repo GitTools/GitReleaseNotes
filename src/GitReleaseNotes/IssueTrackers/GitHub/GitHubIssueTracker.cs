@@ -11,15 +11,15 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
     public class GitHubIssueTracker : IIssueTracker
     {
         private readonly Func<IGitHubClient> gitHubClientFactory;
-        private readonly GitReleaseNotesArguments arguments;
+        private readonly Context context;
         private readonly IRepository gitRepository;
         private readonly ILog log;
 
-        public GitHubIssueTracker(IRepository gitRepository, Func<IGitHubClient> gitHubClientFactory, ILog log, GitReleaseNotesArguments arguments)
+        public GitHubIssueTracker(IRepository gitRepository, Func<IGitHubClient> gitHubClientFactory, ILog log, Context context)
         {
             this.gitRepository = gitRepository;
             this.log = log;
-            this.arguments = arguments;
+            this.context = context;
             this.gitHubClientFactory = gitHubClientFactory;
         }
 
@@ -37,7 +37,7 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
             {
                 string organisation;
                 string repository;
-                GetRepository(arguments, out organisation, out repository);
+                GetRepository(out organisation, out repository);
 
                 return "https://github.com/" + organisation + "/" + repository + "/compare/{0}...{1}";
             }
@@ -47,13 +47,14 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
         {
             if (!RemotePresentWhichMatches)
             {
-                if (arguments.Repo == null)
+                var repo = context.GitHub.Repo;
+                if (repo == null)
                 {
                     log.WriteLine("GitHub repository name must be specified [/Repo .../...]");
                     return false;
                 }
-                var repoParts = arguments.Repo.Split('/');
 
+                var repoParts = repo.Split('/');
                 if (repoParts.Length != 2)
                 {
                     log.WriteLine("GitHub repository name should be in format Organisation/RepoName");
@@ -64,20 +65,22 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
             return true;
         }
 
-        private void GetRepository(GitReleaseNotesArguments arguments, out string organisation, out string repository)
+        private void GetRepository(out string organisation, out string repository)
         {
             if (RemotePresentWhichMatches)
             {
                 if (TryRemote(out organisation, out repository, "upstream"))
                     return;
+
                 if (TryRemote(out organisation, out repository, "origin"))
                     return;
+
                 var remoteName = gitRepository.Network.Remotes.First(r => r.Url.ToLower().Contains("github.com")).Name;
                 if (TryRemote(out organisation, out repository, remoteName))
                     return;
             }
 
-            var repoParts = arguments.Repo.Split('/');
+            var repoParts = context.GitHub.Repo.Split('/');
             organisation = repoParts[0];
             repository = repoParts[1];
         }
@@ -105,7 +108,7 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
         {
             string organisation;
             string repository;
-            GetRepository(arguments, out organisation, out repository);
+            GetRepository(out organisation, out repository);
 
             var gitHubClient = gitHubClientFactory();
             var forRepository = gitHubClient.Issue.GetForRepository(organisation, repository, new RepositoryIssueRequest

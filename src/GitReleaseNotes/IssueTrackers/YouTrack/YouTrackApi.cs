@@ -159,14 +159,14 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
             return result;
         }
 
-        public IEnumerable<OnlineIssue> GetClosedIssues(GitReleaseNotesArguments arguments, DateTimeOffset? since)
+        public IEnumerable<OnlineIssue> GetClosedIssues(Context context, DateTimeOffset? since)
         {
-            var authenticationCookies = ConnectToYouTrack(arguments.Username, arguments.Password, arguments.YouTrackServer);
+            var authenticationCookies = ConnectToYouTrack(context.Authentication.Username, context.Authentication.Password, context.YouTrack.YouTrackServer);
             return IssuesClosedSinceDate(
                 authenticationCookies,
-                arguments.YouTrackFilter,
-                arguments.YouTrackServer,
-                arguments.ProjectId,
+                context.YouTrack.YouTrackFilter,
+                context.YouTrack.YouTrackServer,
+                context.ProjectId,
                 since);
         }
     }

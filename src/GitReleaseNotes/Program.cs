@@ -25,9 +25,14 @@ namespace GitReleaseNotes
         static int Main(string[] args)
         {
             var main = GenerateReleaseNotes(args);
+
             Console.WriteLine("Done");
+
             if (Debugger.IsAttached)
+            {
                 Console.ReadKey();
+            }
+
             return main;
         }
 
@@ -46,40 +51,46 @@ namespace GitReleaseNotes
 
             var arguments = modelBindingDefinition.CreateAndBind(args);
 
+            // TODO: Convert to context verification (we need the context to be valid, not the arguments)
             if (!ArgumentVerifier.VerifyArguments(arguments))
             {
                 return 1;
-            }          
+            }
 
-            using (var gitRepoContext = GetRepository(arguments))
+            var context = arguments.ToContext();
+
+            using (var gitRepoContext = GetRepository(context))
             {
                 // Remote repo's require some additional preparation before first use.
                 if (gitRepoContext.IsRemote)
                 {
-                    gitRepoContext.PrepareRemoteRepoForUse(arguments.RepoBranch);
-                    if (!string.IsNullOrWhiteSpace(arguments.OutputFile))
+                    gitRepoContext.PrepareRemoteRepoForUse(context.Repository.Branch);
+                    if (!string.IsNullOrWhiteSpace(context.OutputFile))
                     {
-                        gitRepoContext.CheckoutFilesIfExist(arguments.OutputFile);
-                    }                   
+                        gitRepoContext.CheckoutFilesIfExist(context.OutputFile);
+                    }
                 }
+
                 var gitRepo = gitRepoContext.Repository;
 
-                CreateIssueTrackers(gitRepo, arguments);
+                CreateIssueTrackers(gitRepo, context);
 
                 IIssueTracker issueTracker = null;
-                if (arguments.IssueTracker == null)
+                if (context.IssueTracker == null)
                 {
                     var firstOrDefault = _issueTrackers.FirstOrDefault(i => i.Value.RemotePresentWhichMatches);
                     if (firstOrDefault.Value != null)
                         issueTracker = firstOrDefault.Value;
                 }
+
                 if (issueTracker == null)
                 {
-                    if (!_issueTrackers.ContainsKey(arguments.IssueTracker.Value))
-                        throw new Exception(string.Format("{0} is not a known issue tracker", arguments.IssueTracker.Value));
+                    if (!_issueTrackers.ContainsKey(context.IssueTracker.Value))
+                        throw new Exception(string.Format("{0} is not a known issue tracker", context.IssueTracker.Value));
 
-                    issueTracker = _issueTrackers[arguments.IssueTracker.Value];
+                    issueTracker = _issueTrackers[context.IssueTracker.Value];
                 }
+
                 if (!issueTracker.VerifyArgumentsAndWriteErrorsToConsole())
                 {
                     return 1;
@@ -97,22 +108,22 @@ namespace GitReleaseNotes
                     outputPath = outputDirectory.Parent.FullName;
                 }
 
-                if (!string.IsNullOrEmpty(arguments.OutputFile))
+                if (!string.IsNullOrEmpty(context.OutputFile))
                 {
-                    outputFile = Path.IsPathRooted(arguments.OutputFile)
-                        ? arguments.OutputFile
-                        : Path.Combine(outputPath, arguments.OutputFile);
+                    outputFile = Path.IsPathRooted(context.OutputFile)
+                        ? context.OutputFile
+                        : Path.Combine(outputPath, context.OutputFile);
                     previousReleaseNotes = new ReleaseNotesFileReader(fileSystem, outputPath).ReadPreviousReleaseNotes(outputFile);
                 }
 
-                var categories = new Categories(arguments.Categories, arguments.AllLabels);
-                TaggedCommit tagToStartFrom = arguments.AllTags
+                var categories = new Categories(context.Categories, context.AllLabels);
+                TaggedCommit tagToStartFrom = context.AllTags
                     ? GitRepositoryInfoFinder.GetFirstCommit(gitRepo)
                     : GitRepositoryInfoFinder.GetLastTaggedCommit(gitRepo) ?? GitRepositoryInfoFinder.GetFirstCommit(gitRepo);
                 var currentReleaseInfo = GitRepositoryInfoFinder.GetCurrentReleaseInfo(gitRepo);
-                if (!string.IsNullOrEmpty(arguments.Version))
+                if (!string.IsNullOrEmpty(context.Version))
                 {
-                    currentReleaseInfo.Name = arguments.Version;
+                    currentReleaseInfo.Name = context.Version;
                     currentReleaseInfo.When = DateTimeOffset.Now;
                 }
                 var releaseNotes = ReleaseNotesGenerator.GenerateReleaseNotes(
@@ -129,7 +140,7 @@ namespace GitReleaseNotes
             }
         }
 
-        private static void CreateIssueTrackers(IRepository repository, GitReleaseNotesArguments arguments)
+        private static void CreateIssueTrackers(IRepository repository, Context context)
         {
             var log = new Log();
             _issueTrackers = new Dictionary<IssueTracker, IIssueTracker>
@@ -139,54 +150,56 @@ namespace GitReleaseNotes
                     new GitHubIssueTracker(repository, () =>
                     {
                         var gitHubClient = new GitHubClient(new Octokit.ProductHeaderValue("GitReleaseNotes"));
-                        if (arguments.Token != null)
+                        if (context.GitHub.Token != null)
                         {
-                            gitHubClient.Credentials = new Credentials(arguments.Token);
+                            gitHubClient.Credentials = new Credentials(context.GitHub.Token);
                         }
 
                         return gitHubClient;
-                    }, log, arguments)
+                    }, log, context)
                 },
                 {
                     IssueTracker.Jira, 
-                    new JiraIssueTracker(new JiraApi(), log, arguments)
+                    new JiraIssueTracker(new JiraApi(), log, context)
                 },
                 {
                     IssueTracker.YouTrack,
-                    new YouTrackIssueTracker(new YouTrackApi(), log, arguments)
+                    new YouTrackIssueTracker(new YouTrackApi(), log, context)
                 },
                 {
                    IssueTracker.BitBucket,
-                   new BitBucketIssueTracker(repository, new BitBucketApi(), log, arguments)
+                   new BitBucketIssueTracker(repository, new BitBucketApi(), log, context)
                 }
             };
         }
 
-        private static GitRepositoryContext GetRepository(GitReleaseNotesArguments args)
+        private static GitRepositoryContext GetRepository(Context context)
         {
-            var workingDir = args.WorkingDirectory ?? Directory.GetCurrentDirectory();
-            bool isRemote = !string.IsNullOrWhiteSpace(args.RepoUrl);
-            ILog log = new Log();
-            IGitRepositoryContextFactory repoFactory = GetRepositoryFactory(log, isRemote, workingDir, args);
+            var workingDir = context.WorkingDirectory ?? Directory.GetCurrentDirectory();
+            var isRemote = !string.IsNullOrWhiteSpace(context.Repository.Url);
+            var log = new Log();
+            var repoFactory = GetRepositoryFactory(log, isRemote, workingDir, context);
             var repo = repoFactory.GetRepositoryContext();
             return repo;
         }
 
-        private static IGitRepositoryContextFactory GetRepositoryFactory(ILog log, bool isRemote, string workingDir, GitReleaseNotesArguments args)
+        private static IGitRepositoryContextFactory GetRepositoryFactory(ILog log, bool isRemote, string workingDir, Context context)
         {
             IGitRepositoryContextFactory gitRepoFactory = null;
             if (isRemote)
             {
 
                 // clone repo from the remote url
-                var cloneRepoArgs = new GitReleaseNotes.Git.GitRemoteRepositoryContextFactory.RemoteRepoArgs();
-                cloneRepoArgs.Url = args.RepoUrl;
+                var cloneRepoArgs = new GitRemoteRepositoryContextFactory.RemoteRepoArgs();
+                cloneRepoArgs.Url = context.Repository.Url;
                 var credentials = new UsernamePasswordCredentials();
-                credentials.Username = args.RepoUsername;
-                credentials.Password = args.RepoPassword;
+
+                credentials.Username = context.Repository.Username;
+                credentials.Password = context.Repository.Password;
+
                 cloneRepoArgs.Credentials = credentials;
                 cloneRepoArgs.DestinationPath = workingDir;
-               
+
                 Console.WriteLine("Cloning a git repo from {0}", cloneRepoArgs.Url);
                 gitRepoFactory = new GitRemoteRepositoryContextFactory(log, cloneRepoArgs);
             }
@@ -194,6 +207,7 @@ namespace GitReleaseNotes
             {
                 gitRepoFactory = new GitLocalRepositoryContextFactory(log, workingDir);
             }
+
             return gitRepoFactory;
         }
     }

@@ -2,8 +2,12 @@
 {
     public class RepositoryContext
     {
-        public string RepoUrl { get; set; }
+        public string Url { get; set; }
 
-        public string RepoBranch { get; set; }
+        public string Branch { get; set; }
+
+        public string Username { get; set; }
+
+        public string Password { get; set; }
     }
 }

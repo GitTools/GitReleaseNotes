@@ -32,10 +32,13 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
                 Repo = "Org/Repo",
                 Token = "213"
             };
+
+            var context = arguments.ToContext();
+
             repo = Substitute.For<IRepository>();
             repo.Network.Returns(new NetworkEx());
 
-            sut = new GitHubIssueTracker(repo, () => gitHubClient, log, arguments);
+            sut = new GitHubIssueTracker(repo, () => gitHubClient, log, context);
         }
 
         [Fact]
