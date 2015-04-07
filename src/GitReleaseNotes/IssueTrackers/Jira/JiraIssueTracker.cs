@@ -28,7 +28,7 @@ namespace GitReleaseNotes.IssueTrackers.Jira
 
             if (string.IsNullOrEmpty(context.ProjectId))
             {
-                log.WriteLine("/JiraProjectId is a required parameter for Jira");
+                log.WriteLine("/ProjectId is a required parameter for Jira");
                 return false;
             }
 
@@ -37,17 +37,11 @@ namespace GitReleaseNotes.IssueTrackers.Jira
                 log.WriteLine("/Username is a required to authenticate with Jira");
                 return false;
             }
+
             if (string.IsNullOrEmpty(context.Authentication.Password))
             {
                 log.WriteLine("/Password is a required to authenticate with Jira");
                 return false;
-            }
-
-            if (string.IsNullOrEmpty(context.Jira.Jql))
-            {
-                context.Jira.Jql = string.Format("project = {0} AND " +
-                               "(issuetype = Bug OR issuetype = Story OR issuetype = \"New Feature\") AND " +
-                               "status in (Closed, Resolved)", context.ProjectId);
             }
 
             return true;

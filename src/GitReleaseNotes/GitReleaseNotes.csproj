@@ -93,7 +93,6 @@
     <Compile Include="IssueTrackers\BitBucket\IBitBucketApi.cs" />
     <Compile Include="IssueTrackers\BitBucket\BitBucketApi.cs" />
     <Compile Include="IssueTrackers\BitBucket\OAuthBase.cs" />
-    <Compile Include="IssueTrackers\Jira\Extensions\JiraExtensions.cs" />
     <Compile Include="ReleaseFinder.cs" />
     <Compile Include="FileSystem\FileSystem.cs" />
     <Compile Include="FileSystem\IFileSystem.cs" />

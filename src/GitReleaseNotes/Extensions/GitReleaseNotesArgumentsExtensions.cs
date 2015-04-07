@@ -10,6 +10,9 @@
             context.Verbose = arguments.Verbose;
             context.IssueTracker = arguments.IssueTracker;
             context.OutputFile = arguments.OutputFile;
+            context.ProjectId = arguments.ProjectId;
+            context.Categories = arguments.Categories;
+            context.Version = arguments.Version;
             context.AllTags = arguments.AllTags;
             context.AllLabels = arguments.AllLabels;
 
@@ -29,7 +32,7 @@
 
             var jira = context.Jira;
             jira.JiraServer = arguments.JiraServer;
-            jira.Jql = arguments.JiraServer;
+            jira.Jql = arguments.Jql;
 
             var youTrack = context.YouTrack;
             youTrack.YouTrackServer = arguments.YouTrackServer;
