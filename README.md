@@ -35,6 +35,9 @@ If you use GitHub milestones to manage your releases [GitHubReleaseNotes](https:
 ## Publishing a release
 Initial versions of this tool allowed publishing to GitHub. This has been removed.
 
-If you use GitHub have a look at [https://github.com/dazinator/GithubReleaseCreator](https://github.com/dazinator/GithubReleaseCreator) [On NuGet](https://www.nuget.org/packages/GithubReleaseCreator/) to make it easy to publish your GitHub releases automatically.
+To easily create and publish releases, use one of the following alternatives:
+
+- GitHub => [GithubReleaseCreator](https://github.com/dazinator/GithubReleaseCreator) or [On NuGet](https://www.nuget.org/packages/GithubReleaseCreator/)
+- Jira => [JiraCli](https://github.com/CatenaLogic/JiraCli)
 
 To use this workflow you should track the current releases release notes in the repo, then on publish just take the file contents as the description with the above tool.
