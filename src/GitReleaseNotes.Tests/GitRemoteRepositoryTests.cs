@@ -1,13 +1,10 @@
-﻿using GitReleaseNotes.Git;
-using LibGit2Sharp;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using GitReleaseNotes.Git;
+using LibGit2Sharp;
+using Shouldly;
 using Xunit;
-using Xunit.Extensions;
 
 namespace GitReleaseNotes.Tests
 {
@@ -23,13 +20,12 @@ namespace GitReleaseNotes.Tests
         {
             // Arrange
             // 1. Create a local repo to serve as the source / origin for our clone.
-            var currentDir = Environment.CurrentDirectory;
             var originRepoDir = TestGitRepoUtils.GetUniqueTempFolder("testOriginGitRepo");
             var testOriginRepo = TestGitRepoUtils.CreateEmptyTestRepo(originRepoDir);
-            string expectedDefaultBranchName = "master";          
+            const string expectedDefaultBranchName = "master";
 
             // Construct the arguments necessary for cloning the origin repo.
-            var remoteArgs = new GitReleaseNotes.Git.GitRemoteRepositoryContextFactory.RemoteRepoArgs();
+            var remoteArgs = new GitRemoteRepositoryContextFactory.RemoteRepoArgs();
             var creds = new DefaultCredentials();
             remoteArgs.Credentials = creds;
             var desinationDirForClone = TestGitRepoUtils.GetUniqueTempFolder("testClonedGitRepo"); // Path.Combine(currentDir, "testClonedGitRepo", Guid.NewGuid().ToString("N"));
@@ -43,11 +39,11 @@ namespace GitReleaseNotes.Tests
             using (var repoContext = remoteRepoContextFactory.GetRepositoryContext())
             {
                 // Assert
-                Assert.True(repoContext.IsRemote);
-                Assert.True(Directory.Exists(Path.Combine(desinationDirForClone, ".git")));
+                repoContext.IsRemote.ShouldBe(true);
+                Directory.Exists(Path.Combine(desinationDirForClone, ".git")).ShouldBe(true);
 
                 var currentBranch = repoContext.Repository.Head.CanonicalName;
-                Assert.True(currentBranch.EndsWith(expectedDefaultBranchName)); // cloned repo should default to master branch.
+                currentBranch.ShouldEndWith(expectedDefaultBranchName); // cloned repo should default to master branch.
             }
         }
 
@@ -66,7 +62,7 @@ namespace GitReleaseNotes.Tests
             using(var testOriginRepo = TestGitRepoUtils.CreateRepoWithBranch(originRepoDir, branchName))
             {
                 // Construct the arguments necessary for cloning this origin repo.
-                var remoteArgs = new GitReleaseNotes.Git.GitRemoteRepositoryContextFactory.RemoteRepoArgs();
+                var remoteArgs = new GitRemoteRepositoryContextFactory.RemoteRepoArgs();
                 var creds = new DefaultCredentials();
                 remoteArgs.Credentials = creds;
 
@@ -86,9 +82,9 @@ namespace GitReleaseNotes.Tests
 
                     // The cloned repo should now be set to the specified branch name.
                     var currentBranch = repoContext.Repository.Head.CanonicalName;
-                    Assert.True(currentBranch.EndsWith(branchName));
+                    currentBranch.ShouldEndWith(branchName);
                 }
-            }       
+            }
         }
 
         [Theory]
@@ -120,7 +116,7 @@ namespace GitReleaseNotes.Tests
                 }
 
                 // Construct the arguments necessary for cloning the origin repo.
-                var remoteArgs = new GitReleaseNotes.Git.GitRemoteRepositoryContextFactory.RemoteRepoArgs();
+                var remoteArgs = new GitRemoteRepositoryContextFactory.RemoteRepoArgs();
                 var creds = new DefaultCredentials();
                 remoteArgs.Credentials = creds;
                 var desinationDirForClone = TestGitRepoUtils.GetUniqueTempFolder("testClonedGitRepo"); // Path.Combine(currentDir, "testClonedGitRepo", Guid.NewGuid().ToString("N"));
@@ -138,17 +134,9 @@ namespace GitReleaseNotes.Tests
 
                     // Assert.
                     var releaseNotesFilePath = Path.Combine(desinationDirForClone,releaseNotesFileName);
-                    Assert.Equal(shouldHaveReleaseNotesFile, File.Exists(releaseNotesFilePath));                    
+                    File.Exists(releaseNotesFilePath).ShouldBe(shouldHaveReleaseNotesFile);
                 }
-
             }
-
-          
         }
-
-
-       
-
-       
     }
 }

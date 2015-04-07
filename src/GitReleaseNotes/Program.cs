@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net.Http.Headers;
 using Args.Help;
 using Args.Help.Formatters;
 using GitReleaseNotes.FileSystem;
@@ -16,7 +15,6 @@ using GitReleaseNotes.IssueTrackers.YouTrack;
 using LibGit2Sharp;
 using Octokit;
 using Credentials = Octokit.Credentials;
-using Repository = LibGit2Sharp.Repository;
 
 namespace GitReleaseNotes
 {

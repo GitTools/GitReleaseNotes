@@ -9,7 +9,6 @@ using NSubstitute;
 using Octokit;
 using Shouldly;
 using Xunit;
-using Xunit.Extensions;
 
 namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
 {
@@ -46,27 +45,15 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
                 .GetForRepository("Org", "Repo", Arg.Any<RepositoryIssueRequest>())
                 .Returns(Task.FromResult<IReadOnlyList<Issue>>(new List<Issue>
                 {
-                    new Issue
-                    {
-                        Number = 1,
-                        Title = "Issue Title",
-                        Labels = new Collection<Label>(),
-                        ClosedAt = DateTimeOffset.Now,
-                        PullRequest = new PullRequest(),
-                        User = new User
-                        {
-                            Login = "User",
-                            Name = "Foo",
-                            HtmlUrl = "http://github.com/foo"
-                        }
-                    }
+                    new Issue(null, null, 1, ItemState.Closed, "Issue Title", string.Empty, new TestUser("User", "Foo", "http://github.com/name"), 
+                        new Collection<Label>(), null, null, 0, new PullRequest(), DateTimeOffset.Now, DateTimeOffset.Now, DateTimeOffset.Now)
                 }.AsReadOnly()));
 
             var closedIssues = sut.GetClosedIssues(DateTimeOffset.Now.AddDays(-2));
             var onlineIssue = closedIssues.Single();
             onlineIssue.Title.ShouldBe("Issue Title");
             onlineIssue.Id.ShouldBe("#1");
-            onlineIssue.Contributors.ShouldContain(c => c.Username == "User" && c.Name == "Foo" && c.Url == "http://github.com/foo");
+            onlineIssue.Contributors.ShouldContain(c => c.Username == "User" && c.Name == "Foo" && c.Url == "http://github.com/name");
         }
 
         [Fact]
