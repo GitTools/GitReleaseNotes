@@ -5,6 +5,6 @@ namespace GitReleaseNotes.IssueTrackers.Jira
 {
     public interface IJiraApi
     {
-        IEnumerable<OnlineIssue> GetClosedIssues(GitReleaseNotesArguments arguments, DateTimeOffset? since);
+        IEnumerable<OnlineIssue> GetClosedIssues(Context context, DateTimeOffset? since);
     }
 }

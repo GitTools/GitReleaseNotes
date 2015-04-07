@@ -6,48 +6,48 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
 {
     public sealed class YouTrackIssueTracker : IIssueTracker
     {
-        private readonly GitReleaseNotesArguments arguments;
-        private readonly IYouTrackApi youTrackApi;
-        private readonly ILog log;
+        private static readonly ILog Log = GitReleaseNotesEnvironment.Log;
 
-        public YouTrackIssueTracker(IYouTrackApi youTrackApi, ILog log, GitReleaseNotesArguments arguments)
+        private readonly Context context;
+        private readonly IYouTrackApi youTrackApi;
+
+        public YouTrackIssueTracker(IYouTrackApi youTrackApi, Context context)
         {
             this.youTrackApi = youTrackApi;
-            this.log = log;
-            this.arguments = arguments;
+            this.context = context;
         }
 
-        public bool VerifyArgumentsAndWriteErrorsToConsole()
+        public bool VerifyArgumentsAndWriteErrorsToLog()
         {
-            if (string.IsNullOrEmpty(arguments.YouTrackServer) ||
-                !Uri.IsWellFormedUriString(arguments.YouTrackServer, UriKind.Absolute))
+            if (string.IsNullOrEmpty(context.YouTrack.YouTrackServer) ||
+                !Uri.IsWellFormedUriString(context.YouTrack.YouTrackServer, UriKind.Absolute))
             {
-                log.WriteLine("A valid YouTrack server must be specified [/YouTrackServer ]");
+                Log.WriteLine("A valid YouTrack server must be specified [/YouTrackServer ]");
                 return false;
             }
 
-            if (string.IsNullOrEmpty(arguments.ProjectId))
+            if (string.IsNullOrEmpty(context.ProjectId))
             {
-                log.WriteLine("/ProjectId is a required parameter for YouTrack");
+                Log.WriteLine("/ProjectId is a required parameter for YouTrack");
                 return false;
             }
 
-            if (string.IsNullOrEmpty(arguments.Username))
+            if (string.IsNullOrEmpty(context.Authentication.Username))
             {
-                log.WriteLine("/Username is a required to authenticate with YouTrack");
+                Log.WriteLine("/Username is a required to authenticate with YouTrack");
                 return false;
             }
-            if (string.IsNullOrEmpty(arguments.Password))
+            if (string.IsNullOrEmpty(context.Authentication.Password))
             {
-                log.WriteLine("/Password is a required to authenticate with YouTrack");
+                Log.WriteLine("/Password is a required to authenticate with YouTrack");
                 return false;
             }
 
-            if (string.IsNullOrEmpty(arguments.YouTrackFilter))
+            if (string.IsNullOrEmpty(context.YouTrack.YouTrackFilter))
             {
-                arguments.YouTrackFilter = string.Format(
+                context.YouTrack.YouTrackFilter = string.Format(
                     "project:{0} State:Resolved State:-{{Won't fix}} State:-{{Can't Reproduce}} State:-Duplicate", 
-                    arguments.ProjectId);
+                    context.ProjectId);
             }
 
             return true;
@@ -55,7 +55,7 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
 
         public IEnumerable<OnlineIssue> GetClosedIssues(DateTimeOffset? since)
         {
-            return youTrackApi.GetClosedIssues(arguments, since).ToArray();
+            return youTrackApi.GetClosedIssues(context, since).ToArray();
         }
 
         public bool RemotePresentWhichMatches

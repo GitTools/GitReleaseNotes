@@ -10,11 +10,13 @@ namespace GitReleaseNotes.IssueTrackers.BitBucket
 
     public class BitBucketApi : IBitBucketApi
     {
+        private static readonly ILog Log = GitReleaseNotesEnvironment.Log;
+
         private const string IssueClosed = "closed";
         private const string IssueResolved = "resolved";
         private const string ApiUrl = "https://bitbucket.org/api/1.0/";
 
-        public IEnumerable<OnlineIssue> GetClosedIssues(GitReleaseNotesArguments arguments, DateTimeOffset? since, string accountName, string repoSlug, bool oauth)
+        public IEnumerable<OnlineIssue> GetClosedIssues(Context context, DateTimeOffset? since, string accountName, string repoSlug, bool oauth)
         {
             var baseUrl = new Uri(ApiUrl, UriKind.Absolute);
             var restClient = new RestClient(baseUrl.AbsoluteUri);
@@ -22,17 +24,19 @@ namespace GitReleaseNotes.IssueTrackers.BitBucket
             var request = new RestRequest(issuesUrl);
             if (oauth)
             {
-                GenerateOauthRequest(arguments, baseUrl, issuesUrl, request);
+                GenerateOauthRequest(context, baseUrl, issuesUrl, request);
             }
             else
             {
-                GenerateClassicalRequest(arguments, request, issuesUrl);
+                GenerateClassicalRequest(context, request, issuesUrl);
             }
+
             var response = restClient.Execute(request);
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 throw new Exception("Failed to query BitBucket: " + response.StatusDescription);
             }
+
             dynamic responseObject = JsonConvert.DeserializeObject<dynamic>(response.Content);
             
             var issues = new List<OnlineIssue>();
@@ -46,38 +50,36 @@ namespace GitReleaseNotes.IssueTrackers.BitBucket
                 string summary = issue.content;
                 string id = issue.local_id.ToString();
                 string title = issue.title;
-                issues.Add(new OnlineIssue
+                issues.Add(new OnlineIssue(id, lastChange)
                 {
-                    Id = id,
                     Title = summary,
                     IssueType = IssueType.Issue,
-                    HtmlUrl = new Uri(baseUrl, string.Format("/repositories/{0}/{1}/issue/{2}/{3}", accountName, repoSlug, id, title)),
-                    DateClosed = lastChange
+                    HtmlUrl = new Uri(baseUrl, string.Format("/repositories/{0}/{1}/issue/{2}/{3}", accountName, repoSlug, id, title))
                 });
             }
             return issues;
         }
 
-        private static void GenerateClassicalRequest(GitReleaseNotesArguments arguments, RestRequest request, string MethodLocation)
+        private static void GenerateClassicalRequest(Context context, RestRequest request, string methodLocation)
         {
-            var usernameAndPass = string.Format("{0}:{1}", arguments.Username, arguments.Password);
+            var usernameAndPass = string.Format("{0}:{1}", context.Authentication.Username, context.Authentication.Password);
             var token = Convert.ToBase64String(Encoding.UTF8.GetBytes(usernameAndPass));
-            request.Resource = string.Format(MethodLocation);
+            request.Resource = string.Format(methodLocation);
             request.AddHeader("Authorization", string.Format("Basic {0}", token));
         }
 
-        private static void GenerateOauthRequest(GitReleaseNotesArguments arguments, Uri baseUrl, string MethodLocation, RestRequest request)
+        private static void GenerateOauthRequest(Context context, Uri baseUrl, string methodLocation, RestRequest request)
         {
-            var consumerKey = string.IsNullOrEmpty(arguments.Username) ? arguments.ConsumerKey : arguments.Username;
-            var consumerSecret = string.IsNullOrEmpty(arguments.Password) ? arguments.ConsumerSecretKey : arguments.Password;
+            var consumerKey = string.IsNullOrEmpty(context.Authentication.Username) ? context.BitBucket.ConsumerKey : context.Authentication.Username;
+            var consumerSecret = string.IsNullOrEmpty(context.Authentication.Password) ? context.BitBucket.ConsumerSecretKey : context.Authentication.Password;
             var oAuth = new OAuthBase();
             var nonce = oAuth.GenerateNonce();
             var timeStamp = oAuth.GenerateTimeStamp();
             string normalizedUrl;
             string normalizedRequestParameters;
-            var sig = oAuth.GenerateSignature(new Uri(baseUrl + MethodLocation), consumerKey, consumerSecret, null, null, "GET", timeStamp, nonce, out normalizedUrl, out normalizedRequestParameters);
+            var sig = oAuth.GenerateSignature(new Uri(baseUrl + methodLocation), consumerKey, consumerSecret, null, null, "GET", timeStamp, nonce, out normalizedUrl, out normalizedRequestParameters);
 
-            request.Resource = string.Format(MethodLocation);
+            request.Resource = string.Format(methodLocation);
             request.Method = Method.GET;
             request.AddParameter("oauth_consumer_key", consumerKey);
             request.AddParameter("oauth_nonce", nonce);

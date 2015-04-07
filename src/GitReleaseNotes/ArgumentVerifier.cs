@@ -1,20 +1,22 @@
-﻿using System;
-
-namespace GitReleaseNotes
+﻿namespace GitReleaseNotes
 {
     public class ArgumentVerifier
     {
+        private static readonly ILog Log = GitReleaseNotesEnvironment.Log;
+
         public static bool VerifyArguments(GitReleaseNotesArguments arguments)
         {
             if (string.IsNullOrEmpty(arguments.OutputFile))
             {
-                Console.WriteLine("WARN: No Output file specified (*.md) [/OutputFile ...]");
+                Log.WriteLine("WARN: No Output file specified (*.md) [/OutputFile ...]");
             }
+
             if (!string.IsNullOrEmpty(arguments.OutputFile) && !arguments.OutputFile.EndsWith(".md"))
             {
-                Console.WriteLine("WARN: Output file should have a .md extension [/OutputFile ...]");
+                Log.WriteLine("WARN: Output file should have a .md extension [/OutputFile ...]");
                 arguments.OutputFile = null;
             }
+
             return true;
         }
     }

@@ -5,6 +5,6 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
 {
     public interface IYouTrackApi
     {
-        IEnumerable<OnlineIssue> GetClosedIssues(GitReleaseNotesArguments arguments, DateTimeOffset? since);
+        IEnumerable<OnlineIssue> GetClosedIssues(Context context, DateTimeOffset? since);
     }
 }

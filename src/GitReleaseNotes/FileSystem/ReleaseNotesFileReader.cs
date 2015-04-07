@@ -4,6 +4,8 @@ namespace GitReleaseNotes.FileSystem
 {
     public class ReleaseNotesFileReader
     {
+        private static readonly ILog Log = GitReleaseNotesEnvironment.Log;
+
         private readonly IFileSystem _fileSystem;
         private readonly string _repositoryRoot;
 
@@ -17,7 +19,10 @@ namespace GitReleaseNotes.FileSystem
         {
             var path = Path.Combine(_repositoryRoot, releaseNotesFileName);
             if (!_fileSystem.FileExists(path))
+            {
                 return new SemanticReleaseNotes();
+            }
+
             var contents = _fileSystem.ReadAllText(path).Replace("\r", string.Empty);
 
             return SemanticReleaseNotes.Parse(contents);

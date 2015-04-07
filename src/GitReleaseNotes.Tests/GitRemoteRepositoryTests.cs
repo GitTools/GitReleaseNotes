@@ -8,13 +8,8 @@ using Xunit;
 
 namespace GitReleaseNotes.Tests
 {
-    public class GitRemoteRepositoryTests : ILog
+    public class GitRemoteRepositoryTests
     {
-        public void WriteLine(string s)
-        {
-            Console.WriteLine(s);
-        }
-
         [Fact]
         public void CanGetRemoteRepoContext()
         {
@@ -32,8 +27,7 @@ namespace GitReleaseNotes.Tests
             remoteArgs.DestinationPath = desinationDirForClone;          
             remoteArgs.Url = testOriginRepo.Info.Path; // This could be the Url of the git repo, but as this is a unit test, we are using a local file path.
           
-            ILog logger = this;           
-            var remoteRepoContextFactory = new GitRemoteRepositoryContextFactory(logger, remoteArgs);
+            var remoteRepoContextFactory = new GitRemoteRepositoryContextFactory(remoteArgs);
 
             // Act
             using (var repoContext = remoteRepoContextFactory.GetRepositoryContext())
@@ -70,10 +64,9 @@ namespace GitReleaseNotes.Tests
                 remoteArgs.DestinationPath = desinationDirForClone;
                
                 remoteArgs.Url = testOriginRepo.Info.Path; // This could be the Url of the git repo, but as this is a unit test, we are using a local file path.
-                ILog logger = this;
 
                 // This is the sut.
-                var remoteRepoContextFactory = new GitRemoteRepositoryContextFactory(logger, remoteArgs);
+                var remoteRepoContextFactory = new GitRemoteRepositoryContextFactory(remoteArgs);
 
                 using (var repoContext = remoteRepoContextFactory.GetRepositoryContext())
                 {
@@ -122,9 +115,8 @@ namespace GitReleaseNotes.Tests
                 var desinationDirForClone = TestGitRepoUtils.GetUniqueTempFolder("testClonedGitRepo"); // Path.Combine(currentDir, "testClonedGitRepo", Guid.NewGuid().ToString("N"));
                 remoteArgs.DestinationPath = desinationDirForClone;
                 remoteArgs.Url = testOriginRepo.Info.Path; // This could be the Url of the git repo, but as this is a unit test, we are using a local file path.
-                ILog logger = this;
               
-                var remoteRepoContextFactory = new GitRemoteRepositoryContextFactory(logger, remoteArgs);
+                var remoteRepoContextFactory = new GitRemoteRepositoryContextFactory(remoteArgs);
                 using (var repoContext = remoteRepoContextFactory.GetRepositoryContext())
                 {                    
                     repoContext.PrepareRemoteRepoForUse(branchName);
