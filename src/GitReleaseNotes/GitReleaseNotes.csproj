@@ -39,6 +39,10 @@
     <Reference Include="Args">
       <HintPath>..\packages\Args.1.1.2\lib\Net40\Args.dll</HintPath>
     </Reference>
+    <Reference Include="Atlassian.Jira, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Atlassian.SDK.2.5.0\lib\Atlassian.Jira.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="LibGit2Sharp, Version=0.20.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\LibGit2Sharp.0.20.2.0\lib\net40\LibGit2Sharp.dll</HintPath>
       <Private>True</Private>
@@ -58,6 +62,7 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -69,7 +74,15 @@
     <Compile Include="ArgumentVerifier.cs" />
     <Compile Include="BlankLine.cs" />
     <Compile Include="Categories.cs" />
+    <Compile Include="Context\AuthenticationContext.cs" />
+    <Compile Include="Context\BitBucketContext.cs" />
+    <Compile Include="Context\Context.cs" />
+    <Compile Include="Context\GitHubContext.cs" />
+    <Compile Include="Context\JiraContext.cs" />
+    <Compile Include="Context\RepositoryContext.cs" />
+    <Compile Include="Context\YouTrackContext.cs" />
     <Compile Include="Contributor.cs" />
+    <Compile Include="Extensions\GitReleaseNotesArgumentsExtensions.cs" />
     <Compile Include="Git\GitBranchNameInfo.cs" />
     <Compile Include="Git\GitLocalRepositoryContextFactory.cs" />
     <Compile Include="Git\GitRemoteRepositoryContextFactory.cs" />
@@ -80,6 +93,7 @@
     <Compile Include="IssueTrackers\BitBucket\IBitBucketApi.cs" />
     <Compile Include="IssueTrackers\BitBucket\BitBucketApi.cs" />
     <Compile Include="IssueTrackers\BitBucket\OAuthBase.cs" />
+    <Compile Include="IssueTrackers\Jira\Extensions\JiraExtensions.cs" />
     <Compile Include="ReleaseFinder.cs" />
     <Compile Include="FileSystem\FileSystem.cs" />
     <Compile Include="FileSystem\IFileSystem.cs" />
