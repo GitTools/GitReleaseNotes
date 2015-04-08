@@ -77,6 +77,7 @@
     <Compile Include="Context\AuthenticationContext.cs" />
     <Compile Include="Context\BitBucketContext.cs" />
     <Compile Include="Context\Context.cs" />
+    <Compile Include="Context\Extensions\ContextExtensions.cs" />
     <Compile Include="Context\GitHubContext.cs" />
     <Compile Include="Context\JiraContext.cs" />
     <Compile Include="Context\RepositoryContext.cs" />

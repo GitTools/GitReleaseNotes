@@ -11,7 +11,6 @@ using GitReleaseNotes.IssueTrackers.Jira;
 using GitReleaseNotes.IssueTrackers.YouTrack;
 using LibGit2Sharp;
 using Octokit;
-using Credentials = LibGit2Sharp.Credentials;
 
 namespace GitReleaseNotes
 {

@@ -1,0 +1,42 @@
+﻿@using System.Web.Optimization
+@using Catel.Reflection
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - @AssemblyHelper.GetEntryAssembly().Title()</title>
+
+    @Styles.Render("~/content/styles/bundle")
+    @Styles.Render("~/content/angular/styles/bundle")
+
+</head>
+
+<body ng-app="app" class="smart-style-1">
+
+    @RenderBody()
+
+    @Scripts.Render("~/content/scripts/modernizrbundle")
+    @Scripts.Render("~/content/scripts/jquerybundle")
+    @Scripts.Render("~/content/scripts/bootstrapbundle")
+    @Scripts.Render("~/content/scripts/scriptsbundle")
+
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.10/angular.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular-ui/0.4.0/angular-ui.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.10.0/ui-bootstrap-tpls.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
+
+    @Scripts.Render("~/content/angular/scriptsbundle")
+
+    @RenderSection("Scripts", required: false)
+    
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $(".input-group.date").datepicker({ autoclose: true, todayHighlight: true });
+        });
+    </script>
+
+</body>
+
+</html>
