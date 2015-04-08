@@ -4,7 +4,7 @@
     {
         public static string GetContextKey(this Context context)
         {
-            var key = string.Format("{0}", context.ProjectId);
+            var key = string.Format("{0}_{1}", context.ProjectId, context.Repository.Branch);
 
             var bitbucket = context.BitBucket;
             if (!string.IsNullOrWhiteSpace(bitbucket.Repo))
