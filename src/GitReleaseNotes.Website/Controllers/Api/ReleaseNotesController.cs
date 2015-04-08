@@ -11,7 +11,7 @@ namespace GitReleaseNotes.Website.Controllers.Api
     using System.Web.Http;
 
     [RoutePrefix("api/releasenotes")]
-    public class ReleaseNotesController : ApiController
+    public class ReleaseNotesController : ApiControllerBase
     {
         private readonly IReleaseNotesService _releaseNotesService;
 
@@ -29,6 +29,8 @@ namespace GitReleaseNotes.Website.Controllers.Api
             Argument.IsNotNull(() => releaseNotesRequest);
 
             var context = releaseNotesRequest.ToContext();
+            context.AllTags = true;
+
             var releaseNotes = _releaseNotesService.GetReleaseNotes(context);
             
             return new HttpResponseMessage
