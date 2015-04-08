@@ -1,20 +1,34 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace GitReleaseNotes.FileSystem
 {
-    class FileSystem : IFileSystem
+    public class FileSystem : IFileSystem
     {
-        public void WriteAllText(string path, string contents)
+        public virtual string GetRepositoryWorkingDirectory(Context context)
+        {
+            if (!string.IsNullOrWhiteSpace(context.WorkingDirectory))
+            {
+                return context.WorkingDirectory;
+            }
+
+            var key = context.GetContextKey();
+
+            var tempDirectory = Path.Combine(Path.GetTempPath(), "GitReleaseNotes", key);
+            return tempDirectory;
+        }
+
+        public virtual void WriteAllText(string path, string contents)
         {
             File.WriteAllText(path, contents);
         }
 
-        public string ReadAllText(string path)
+        public virtual string ReadAllText(string path)
         {
             return File.ReadAllText(path);
         }
 
-        public bool FileExists(string path)
+        public virtual bool FileExists(string path)
         {
             return File.Exists(path);
         }

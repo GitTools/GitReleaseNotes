@@ -112,3 +112,4 @@ src/GitReleaseNotes.sln.ide/graph
 src/_NCrunch_GitReleaseNotes
 *.received.txt
 src/GitReleaseNotes.sln.ide/
+*.GhostDoc.xml

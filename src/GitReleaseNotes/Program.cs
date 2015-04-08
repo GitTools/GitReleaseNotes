@@ -40,7 +40,8 @@ namespace GitReleaseNotes
 
             try
             {
-                ReleaseNotesGenerator.GenerateReleaseNotes(context);
+                var releaseNotesGenerator = new ReleaseNotesGenerator(context, new FileSystem.FileSystem());
+                releaseNotesGenerator.GenerateReleaseNotes();
 
                 Log.WriteLine("Done");
             }

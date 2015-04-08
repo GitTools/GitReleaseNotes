@@ -1,0 +1,56 @@
+﻿body {
+  padding-top: 50px;
+}
+
+#content {
+    
+}
+
+.body-content {
+    
+}
+
+.page-header {
+    margin: 10px 0 15px 0;
+}
+
+.tableControlButtons {
+    width: 100px;
+}
+
+nav > h3 {
+    color: white;
+    margin: 10px 15px 5px 15px;
+    /*border-bottom: 1px solid white;*/
+}
+
+.btn-navigation {
+    width: 100px;
+}
+
+.navigation-container {
+    float: right;
+    clear: both;
+}
+
+.top-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    clear: both;
+}
+
+.top-container > .action-container {
+    flex: 1;
+    order: 1;
+}
+
+.top-container > .filter-container {
+    order: 2;
+}
+
+textarea {
+    margin: 20px 0px 20px 0px;
+    min-height: 300px;
+}
