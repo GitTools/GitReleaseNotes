@@ -9,26 +9,30 @@
             var bitbucket = context.BitBucket;
             if (!string.IsNullOrWhiteSpace(bitbucket.Repo))
             {
-                key += bitbucket.Repo;
+                key += "_" + bitbucket.Repo;
             }
 
             var github = context.GitHub;
             if (!string.IsNullOrWhiteSpace(github.Repo))
             {
-                key += github.Repo;
+                key += "_" + github.Repo;
             }
 
             var jira = context.Jira;
             if (!string.IsNullOrWhiteSpace(jira.JiraServer))
             {
-                key += jira.JiraServer;
+                key += "_" + jira.JiraServer;
             }
 
             var youtrack = context.YouTrack;
             if (!string.IsNullOrWhiteSpace(youtrack.YouTrackServer))
             {
-                key += youtrack.YouTrackServer;
+                key += "_" + youtrack.YouTrackServer;
             }
+
+            key = key.Replace("/", "_")
+                .Replace("\\", "_")
+                .Replace(":", "_");
 
             return key;
         }

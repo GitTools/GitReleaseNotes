@@ -14,14 +14,25 @@ using Octokit;
 
 namespace GitReleaseNotes
 {
-    public static class ReleaseNotesGenerator
+    public class ReleaseNotesGenerator
     {
         private static readonly ILog Log = GitReleaseNotesEnvironment.Log;
 
         private static Dictionary<IssueTracker, IIssueTracker> _issueTrackers;
 
-        public static SemanticReleaseNotes GenerateReleaseNotes(Context context)
+        private readonly Context _context;
+        private readonly IFileSystem _fileSystem;
+
+        public ReleaseNotesGenerator(Context context, IFileSystem fileSystem)
         {
+            _context = context;
+            _fileSystem = fileSystem;
+        }
+
+        public SemanticReleaseNotes GenerateReleaseNotes()
+        {
+            var context = _context;
+
             using (var gitRepoContext = GetRepository(context))
             {
                 // Remote repo's require some additional preparation before first use.
@@ -104,7 +115,7 @@ namespace GitReleaseNotes
                 releaseFileWriter.OutputReleaseNotesFile(releaseNotesOutput, outputFile);
 
                 return releaseNotes;
-            }
+            }            
         }
 
         private static void CreateIssueTrackers(IRepository repository, Context context)
@@ -139,9 +150,9 @@ namespace GitReleaseNotes
             };
         }
 
-        private static GitRepositoryContext GetRepository(Context context)
+        private GitRepositoryContext GetRepository(Context context)
         {
-            var workingDir = context.WorkingDirectory ?? Directory.GetCurrentDirectory();
+            var workingDir = _fileSystem.GetRepositoryWorkingDirectory(context);
             var isRemote = !string.IsNullOrWhiteSpace(context.Repository.Url);
             var repoFactory = GetRepositoryFactory(isRemote, workingDir, context);
             var repo = repoFactory.GetRepositoryContext();

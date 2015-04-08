@@ -14,13 +14,6 @@
     margin: 10px 0 15px 0;
 }
 
-/* Set width on the form input elements since they're 100% wide by default */
-input,
-select,
-textarea {
-    max-width: 280px;
-}
-
 .tableControlButtons {
     width: 100px;
 }
@@ -55,4 +48,9 @@ nav > h3 {
 
 .top-container > .filter-container {
     order: 2;
+}
+
+textarea {
+    margin: 20px 0px 20px 0px;
+    min-height: 300px;
 }

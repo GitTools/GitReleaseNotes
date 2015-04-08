@@ -1,5 +1,8 @@
 ﻿
 
+using Catel;
+using Catel.IoC;
+
 namespace GitReleaseNotes.Website.Services
 {
     using System;
@@ -12,23 +15,39 @@ namespace GitReleaseNotes.Website.Services
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
 
         private readonly ICacheStorage<string, SemanticReleaseNotes> _releaseNotesCacheStorage =
-            new CacheStorage<string, SemanticReleaseNotes>(() => ExpirationPolicy.Duration(TimeSpan.FromHours(1))); 
+            new CacheStorage<string, SemanticReleaseNotes>(() => ExpirationPolicy.Duration(TimeSpan.FromHours(1)));
 
-        public ReleaseNotesService()
+        private readonly ITypeFactory _typeFactory;
+
+        public ReleaseNotesService(ITypeFactory typeFactory)
         {
-            
+            Argument.IsNotNull(() => typeFactory);
+
+            _typeFactory = typeFactory;
         }
 
         public SemanticReleaseNotes GetReleaseNotes(Context context)
         {
             var key = context.GetContextKey();
 
-            return _releaseNotesCacheStorage.GetFromCacheOrFetch(key, () =>
+            var cachedReleaseNotes = _releaseNotesCacheStorage.GetFromCacheOrFetch(key, () =>
             {
-                Log.Info("Generating release notes for context '{0}'", key);
+                try
+                {
+                    Log.Info("Generating release notes for context '{0}'", key);
 
-                return ReleaseNotesGenerator.GenerateReleaseNotes(context);
+                    var releaseNotesGenerator = _typeFactory.CreateInstanceWithParametersAndAutoCompletion<ReleaseNotesGenerator>(context);
+                    var releaseNotes = releaseNotesGenerator.GenerateReleaseNotes();
+                    return releaseNotes;
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Failed to generate release notes for context '{0}'", key);
+                    return null;
+                }
             });
+
+            return cachedReleaseNotes;
         }
     }
 }

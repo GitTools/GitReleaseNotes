@@ -37,8 +37,8 @@
     <button type="button" class="btn btn-lg btn-default" ng-click="useExampleValues()">Use example values</button>
     <button type="button" class="btn btn-lg btn-primary" ng-click="generateReleaseNotes()">Generate release notes</button>
 
-    <div>
-        <textarea ng-show="releaseNotes !== ''">{{releaseNotes}}</textarea>
+    <div class="form-group">
+        <textarea class="form-control" id="releaseNotes" ng-model="releaseNotes" ng-show="releaseNotes !== ''"></textarea>
     </div>
 
 </div>
