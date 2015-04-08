@@ -1,17 +1,44 @@
-﻿
-@{
-    Layout = null;
+﻿@{
+    ViewBag.Title = "Git Release Notes";
 }
 
-<!DOCTYPE html>
+<h1>Git Release Notes</h1>
 
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Home</title>
-</head>
-<body>
-    <div> 
+<div ng-controller="HomeController">
+
+    <p>
+        Generate the release notes of any public repository down here.
+    </p>
+
+    <div class="form-group">
+        <label for="repositoryUrl">Repository url</label>
+        <input type="text" class="form-control" id="repositoryUrl" value="{{repositoryUrl}}" required
+               placeholder="e.g. https://github.com/catel/catel" data-cip-id="repositoryUrl" autocomplete="off">
     </div>
-</body>
-</html>
+
+    <div class="form-group">
+        <label for="repositoryBranch">Repository branch</label>
+        <input type="text" class="form-control" id="repositoryBranch" value="{{repositoryBranch}}" required
+               placeholder="e.g. develop" data-cip-id="repositoryBranch" autocomplete="off">
+    </div>
+
+    <div class="form-group">
+        <label for="issueTrackerUrl">Issue tracker url</label>
+        <input type="text" class="form-control" id="issueTrackerUrl" value="{{issueTrackerUrl}}" required
+               placeholder="e.g. https://catelproject.atlassian.net" data-cip-id="issueTrackerUrl" autocomplete="off">
+    </div>
+
+    <div class="form-group">
+        <label for="issueTrackerProjectId">Issue tracker project id</label>
+        <input type="text" class="form-control" id="issueTrackerProjectId" value="{{issueTrackerProjectId}}"
+               placeholder="e.g. CTL" data-cip-id="issueTrackerProjectId" autocomplete="off">
+    </div>
+
+    <button type="button" class="btn btn-lg btn-default" ng-click="useExampleValues()">Use example values</button>
+    <button type="button" class="btn btn-lg btn-primary" ng-click="generateReleaseNotes()">Generate release notes</button>
+
+    <div>
+        <textarea ng-show="releaseNotes !== ''">{{releaseNotes}}</textarea>
+    </div>
+
+</div>

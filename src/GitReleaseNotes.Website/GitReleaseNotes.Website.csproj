@@ -128,6 +128,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="content\angular\app.js" />
+    <Content Include="content\angular\components\home\controllers\HomeController.js" />
+    <Content Include="content\angular\services\ReleaseNotesService.js" />
     <Content Include="content\fonts\fontawesome-webfont.svg" />
     <Content Include="content\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="content\scripts\bootstrap-datepicker.js" />
@@ -213,10 +215,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="content\angular\components\" />
     <Folder Include="content\angular\directives\" />
     <Folder Include="content\angular\mixins\" />
-    <Folder Include="content\angular\services\" />
     <Folder Include="content\img\" />
     <Folder Include="content\templates\" />
   </ItemGroup>

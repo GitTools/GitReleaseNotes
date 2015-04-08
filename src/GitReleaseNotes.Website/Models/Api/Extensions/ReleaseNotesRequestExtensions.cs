@@ -6,7 +6,7 @@
         {
             var context = new Context();
 
-            context.ProjectId = releaseNotesRequest.ProjectId;
+            context.ProjectId = releaseNotesRequest.IssueTrackerProjectId;
 
             context.Repository.Url = releaseNotesRequest.RepositoryUrl;
             context.Repository.Branch = releaseNotesRequest.RepositoryBranch;

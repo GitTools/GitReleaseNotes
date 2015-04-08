@@ -24,7 +24,7 @@ namespace GitReleaseNotes.Website.Controllers.Api
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<HttpResponseMessage> Validate([FromBody] ReleaseNotesRequest releaseNotesRequest)
+        public async Task<HttpResponseMessage> Generate([FromBody] ReleaseNotesRequest releaseNotesRequest)
         {
             Argument.IsNotNull(() => releaseNotesRequest);
 

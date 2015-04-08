@@ -38,9 +38,9 @@
             bundles.Add(new ScriptBundle("~/content/angular/scriptsbundle")
                 .Include("~/content/angular/app.js")
                 //.IncludeDirectory("~/content/angular/directives", "*.js", true)
-                //.IncludeDirectory("~/content/angular/services", "*.js", true)
+                .IncludeDirectory("~/content/angular/services", "*.js", true)
                 //.IncludeDirectory("~/content/angular/mixins", "*.js", true)
-                //.IncludeDirectory("~/content/angular/components", "*.js", true)
+                .IncludeDirectory("~/content/angular/components", "*.js", true)
                 );
         }
 
