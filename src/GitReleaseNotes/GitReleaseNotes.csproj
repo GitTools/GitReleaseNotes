@@ -140,8 +140,15 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="..\..\..\GitReleaseNotes\src\packages\LibGit2Sharp.0.21.0.176\lib\net40\NativeBinaries\amd64\git2-e0902fb.dll">
+      <Link>costura64\git2-e0902fb.dll</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\..\GitReleaseNotes\src\packages\LibGit2Sharp.0.21.0.176\lib\net40\NativeBinaries\x86\git2-e0902fb.dll">
+      <Link>costura32\git2-e0902fb.dll</Link>
+    </EmbeddedResource>
     <Content Include="FodyWeavers.xml" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
