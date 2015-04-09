@@ -91,7 +91,7 @@
     <Compile Include="Git\GitLocalRepositoryContextFactory.cs" />
     <Compile Include="Git\GitRemoteRepositoryContextFactory.cs" />
     <Compile Include="Git\GitRepositoryContext.cs" />
-    <Compile Include="Git\IGitRepositoryContextFactory.cs" />
+    <Compile Include="Git\Interfaces\IGitRepositoryContextFactory.cs" />
     <Compile Include="Models\Interfaces\IReleaseNoteLine.cs" />
     <Compile Include="IssueTrackers\BitBucket\BitBucketIssueTracker.cs" />
     <Compile Include="IssueTrackers\BitBucket\IBitBucketApi.cs" />
@@ -101,7 +101,7 @@
     <Compile Include="ReleaseFinder.cs" />
     <Compile Include="FileSystem\FileSystem.cs" />
     <Compile Include="FileSystem\Interfaces\IFileSystem.cs" />
-    <Compile Include="Logging\ILog.cs" />
+    <Compile Include="Logging\Interfaces\ILog.cs" />
     <Compile Include="IssueTrackers\GitHub\GitHubIssueTracker.cs" />
     <Compile Include="GitReleaseNotesArguments.cs" />
     <Compile Include="Git\GitDirFinder.cs" />
