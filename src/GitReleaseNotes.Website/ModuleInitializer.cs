@@ -1,6 +1,7 @@
 ﻿using Catel.IoC;
 using GitReleaseNotes;
 using GitReleaseNotes.FileSystem;
+using GitReleaseNotes.IssueTrackers;
 using GitReleaseNotes.Website.Services;
 using FileSystem = GitReleaseNotes.Website.Services.FileSystem;
 
@@ -18,5 +19,6 @@ public static class ModuleInitializer
 
         serviceLocator.RegisterType<IReleaseNotesService, ReleaseNotesService>();
         serviceLocator.RegisterType<IFileSystem, FileSystem>();
+        serviceLocator.RegisterType<IIssueTrackerFactory, IssueTrackerFactory>();
     }
 }
