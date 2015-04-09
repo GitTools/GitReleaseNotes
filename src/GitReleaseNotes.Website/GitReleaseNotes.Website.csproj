@@ -197,6 +197,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="IoC\CatelWebApiDependencyResolver.cs" />
+    <Compile Include="Logging\GitReleaseNotesLogger.cs" />
     <Compile Include="Models\Api\Extensions\ReleaseNotesRequestExtensions.cs" />
     <Compile Include="Models\Api\Response.cs" />
     <Compile Include="Models\Api\ReleaseNotesRequest.cs" />
