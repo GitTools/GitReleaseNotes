@@ -33,6 +33,11 @@ namespace GitReleaseNotes.FileSystem
             return File.ReadAllText(path);
         }
 
+        public virtual bool DirectoryExists(string path)
+        {
+            return Directory.Exists(path);
+        }
+
         public virtual bool FileExists(string path)
         {
             return File.Exists(path);

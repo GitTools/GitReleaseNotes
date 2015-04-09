@@ -24,55 +24,40 @@ namespace GitReleaseNotes.Git
 
             var gitRootDirectory = Path.Combine(args.DestinationPath);
             var gitDirectory = Path.Combine(gitRootDirectory, ".git");
-            if (Directory.Exists(gitDirectory))
-            {
-                Log.WriteLine("Deleting existing .git folder from '{0}' to force new checkout from url", gitDirectory);
-                DeleteGitDirectory(gitDirectory);
-            }
 
             var credentials = args.Credentials;
 
-            Log.WriteLine("Retrieving git info from url '{0}'", args.Url);
-
-            var cloneOptions = new CloneOptions();
-            cloneOptions.IsBare = true;
-            cloneOptions.Checkout = false;
-            cloneOptions.CredentialsProvider = (url, usernameFromUrl, types) => credentials;
-
-            var repoPath = Repository.Clone(args.Url, gitDirectory, cloneOptions);
-            var repository = new Repository(repoPath);
-            var repoContext = new GitRepositoryContext(repository, credentials, true, args.Url, fileSystem);
-            return repoContext;
-        }
-
-        /// <summary>
-        /// Deletes a .Git directory and all of it's contents.
-        /// </summary>
-        /// <param name="path"></param>
-        private static void DeleteGitDirectory(string path)
-        {
-            var directory = new DirectoryInfo(path)
+            if (fileSystem.DirectoryExists(gitDirectory))
             {
-                Attributes = FileAttributes.Normal
-            };
+                Log.WriteLine("Git repository already exists, using existing instance from url '{0}'", args.Url);
 
-            if (directory.Name != ".git")
-            {
-                throw new ArgumentException("Cannot delete a diretory that isn't a git repository.");
+                var repository = new Repository(gitDirectory);
+                var repoContext = new GitRepositoryContext(repository, credentials, true, args.Url, fileSystem);
+                return repoContext;
             }
-
-            foreach (var info in directory.GetFileSystemInfos("*", SearchOption.AllDirectories))
+            else
             {
-                info.Attributes = FileAttributes.Normal;
-            }
+                Log.WriteLine("Cloning git repository from url '{0}'", args.Url);
 
-            directory.Delete(true);
+                var cloneOptions = new CloneOptions
+                {
+                    IsBare = true,
+                    Checkout = false,
+                    CredentialsProvider = (url, usernameFromUrl, types) => credentials
+                };
+
+                var repoPath = Repository.Clone(args.Url, gitDirectory, cloneOptions);
+                var repository = new Repository(repoPath);
+                var repoContext = new GitRepositoryContext(repository, credentials, true, args.Url, fileSystem);
+                return repoContext;
+            }
         }
 
         public class RemoteRepoArgs
         {
             public string DestinationPath { get; set; }
             public string Url { get; set; }
+            public string Branch { get; set; }
             public Credentials Credentials { get; set; }
 
             internal void Validate()
@@ -95,4 +80,3 @@ namespace GitReleaseNotes.Git
         }
     }
 }
-

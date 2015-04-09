@@ -100,7 +100,7 @@
     <Compile Include="Logging\CustomLog.cs" />
     <Compile Include="ReleaseFinder.cs" />
     <Compile Include="FileSystem\FileSystem.cs" />
-    <Compile Include="FileSystem\IFileSystem.cs" />
+    <Compile Include="FileSystem\Interfaces\IFileSystem.cs" />
     <Compile Include="Logging\ILog.cs" />
     <Compile Include="IssueTrackers\GitHub\GitHubIssueTracker.cs" />
     <Compile Include="GitReleaseNotesArguments.cs" />

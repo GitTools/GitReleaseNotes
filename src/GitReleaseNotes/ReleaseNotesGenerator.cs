@@ -167,8 +167,9 @@ namespace GitReleaseNotes
                 // clone repo from the remote url
                 var cloneRepoArgs = new GitRemoteRepositoryContextFactory.RemoteRepoArgs();
                 cloneRepoArgs.Url = context.Repository.Url;
-                var credentials = new UsernamePasswordCredentials();
+                cloneRepoArgs.Branch = context.Repository.Branch;
 
+                var credentials = new UsernamePasswordCredentials();
                 credentials.Username = context.Repository.Username;
                 credentials.Password = context.Repository.Password;
 
