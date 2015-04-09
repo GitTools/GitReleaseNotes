@@ -27,7 +27,7 @@ namespace GitReleaseNotes.Tests
             remoteArgs.DestinationPath = desinationDirForClone;          
             remoteArgs.Url = testOriginRepo.Info.Path; // This could be the Url of the git repo, but as this is a unit test, we are using a local file path.
           
-            var remoteRepoContextFactory = new GitRemoteRepositoryContextFactory(remoteArgs);
+            var remoteRepoContextFactory = new GitRemoteRepositoryContextFactory(remoteArgs, new FileSystem.FileSystem());
 
             // Act
             using (var repoContext = remoteRepoContextFactory.GetRepositoryContext())
@@ -66,7 +66,7 @@ namespace GitReleaseNotes.Tests
                 remoteArgs.Url = testOriginRepo.Info.Path; // This could be the Url of the git repo, but as this is a unit test, we are using a local file path.
 
                 // This is the sut.
-                var remoteRepoContextFactory = new GitRemoteRepositoryContextFactory(remoteArgs);
+                var remoteRepoContextFactory = new GitRemoteRepositoryContextFactory(remoteArgs, new FileSystem.FileSystem());
 
                 using (var repoContext = remoteRepoContextFactory.GetRepositoryContext())
                 {
@@ -116,7 +116,7 @@ namespace GitReleaseNotes.Tests
                 remoteArgs.DestinationPath = desinationDirForClone;
                 remoteArgs.Url = testOriginRepo.Info.Path; // This could be the Url of the git repo, but as this is a unit test, we are using a local file path.
               
-                var remoteRepoContextFactory = new GitRemoteRepositoryContextFactory(remoteArgs);
+                var remoteRepoContextFactory = new GitRemoteRepositoryContextFactory(remoteArgs, new FileSystem.FileSystem());
                 using (var repoContext = remoteRepoContextFactory.GetRepositoryContext())
                 {                    
                     repoContext.PrepareRemoteRepoForUse(branchName);

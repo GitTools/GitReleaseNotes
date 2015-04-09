@@ -33,7 +33,7 @@ namespace GitReleaseNotes
         {
             var context = _context;
 
-            using (var gitRepoContext = GetRepository(context))
+            using (var gitRepoContext = GetRepository(context, _fileSystem))
             {
                 // Remote repo's require some additional preparation before first use.
                 if (gitRepoContext.IsRemote)
@@ -47,7 +47,7 @@ namespace GitReleaseNotes
 
                 var gitRepo = gitRepoContext.Repository;
 
-                CreateIssueTrackers(gitRepo, context);
+                CreateIssueTrackers(gitRepo, context, _fileSystem);
 
                 IIssueTracker issueTracker = null;
                 if (context.IssueTracker == null)
@@ -74,8 +74,7 @@ namespace GitReleaseNotes
                     throw new GitReleaseNotesException("Argument verification failed");
                 }
 
-                var fileSystem = new FileSystem.FileSystem();
-                var releaseFileWriter = new ReleaseFileWriter(fileSystem);
+                var releaseFileWriter = new ReleaseFileWriter(_fileSystem);
                 string outputFile = null;
                 var previousReleaseNotes = new SemanticReleaseNotes();
 
@@ -91,7 +90,7 @@ namespace GitReleaseNotes
                     outputFile = Path.IsPathRooted(context.OutputFile)
                         ? context.OutputFile
                         : Path.Combine(outputPath, context.OutputFile);
-                    previousReleaseNotes = new ReleaseNotesFileReader(fileSystem, outputPath).ReadPreviousReleaseNotes(outputFile);
+                    previousReleaseNotes = new ReleaseNotesFileReader(_fileSystem, outputPath).ReadPreviousReleaseNotes(outputFile);
                 }
 
                 var categories = new Categories(context.Categories, context.AllLabels);
@@ -118,7 +117,7 @@ namespace GitReleaseNotes
             }            
         }
 
-        private static void CreateIssueTrackers(IRepository repository, Context context)
+        private static void CreateIssueTrackers(IRepository repository, Context context, IFileSystem fileSystem)
         {
             _issueTrackers = new Dictionary<IssueTracker, IIssueTracker>
             {
@@ -150,17 +149,17 @@ namespace GitReleaseNotes
             };
         }
 
-        private GitRepositoryContext GetRepository(Context context)
+        private GitRepositoryContext GetRepository(Context context, IFileSystem fileSystem)
         {
             var workingDir = _fileSystem.GetRepositoryWorkingDirectory(context);
             var isRemote = !string.IsNullOrWhiteSpace(context.Repository.Url);
-            var repoFactory = GetRepositoryFactory(isRemote, workingDir, context);
+            var repoFactory = GetRepositoryFactory(isRemote, workingDir, context, fileSystem);
             var repo = repoFactory.GetRepositoryContext();
 
             return repo;
         }
 
-        private static IGitRepositoryContextFactory GetRepositoryFactory(bool isRemote, string workingDir, Context context)
+        private static IGitRepositoryContextFactory GetRepositoryFactory(bool isRemote, string workingDir, Context context, IFileSystem fileSystem)
         {
             IGitRepositoryContextFactory gitRepoFactory = null;
             if (isRemote)
@@ -177,11 +176,11 @@ namespace GitReleaseNotes
                 cloneRepoArgs.DestinationPath = workingDir;
 
                 Log.WriteLine("Cloning a git repo from {0}", cloneRepoArgs.Url);
-                gitRepoFactory = new GitRemoteRepositoryContextFactory(cloneRepoArgs);
+                gitRepoFactory = new GitRemoteRepositoryContextFactory(cloneRepoArgs, fileSystem);
             }
             else
             {
-                gitRepoFactory = new GitLocalRepositoryContextFactory(workingDir);
+                gitRepoFactory = new GitLocalRepositoryContextFactory(workingDir, fileSystem);
             }
 
             return gitRepoFactory;

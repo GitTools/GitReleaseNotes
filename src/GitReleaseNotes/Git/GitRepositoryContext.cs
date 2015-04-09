@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GitReleaseNotes.FileSystem;
 
 namespace GitReleaseNotes.Git
 {
@@ -19,13 +20,15 @@ namespace GitReleaseNotes.Git
         private bool isRemote;
         private Credentials credentials;
         private string repoUrl;
+        private readonly IFileSystem fileSystem;
 
-        public GitRepositoryContext(IRepository repository, Credentials credentials, bool isRemote, string repoUrl)
+        public GitRepositoryContext(IRepository repository, Credentials credentials, bool isRemote, string repoUrl, IFileSystem fileSystem)
         {
             this.repository = repository;
             this.isRemote = isRemote;
             this.credentials = credentials;
-            this.repoUrl = repoUrl;           
+            this.repoUrl = repoUrl;
+            this.fileSystem = fileSystem;
         }
 
         public IRepository Repository { get { return repository; } }
@@ -35,16 +38,13 @@ namespace GitReleaseNotes.Git
         /// <summary>
         /// Prepares the git repository for first use.
         /// </summary>
-        /// <param name="repo"></param>
-        /// <param name="credentials"></param>
-        /// <param name="branchName"></param>
-        /// <param name="url"></param>
+        /// <param name="branchName">Name of the branch.</param>
         public void PrepareRemoteRepoForUse(string branchName)
         {
             // Normalize (download branches) before using the branch
-            this.NormalizeGitDirectory();
+            NormalizeGitDirectory();
 
-            string targetBranch = branchName;
+            var targetBranch = branchName;
             if (string.IsNullOrWhiteSpace(branchName))
             {
                 targetBranch = Repository.Head.Name;
@@ -64,9 +64,9 @@ namespace GitReleaseNotes.Git
                 if (remoteReference != null)
                 {
                     Repository.Network.Fetch(repoUrl, new[]
-                            {
-                                string.Format("{0}:{1}", remoteReference.CanonicalName, targetBranch)
-                            });
+                    {
+                        string.Format("{0}:{1}", remoteReference.CanonicalName, targetBranch)
+                    });
 
                     newHead = Repository.Refs[string.Format("refs/heads/{0}", targetBranch)];
                 }
@@ -86,7 +86,7 @@ namespace GitReleaseNotes.Git
                 return;
             }
 
-            Log.WriteLine("Checking out files that might be needed later.");
+            Log.WriteLine("Checking out files that might be needed later");
 
             foreach (var fileName in fileNames)
             {
@@ -108,7 +108,7 @@ namespace GitReleaseNotes.Git
                     {
                         using (var streamReader = new BinaryReader(stream))
                         {
-                            File.WriteAllBytes(fullPath, streamReader.ReadBytes((int)stream.Length));
+                            this.fileSystem.WriteAllBytes(fullPath, streamReader.ReadBytes((int)stream.Length));
                         }
                     }
                 }
@@ -145,7 +145,7 @@ namespace GitReleaseNotes.Git
             var targetBranchName = branchNameInfo.GetCanonicalBranchName();
             var remoteReferences = repository.Network.ListReferences(repoUrl);
             return remoteReferences.FirstOrDefault(remoteRef => string.Equals(remoteRef.CanonicalName, targetBranchName));
-        }       
+        }
 
         public void Dispose()
         {
@@ -163,7 +163,7 @@ namespace GitReleaseNotes.Git
             var remote = EnsureSingleRemoteIsDefined();
             EnsureRepoHasRefSpecs(remote);
 
-            Log.WriteLine("Fetching from remote '{0}' using the following refspecs: {1}.",
+            Log.WriteLine("Fetching from remote '{0}' using the following refspecs: {1}",
                 remote.Name, string.Join(", ", remote.FetchRefSpecs.Select(r => r.Specification)));
 
             var fetchOptions = new FetchOptions();
@@ -175,11 +175,11 @@ namespace GitReleaseNotes.Git
 
             if (!Repository.Info.IsHeadDetached)
             {
-                Log.WriteLine("HEAD points at branch '{0}'.", headSha);
+                Log.WriteLine("HEAD points at branch '{0}'", headSha);
                 return;
             }
 
-            Log.WriteLine("HEAD is detached and points at commit '{0}'.", headSha);
+            Log.WriteLine("HEAD is detached and points at commit '{0}'", headSha);
 
             // In order to decide whether a fake branch is required or not, first check to see if any local branches have the same commit SHA of the head SHA.
             // If they do, go ahead and checkout that branch
@@ -189,18 +189,18 @@ namespace GitReleaseNotes.Git
             if (localBranchesWhereCommitShaIsHead.Count > 1)
             {
                 var names = string.Join(", ", localBranchesWhereCommitShaIsHead.Select(r => r.CanonicalName));
-                var message = string.Format("Found more than one local branch pointing at the commit '{0}'. Unable to determine which one to use ({1}).", headSha, names);
+                var message = string.Format("Found more than one local branch pointing at the commit '{0}'. Unable to determine which one to use ({1})", headSha, names);
                 throw new InvalidOperationException(message);
             }
 
             if (localBranchesWhereCommitShaIsHead.Count == 0)
             {
-                Log.WriteLine("No local branch pointing at the commit '{0}'. Fake branch needs to be created.", headSha);
+                Log.WriteLine("No local branch pointing at the commit '{0}'. Fake branch needs to be created", headSha);
                 CreateFakeBranchPointingAtThePullRequestTip();
             }
             else
             {
-                Log.WriteLine("Checking out local branch 'refs/heads/{0}'.", localBranchesWhereCommitShaIsHead[0].Name);
+                Log.WriteLine("Checking out local branch 'refs/heads/{0}'", localBranchesWhereCommitShaIsHead[0].Name);
                 Repository.Branches[localBranchesWhereCommitShaIsHead[0].Name].Checkout();
             }
         }
@@ -216,32 +216,32 @@ namespace GitReleaseNotes.Git
 
             if (refs.Count == 0)
             {
-                var message = string.Format("Couldn't find any remote tips from remote '{0}' pointing at the commit '{1}'.", remote.Url, headTipSha);
+                var message = string.Format("Couldn't find any remote tips from remote '{0}' pointing at the commit '{1}'", remote.Url, headTipSha);
                 throw new GitReleaseNotesException(message);
             }
 
             if (refs.Count > 1)
             {
                 var names = string.Join(", ", refs.Select(r => r.CanonicalName));
-                var message = string.Format("Found more than one remote tip from remote '{0}' pointing at the commit '{1}'. Unable to determine which one to use ({2}).", remote.Url, headTipSha, names);
+                var message = string.Format("Found more than one remote tip from remote '{0}' pointing at the commit '{1}'. Unable to determine which one to use ({2})", remote.Url, headTipSha, names);
                 throw new GitReleaseNotesException(message);
             }
 
             var canonicalName = refs[0].CanonicalName;
-            Log.WriteLine("Found remote tip '{0}' pointing at the commit '{1}'.", canonicalName, headTipSha);
+            Log.WriteLine("Found remote tip '{0}' pointing at the commit '{1}'", canonicalName, headTipSha);
 
             if (!canonicalName.StartsWith("refs/pull/") && !canonicalName.StartsWith("refs/pull-requests/"))
             {
-                var message = string.Format("Remote tip '{0}' from remote '{1}' doesn't look like a valid pull request.", canonicalName, remote.Url);
+                var message = string.Format("Remote tip '{0}' from remote '{1}' doesn't look like a valid pull request", canonicalName, remote.Url);
                 throw new GitReleaseNotesException(message);
             }
 
             var fakeBranchName = canonicalName.Replace("refs/pull/", "refs/heads/pull/").Replace("refs/pull-requests/", "refs/heads/pull-requests/");
 
-            Log.WriteLine("Creating fake local branch '{0}'.", fakeBranchName);
+            Log.WriteLine("Creating fake local branch '{0}'", fakeBranchName);
             Repository.Refs.Add(fakeBranchName, new ObjectId(headTipSha));
 
-            Log.WriteLine("Checking local branch '{0}' out.", fakeBranchName);
+            Log.WriteLine("Checking local branch '{0}' out", fakeBranchName);
             Repository.Checkout(fakeBranchName);
         }
 
@@ -261,11 +261,11 @@ namespace GitReleaseNotes.Git
 
                 if (Repository.Refs.Any(x => x.CanonicalName == localCanonicalName))
                 {
-                    Log.WriteLine("Skipping local branch creation since it already exists '{0}'.", remoteTrackingReference.CanonicalName);
+                    Log.WriteLine("Skipping local branch creation since it already exists '{0}'", remoteTrackingReference.CanonicalName);
                     continue;
                 }
 
-                Log.WriteLine("Creating local branch from remote tracking '{0}'.", remoteTrackingReference.CanonicalName);
+                Log.WriteLine("Creating local branch from remote tracking '{0}'", remoteTrackingReference.CanonicalName);
 
                 var symbolicReference = remoteTrackingReference as SymbolicReference;
                 if (symbolicReference == null)
@@ -295,7 +295,6 @@ namespace GitReleaseNotes.Git
         {
             var remotes = Repository.Network.Remotes;
             var howMany = remotes.Count();
-
             if (howMany == 1)
             {
                 var remote = remotes.Single();

@@ -23,6 +23,11 @@ namespace GitReleaseNotes.FileSystem
             File.WriteAllText(path, contents);
         }
 
+        public virtual void WriteAllBytes(string path, byte[] contents)
+        {
+            File.WriteAllBytes(path, contents);
+        }
+
         public virtual string ReadAllText(string path)
         {
             return File.ReadAllText(path);

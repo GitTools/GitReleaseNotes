@@ -1,19 +1,21 @@
 ﻿using System;
 using System.IO;
+using GitReleaseNotes.FileSystem;
 using LibGit2Sharp;
 
 namespace GitReleaseNotes.Git
 {
-
     public class GitRemoteRepositoryContextFactory : IGitRepositoryContextFactory
     {
         private static readonly ILog Log = GitReleaseNotesEnvironment.Log;
 
         private readonly RemoteRepoArgs args;
+        private readonly IFileSystem fileSystem;
 
-        public GitRemoteRepositoryContextFactory(RemoteRepoArgs args)
+        public GitRemoteRepositoryContextFactory(RemoteRepoArgs args, IFileSystem fileSystem)
         {
             this.args = args;
+            this.fileSystem = fileSystem;
         }
 
         public GitRepositoryContext GetRepositoryContext()
@@ -39,7 +41,7 @@ namespace GitReleaseNotes.Git
 
             var repoPath = Repository.Clone(args.Url, gitDirectory, cloneOptions);
             var repository = new Repository(repoPath);
-            var repoContext = new GitRepositoryContext(repository, credentials, true, args.Url);
+            var repoContext = new GitRepositoryContext(repository, credentials, true, args.Url, fileSystem);
             return repoContext;
         }
 
