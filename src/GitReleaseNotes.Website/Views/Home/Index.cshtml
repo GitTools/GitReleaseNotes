@@ -12,26 +12,26 @@
 
     <div class="form-group">
         <label for="repositoryUrl">Repository url</label>
-        <input type="text" class="form-control" id="repositoryUrl" value="{{repositoryUrl}}" required
-               placeholder="e.g. https://github.com/catel/catel" data-cip-id="repositoryUrl" autocomplete="off">
+        <input type="text" class="form-control" id="repositoryUrl" ng-model="repositoryUrl"
+               placeholder="e.g. https://github.com/catel/catel" autocomplete="off">
     </div>
 
     <div class="form-group">
         <label for="repositoryBranch">Repository branch</label>
-        <input type="text" class="form-control" id="repositoryBranch" value="{{repositoryBranch}}" required
-               placeholder="e.g. develop" data-cip-id="repositoryBranch" autocomplete="off">
+        <input type="text" class="form-control" id="repositoryBranch" ng-model="repositoryBranch"
+               placeholder="e.g. develop" autocomplete="off">
     </div>
 
     <div class="form-group">
         <label for="issueTrackerUrl">Issue tracker url</label>
-        <input type="text" class="form-control" id="issueTrackerUrl" value="{{issueTrackerUrl}}" required
-               placeholder="e.g. https://catelproject.atlassian.net" data-cip-id="issueTrackerUrl" autocomplete="off">
+        <input type="text" class="form-control" id="issueTrackerUrl" ng-model="issueTrackerUrl"
+               placeholder="e.g. https://catelproject.atlassian.net" autocomplete="off">
     </div>
 
     <div class="form-group">
         <label for="issueTrackerProjectId">Issue tracker project id</label>
-        <input type="text" class="form-control" id="issueTrackerProjectId" value="{{issueTrackerProjectId}}"
-               placeholder="e.g. CTL" data-cip-id="issueTrackerProjectId" autocomplete="off">
+        <input type="text" class="form-control" id="issueTrackerProjectId" ng-model="issueTrackerProjectId"
+               placeholder="e.g. CTL" autocomplete="off">
     </div>
 
     <button type="button" class="btn btn-lg btn-default" ng-click="useExampleValues()">Use example values</button>
