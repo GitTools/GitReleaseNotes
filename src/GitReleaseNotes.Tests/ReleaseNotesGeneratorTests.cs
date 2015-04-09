@@ -13,6 +13,8 @@ namespace GitReleaseNotes.Tests
         [Fact]
         public void AllTagsWithNoCommitsOrIssuesAfterLastRelease()
         {
+            var context = new Context(new JiraContext());
+
             IRepository repo;
             IIssueTracker issueTracker;
             new TestDataCreator(new DateTimeOffset(2012, 1, 1, 0, 0, 0, new TimeSpan()))
@@ -23,9 +25,9 @@ namespace GitReleaseNotes.Tests
             var tagToStartFrom = GitRepositoryInfoFinder.GetFirstCommit(repo);
             var currentReleaseInfo = GitRepositoryInfoFinder.GetCurrentReleaseInfo(repo); 
 
-            var releaseNotes = ReleaseNotesGenerator.GenerateReleaseNotes(
+            var releaseNotes = ReleaseNotesGenerator.GenerateReleaseNotes(context,
                 repo, issueTracker, new SemanticReleaseNotes(), new Categories(),
-                tagToStartFrom, currentReleaseInfo, issueTracker.DiffUrlFormat);
+                tagToStartFrom, currentReleaseInfo);
 
             Approvals.Verify(releaseNotes.ToString(), Scrubber);
         }
@@ -33,6 +35,8 @@ namespace GitReleaseNotes.Tests
         [Fact]
         public void AllTags()
         {
+            var context = new Context(new JiraContext());
+
             IRepository repo;
             IIssueTracker issueTracker;
             new TestDataCreator(new DateTimeOffset(2012, 1, 1, 0, 0, 0, new TimeSpan()))
@@ -44,9 +48,9 @@ namespace GitReleaseNotes.Tests
             var tagToStartFrom = GitRepositoryInfoFinder.GetFirstCommit(repo);
             var currentReleaseInfo = GitRepositoryInfoFinder.GetCurrentReleaseInfo(repo); 
 
-            var releaseNotes = ReleaseNotesGenerator.GenerateReleaseNotes(
+            var releaseNotes = ReleaseNotesGenerator.GenerateReleaseNotes(context, 
                 repo, issueTracker, new SemanticReleaseNotes(), new Categories(),
-                tagToStartFrom, currentReleaseInfo, string.Empty);
+                tagToStartFrom, currentReleaseInfo);
 
             Approvals.Verify(releaseNotes.ToString(), Scrubber);
         }
@@ -54,6 +58,8 @@ namespace GitReleaseNotes.Tests
         [Fact(Skip = "To fix")]
         public void AppendOnlyNewItems()
         {
+            var context = new Context(new JiraContext());
+
             IRepository repo;
             IIssueTracker issueTracker;
             new TestDataCreator(new DateTimeOffset(2012, 1, 1, 0, 0, 0, new TimeSpan()))
@@ -85,9 +91,9 @@ Commits:  AC39885536...CA74E870F2
 
 Commits: E413A880DB...F6924D7A0B");
 
-            var releaseNotes = ReleaseNotesGenerator.GenerateReleaseNotes(
+            var releaseNotes = ReleaseNotesGenerator.GenerateReleaseNotes(context,
                 repo, issueTracker, previousReleaseNotes, new Categories(),
-                tagToStartFrom, currentReleaseInfo, string.Empty);
+                tagToStartFrom, currentReleaseInfo);
 
             Approvals.Verify(releaseNotes.ToString(), Scrubber);
         }
@@ -95,6 +101,7 @@ Commits: E413A880DB...F6924D7A0B");
         [Fact(Skip = "To fix")]
         public void KeepsCustomisations()
         {
+            var context = new Context(new JiraContext());
 
             IRepository repo;
             IIssueTracker issueTracker;
@@ -142,9 +149,9 @@ Which spans multiple lines
 
 Commits: E413A880DB...F6924D7A0B");
 
-            var releaseNotes = ReleaseNotesGenerator.GenerateReleaseNotes(
+            var releaseNotes = ReleaseNotesGenerator.GenerateReleaseNotes(context,
                 repo, issueTracker, previousReleaseNotes, new Categories(),
-                tagToStartFrom, currentReleaseInfo, "url/{0}...{1}");
+                tagToStartFrom, currentReleaseInfo);
 
             Approvals.Verify(releaseNotes.ToString(), Scrubber);
         }

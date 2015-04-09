@@ -8,51 +8,18 @@ namespace GitReleaseNotes.IssueTrackers.Jira
     {
         private static readonly ILog Log = GitReleaseNotesEnvironment.Log;
 
-        private readonly Context context;
-        private readonly IJiraApi jiraApi;
+        private readonly Context _context;
+        private readonly IJiraApi _jiraApi;
 
         public JiraIssueTracker(IJiraApi jiraApi, Context context)
         {
-            this.jiraApi = jiraApi;
-            this.context = context;
+            _jiraApi = jiraApi;
+            _context = context;
         }
 
-        public bool VerifyArgumentsAndWriteErrorsToLog()
+        public IEnumerable<OnlineIssue> GetClosedIssues(IIssueTrackerContext context, DateTimeOffset? since)
         {
-            if (string.IsNullOrEmpty(context.Jira.JiraServer) ||
-                !Uri.IsWellFormedUriString(context.Jira.JiraServer, UriKind.Absolute))
-            {
-                Log.WriteLine("A valid Jira server must be specified [/JiraServer ]");
-                return false;
-            }
-
-            if (string.IsNullOrEmpty(context.ProjectId))
-            {
-                Log.WriteLine("/ProjectId is a required parameter for Jira");
-                return false;
-            }
-
-            if (string.IsNullOrEmpty(context.Authentication.Username))
-            {
-                Log.WriteLine("/Username is a required to authenticate with Jira");
-                return false;
-            }
-
-            if (string.IsNullOrEmpty(context.Authentication.Password))
-            {
-                Log.WriteLine("/Password is a required to authenticate with Jira");
-                return false;
-            }
-
-            return true;
+            return _jiraApi.GetClosedIssues(context, since).ToArray();
         }
-
-        public IEnumerable<OnlineIssue> GetClosedIssues(DateTimeOffset? since)
-        {
-            return jiraApi.GetClosedIssues(context, since).ToArray();
-        }
-
-        public bool RemotePresentWhichMatches { get { return false; }}
-        public string DiffUrlFormat { get { return string.Empty; } }
     }
 }

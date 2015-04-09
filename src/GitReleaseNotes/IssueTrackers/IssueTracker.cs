@@ -2,12 +2,13 @@ namespace GitReleaseNotes.IssueTrackers
 {
     public enum IssueTracker
     {
-        Unknown,
-
+        BitBucket,
         GitHub,
         Jira,
         YouTrack,
-        BitBucket,
+        
        //TODO Tfs
+
+        Unknown,
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using Args;
 using Args.Help;
 using Args.Help.Formatters;
+using GitReleaseNotes.IssueTrackers;
 
 namespace GitReleaseNotes
 {
@@ -29,18 +30,15 @@ namespace GitReleaseNotes
             var exitCode = 0;
 
             var arguments = modelBindingDefinition.CreateAndBind(args);
-
-            // TODO: Convert to context verification (we need the context to be valid, not the arguments)
-            if (!ArgumentVerifier.VerifyArguments(arguments))
-            {
-                return 1;
-            }
-
             var context = arguments.ToContext();
+            if (!context.Validate())
+            {
+                return -1;
+            }
 
             try
             {
-                var releaseNotesGenerator = new ReleaseNotesGenerator(context, new FileSystem.FileSystem());
+                var releaseNotesGenerator = new ReleaseNotesGenerator(context, new FileSystem.FileSystem(), new IssueTrackerFactory());
                 releaseNotesGenerator.GenerateReleaseNotes();
 
                 Log.WriteLine("Done");

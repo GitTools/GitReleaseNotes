@@ -13,7 +13,7 @@ namespace GitReleaseNotes.Tests.IssueTrackers.Jira
         public JiraIssueTrackerTests()
         {
             _jiraApi = Substitute.For<IJiraApi>();
-            _sut = new JiraIssueTracker(_jiraApi, new Context());
+            _sut = new JiraIssueTracker(_jiraApi, new Context(new JiraContext()));
         }
 
         //[Fact]

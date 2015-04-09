@@ -1,7 +1,7 @@
-using System;
-
 namespace GitReleaseNotes.IssueTrackers
 {
+    using System;
+
     public class OnlineIssue
     {
         public OnlineIssue(string id, DateTimeOffset dateClosed)

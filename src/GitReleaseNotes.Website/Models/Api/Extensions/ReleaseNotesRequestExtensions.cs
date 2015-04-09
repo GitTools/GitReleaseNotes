@@ -4,33 +4,47 @@
     {
         public static Context ToContext(this ReleaseNotesRequest releaseNotesRequest)
         {
-            var context = new Context();
-
-            context.ProjectId = releaseNotesRequest.IssueTrackerProjectId;
-
-            context.Repository.Url = releaseNotesRequest.RepositoryUrl;
-            context.Repository.Branch = releaseNotesRequest.RepositoryBranch;
+            IIssueTrackerContext issueTrackerContext = null;
 
             var lowercaseUrl = releaseNotesRequest.IssueTrackerUrl.ToLower();
             if (lowercaseUrl.Contains("bitbucket"))
             {
-                context.BitBucket.Repo = releaseNotesRequest.IssueTrackerUrl;
+                issueTrackerContext = new BitBucketContext
+                {
+                    Url = releaseNotesRequest.IssueTrackerUrl
+                };
             }
 
             if (lowercaseUrl.Contains("atlassian"))
             {
-                context.Jira.JiraServer = releaseNotesRequest.IssueTrackerUrl;
+                issueTrackerContext = new JiraContext
+                {
+                    Url = releaseNotesRequest.IssueTrackerUrl
+                };
             }
 
             if (lowercaseUrl.Contains("github"))
             {
-                context.GitHub.Repo = releaseNotesRequest.IssueTrackerUrl;
+                issueTrackerContext = new GitHubContext
+                {
+                    Url = releaseNotesRequest.IssueTrackerUrl
+                };
             }
 
             if (lowercaseUrl.Contains("youtrack"))
             {
-                context.YouTrack.YouTrackServer = releaseNotesRequest.IssueTrackerUrl;
+                issueTrackerContext = new YouTrackContext
+                {
+                    Url = releaseNotesRequest.IssueTrackerUrl
+                };
             }
+
+            var context = new Context(issueTrackerContext);
+
+            context.Repository.Url = releaseNotesRequest.RepositoryUrl;
+            context.Repository.Branch = releaseNotesRequest.RepositoryBranch;
+
+            context.IssueTracker.ProjectId = releaseNotesRequest.IssueTrackerProjectId;
 
             return context;
         }

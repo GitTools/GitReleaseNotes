@@ -1,33 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text.RegularExpressions;
-using LibGit2Sharp;
-using Octokit;
-
-namespace GitReleaseNotes.IssueTrackers.GitHub
+﻿namespace GitReleaseNotes.IssueTrackers.GitHub
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.Linq;
+    using System.Text.RegularExpressions;
+    using LibGit2Sharp;
+    using Octokit;
+
     public class GitHubIssueTracker : IIssueTracker
     {
         private static readonly ILog Log = GitReleaseNotesEnvironment.Log;
 
-        private readonly Func<IGitHubClient> gitHubClientFactory;
-        private readonly Context context;
-        private readonly IRepository gitRepository;
+        private readonly Func<IGitHubClient> _gitHubClientFactory;
+        private readonly Context _context;
+        private readonly IRepository _gitRepository;
 
         public GitHubIssueTracker(IRepository gitRepository, Func<IGitHubClient> gitHubClientFactory, Context context)
         {
-            this.gitRepository = gitRepository;
-            this.context = context;
-            this.gitHubClientFactory = gitHubClientFactory;
+            _gitRepository = gitRepository;
+            _context = context;
+            _gitHubClientFactory = gitHubClientFactory;
         }
 
         public bool RemotePresentWhichMatches
         {
             get
             {
-                return gitRepository.Network.Remotes.Any(r => r.Url.ToLower().Contains("github.com"));
+                return _gitRepository.Network.Remotes.Any(r => r.Url.ToLower().Contains("github.com"));
             }
         }
 
@@ -41,28 +41,6 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
 
                 return "https://github.com/" + organisation + "/" + repository + "/compare/{0}...{1}";
             }
-        }
-
-        public bool VerifyArgumentsAndWriteErrorsToLog()
-        {
-            if (!RemotePresentWhichMatches)
-            {
-                var repo = context.GitHub.Repo;
-                if (repo == null)
-                {
-                    Log.WriteLine("GitHub repository name must be specified [/Repo .../...]");
-                    return false;
-                }
-
-                var repoParts = repo.Split('/');
-                if (repoParts.Length != 2)
-                {
-                    Log.WriteLine("GitHub repository name should be in format Organisation/RepoName");
-                    return false;
-                }
-            }
-
-            return true;
         }
 
         private void GetRepository(out string organisation, out string repository)
@@ -79,21 +57,21 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
                     return;
                 }
 
-                var remoteName = gitRepository.Network.Remotes.First(r => r.Url.ToLower().Contains("github.com")).Name;
+                var remoteName = _gitRepository.Network.Remotes.First(r => r.Url.ToLower().Contains("github.com")).Name;
                 if (TryRemote(out organisation, out repository, remoteName))
                 {
                     return;
                 }
             }
 
-            var repoParts = context.GitHub.Repo.Split('/');
+            var repoParts = _context.IssueTracker.ProjectId.Split('/');
             organisation = repoParts[0];
             repository = repoParts[1];
         }
 
         private bool TryRemote(out string organisation, out string repository, string remoteName)
         {
-            var remote = gitRepository.Network.Remotes[remoteName];
+            var remote = _gitRepository.Network.Remotes[remoteName];
             if (remote != null && remote.Url.ToLower().Contains("github.com"))
             {
                 var urlWithoutGitExtension = remote.Url.EndsWith(".git") ? remote.Url.Substring(0, remote.Url.Length - 4) : remote.Url;
@@ -111,13 +89,13 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
             return false;
         }
 
-        public IEnumerable<OnlineIssue> GetClosedIssues(DateTimeOffset? since)
+        public IEnumerable<OnlineIssue> GetClosedIssues(IIssueTrackerContext context, DateTimeOffset? since)
         {
             string organisation;
             string repository;
             GetRepository(out organisation, out repository);
 
-            var gitHubClient = gitHubClientFactory();
+            var gitHubClient = _gitHubClientFactory();
             var forRepository = gitHubClient.Issue.GetForRepository(organisation, repository, new RepositoryIssueRequest
             {
                 Filter = IssueFilter.All,
@@ -150,9 +128,9 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
                 Title = i.Title,
                 IssueType = i.PullRequest == null ? IssueType.Issue : IssueType.PullRequest,
                 Labels = i.Labels.Select(l => l.Name).ToArray(),
-                Contributors = i.PullRequest == null ? new Contributor[0] : new[]
+                Contributors = i.PullRequest == null ? new GitReleaseNotes.Contributor[0] : new[]
                 {
-                    new Contributor(getUserName(i.User), i.User.Login, i.User.HtmlUrl)
+                    new GitReleaseNotes.Contributor(getUserName(i.User), i.User.Login, i.User.HtmlUrl)
                 }
             });
         }
