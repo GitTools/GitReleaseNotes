@@ -72,8 +72,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArgumentVerifier.cs" />
-    <Compile Include="BlankLine.cs" />
-    <Compile Include="Categories.cs" />
+    <Compile Include="Models\BlankLine.cs" />
+    <Compile Include="Models\Categories.cs" />
     <Compile Include="Context\AuthenticationContext.cs" />
     <Compile Include="Context\BitBucketContext.cs" />
     <Compile Include="Context\Context.cs" />
@@ -82,7 +82,7 @@
     <Compile Include="Context\JiraContext.cs" />
     <Compile Include="Context\RepositoryContext.cs" />
     <Compile Include="Context\YouTrackContext.cs" />
-    <Compile Include="Contributor.cs" />
+    <Compile Include="Models\Contributor.cs" />
     <Compile Include="Exceptions\GitReleaseNotesException.cs" />
     <Compile Include="Extensions\GitReleaseNotesArgumentsExtensions.cs" />
     <Compile Include="Extensions\ILogExtensions.cs" />
@@ -92,7 +92,7 @@
     <Compile Include="Git\GitRemoteRepositoryContextFactory.cs" />
     <Compile Include="Git\GitRepositoryContext.cs" />
     <Compile Include="Git\IGitRepositoryContextFactory.cs" />
-    <Compile Include="IReleaseNoteLine.cs" />
+    <Compile Include="Models\Interfaces\IReleaseNoteLine.cs" />
     <Compile Include="IssueTrackers\BitBucket\BitBucketIssueTracker.cs" />
     <Compile Include="IssueTrackers\BitBucket\IBitBucketApi.cs" />
     <Compile Include="IssueTrackers\BitBucket\BitBucketApi.cs" />
@@ -110,8 +110,8 @@
     <Compile Include="IssueTrackers\YouTrack\IYouTrackApi.cs" />
     <Compile Include="IssueTrackers\YouTrack\YouTrackApi.cs" />
     <Compile Include="IssueTrackers\YouTrack\YouTrackIssueTracker.cs" />
-    <Compile Include="ReleaseDiffInfo.cs" />
-    <Compile Include="ReleaseNoteItem.cs" />
+    <Compile Include="Models\ReleaseDiffInfo.cs" />
+    <Compile Include="Models\ReleaseNoteItem.cs" />
     <Compile Include="IssueTrackers\IIssueNumberExtractor.cs" />
     <Compile Include="IssueTrackers\IssueNumberExtractor.cs" />
     <Compile Include="IssueTrackers\IIssueTracker.cs" />
@@ -126,12 +126,12 @@
     <Compile Include="Git\TaggedCommit.cs" />
     <Compile Include="Git\GitRepositoryInfoFinder.cs" />
     <Compile Include="FileSystem\ReleaseFileWriter.cs" />
-    <Compile Include="ReleaseInfo.cs" />
+    <Compile Include="Models\ReleaseInfo.cs" />
     <Compile Include="FileSystem\ReleaseNotesFileReader.cs" />
-    <Compile Include="ReleaseNoteLine.cs" />
+    <Compile Include="Models\ReleaseNoteLine.cs" />
     <Compile Include="ReleaseNotesGenerator.cs" />
-    <Compile Include="SemanticRelease.cs" />
-    <Compile Include="SemanticReleaseNotes.cs" />
+    <Compile Include="Models\SemanticRelease.cs" />
+    <Compile Include="Models\SemanticReleaseNotes.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
