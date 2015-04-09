@@ -139,6 +139,7 @@
     <Content Include="content\angular\app.js" />
     <Content Include="content\angular\components\home\controllers\HomeController.js" />
     <Content Include="content\angular\services\BusyIndicatorService.js" />
+    <Content Include="content\angular\services\ReleaseNotesFormattingService.js" />
     <Content Include="content\angular\services\ReleaseNotesService.js" />
     <Content Include="content\fonts\fontawesome-webfont.svg" />
     <Content Include="content\fonts\glyphicons-halflings-regular.svg" />
