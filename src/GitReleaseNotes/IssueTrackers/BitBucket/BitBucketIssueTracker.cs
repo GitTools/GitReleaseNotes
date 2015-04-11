@@ -9,93 +9,60 @@ namespace GitReleaseNotes.IssueTrackers.BitBucket
     {
         private static readonly ILog Log = GitReleaseNotesEnvironment.Log;
 
-        private readonly IRepository gitRepository;
+        private readonly IRepository _gitRepository;
 
-        private readonly Context context;
-        private readonly BitBucketApi bitBucketApi;
-        private string accountName;
-        private string repoSlug;
-        private bool oauth;
+        private readonly Context _context;
+        private readonly BitBucketApi _bitBucketApi;
+        private string _accountName;
+        private string _repoSlug;
+        private bool _oauth;
 
         public BitBucketIssueTracker(IRepository gitRepository, BitBucketApi bitBucketApi, Context context)
         {
-            this.gitRepository = gitRepository;
-            this.bitBucketApi = bitBucketApi;
-            this.context = context;
-        }
+            _gitRepository = gitRepository;
+            _bitBucketApi = bitBucketApi;
+            _context = context;
 
-        public bool VerifyArgumentsAndWriteErrorsToLog()
-        {
             if (!RemotePresentWhichMatches)
             {
-                var repo = context.BitBucket.Repo;
+                var repo = _context.IssueTracker.Url;
                 if (repo == null)
                 {
                     Log.WriteLine("Bitbucket repository name must be specified [/Repo .../...]");
-                    return false;
+                    return;
                 }
 
                 var repoParts = repo.Split('/');
                 if (repoParts.Length != 2)
                 {
                     Log.WriteLine("Bitbucket repository name should be in format Organisation/RepoName");
-                    return false;
+                    return;
                 }
 
-                accountName = repoParts[0];
-                repoSlug = repoParts[1];
+                _accountName = repoParts[0];
+                _repoSlug = repoParts[1];
             }
             else
             {
-                var remotes = gitRepository.Network.Remotes.Where(r => r.Url.ToLower().Contains("bitbucket.org"));
+                var remotes = _gitRepository.Network.Remotes.Where(r => r.Url.ToLower().Contains("bitbucket.org"));
                 var remoteUrl = remotes.First().Url;
-                var split = remoteUrl.Split(new[] {'/', '.'});
-                accountName = split[4];
-                repoSlug = split[5];
+                var split = remoteUrl.Split('/', '.');
+                _accountName = split[4];
+                _repoSlug = split[5];
             }
 
-            if (string.IsNullOrEmpty(context.BitBucket.ConsumerKey) && string.IsNullOrEmpty(context.BitBucket.ConsumerSecretKey))
-            {
-                if (string.IsNullOrEmpty(context.Authentication.Username))
-                {
-                    Log.WriteLine("/Username is a required to authenticate with BitBucket");
-                    return false;
-                }
-
-                if (string.IsNullOrEmpty(context.Authentication.Password))
-                {
-                    Log.WriteLine("/Password is a required to authenticate with BitBucket");
-                    return false;
-                }
-            }
-            else
-            {
-                if (string.IsNullOrEmpty(context.BitBucket.ConsumerKey))
-                {
-                    Log.WriteLine("/Consumer Key is a required to authenticate with BitBucket");
-                    return false;
-                }
-
-                if (string.IsNullOrEmpty(context.BitBucket.ConsumerSecretKey))
-                {
-                    Log.WriteLine("/Consumer Secret Key is a required to authenticate with BitBucket");
-                    return false;
-                }
-
-                oauth = true;
-            }
-
-            return true;
+            // Assume oauth first
+            _oauth = true;
         }
 
-        public IEnumerable<OnlineIssue> GetClosedIssues(DateTimeOffset? since)
+        public IEnumerable<OnlineIssue> GetClosedIssues(IIssueTrackerContext context, DateTimeOffset? since)
         {
-            return bitBucketApi.GetClosedIssues(context, since, accountName, repoSlug, oauth).ToArray();
+            return _bitBucketApi.GetClosedIssues(context, since, _accountName, _repoSlug, _oauth).ToArray();
         }
 
         public bool RemotePresentWhichMatches
         {
-            get { return gitRepository.Network.Remotes.Any(r => r.Url.ToLower().Contains("bitbucket.org")); }
+            get { return _gitRepository.Network.Remotes.Any(r => r.Url.ToLower().Contains("bitbucket.org")); }
         }
 
         public string DiffUrlFormat

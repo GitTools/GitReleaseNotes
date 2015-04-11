@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using GitReleaseNotes.IssueTrackers;
 using GitReleaseNotes.IssueTrackers.GitHub;
 using LibGit2Sharp;
 using NSubstitute;
@@ -27,8 +28,9 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
             gitHubClient.Issue.Returns(issuesClient);
             arguments = new GitReleaseNotesArguments
             {
-                Repo = "Org/Repo",
-                Token = "213"
+                IssueTracker = IssueTracker.GitHub,
+                IssueTrackerProjectId= "Org/Repo",
+                IssueTrackerToken= "213"
             };
 
             var context = arguments.ToContext();
@@ -50,7 +52,7 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
                         new Collection<Label>(), null, null, 0, new PullRequest(), DateTimeOffset.Now, DateTimeOffset.Now, DateTimeOffset.Now)
                 }.AsReadOnly()));
 
-            var closedIssues = sut.GetClosedIssues(DateTimeOffset.Now.AddDays(-2));
+            var closedIssues = sut.GetClosedIssues(new GitHubContext(), DateTimeOffset.Now.AddDays(-2));
             var onlineIssue = closedIssues.Single();
             onlineIssue.Title.ShouldBe("Issue Title");
             onlineIssue.Id.ShouldBe("#1");
@@ -93,7 +95,7 @@ namespace GitReleaseNotes.Tests.IssueTrackers.GitHub
         {
             repo.Network.Remotes.Add("upstream", "http://github.com/Org/Repo.With.Dots");
 
-            sut.GetClosedIssues(DateTimeOffset.Now.AddDays(-2));
+            sut.GetClosedIssues(new GitHubContext(), DateTimeOffset.Now.AddDays(-2));
 
             issuesClient.Received().GetForRepository("Org", "Repo.With.Dots", Arg.Any<RepositoryIssueRequest>());
         }

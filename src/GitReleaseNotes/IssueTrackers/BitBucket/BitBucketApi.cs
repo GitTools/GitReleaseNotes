@@ -1,12 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Text;
-using RestSharp;
-
 namespace GitReleaseNotes.IssueTrackers.BitBucket
 {
     using Newtonsoft.Json;
+    using System;
+    using System.Collections.Generic;
+    using System.Net;
+    using System.Text;
+    using RestSharp;
 
     public class BitBucketApi : IBitBucketApi
     {
@@ -16,7 +15,7 @@ namespace GitReleaseNotes.IssueTrackers.BitBucket
         private const string IssueResolved = "resolved";
         private const string ApiUrl = "https://bitbucket.org/api/1.0/";
 
-        public IEnumerable<OnlineIssue> GetClosedIssues(Context context, DateTimeOffset? since, string accountName, string repoSlug, bool oauth)
+        public IEnumerable<OnlineIssue> GetClosedIssues(IIssueTrackerContext context, DateTimeOffset? since, string accountName, string repoSlug, bool oauth)
         {
             var baseUrl = new Uri(ApiUrl, UriKind.Absolute);
             var restClient = new RestClient(baseUrl.AbsoluteUri);
@@ -60,18 +59,18 @@ namespace GitReleaseNotes.IssueTrackers.BitBucket
             return issues;
         }
 
-        private static void GenerateClassicalRequest(Context context, RestRequest request, string methodLocation)
+        private static void GenerateClassicalRequest(IIssueTrackerContext context, RestRequest request, string methodLocation)
         {
-            var usernameAndPass = string.Format("{0}:{1}", context.Authentication.Username, context.Authentication.Password);
+            var usernameAndPass = string.Format("{0}:{1}", context.Username, context.Password);
             var token = Convert.ToBase64String(Encoding.UTF8.GetBytes(usernameAndPass));
             request.Resource = string.Format(methodLocation);
             request.AddHeader("Authorization", string.Format("Basic {0}", token));
         }
 
-        private static void GenerateOauthRequest(Context context, Uri baseUrl, string methodLocation, RestRequest request)
+        private static void GenerateOauthRequest(IIssueTrackerContext context, Uri baseUrl, string methodLocation, RestRequest request)
         {
-            var consumerKey = string.IsNullOrEmpty(context.Authentication.Username) ? context.BitBucket.ConsumerKey : context.Authentication.Username;
-            var consumerSecret = string.IsNullOrEmpty(context.Authentication.Password) ? context.BitBucket.ConsumerSecretKey : context.Authentication.Password;
+            var consumerKey = context.Username;
+            var consumerSecret = context.Password;
             var oAuth = new OAuthBase();
             var nonce = oAuth.GenerateNonce();
             var timeStamp = oAuth.GenerateTimeStamp();

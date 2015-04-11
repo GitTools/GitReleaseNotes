@@ -8,64 +8,26 @@ namespace GitReleaseNotes.IssueTrackers.YouTrack
     {
         private static readonly ILog Log = GitReleaseNotesEnvironment.Log;
 
-        private readonly Context context;
-        private readonly IYouTrackApi youTrackApi;
+        private readonly Context _context;
+        private readonly IYouTrackApi _youTrackApi;
 
         public YouTrackIssueTracker(IYouTrackApi youTrackApi, Context context)
         {
-            this.youTrackApi = youTrackApi;
-            this.context = context;
-        }
+            _youTrackApi = youTrackApi;
+            _context = context;
 
-        public bool VerifyArgumentsAndWriteErrorsToLog()
-        {
-            if (string.IsNullOrEmpty(context.YouTrack.YouTrackServer) ||
-                !Uri.IsWellFormedUriString(context.YouTrack.YouTrackServer, UriKind.Absolute))
+            var youTrackContext = (YouTrackContext) context.IssueTracker;
+            if (string.IsNullOrWhiteSpace(youTrackContext.Filter))
             {
-                Log.WriteLine("A valid YouTrack server must be specified [/YouTrackServer ]");
-                return false;
-            }
-
-            if (string.IsNullOrEmpty(context.ProjectId))
-            {
-                Log.WriteLine("/ProjectId is a required parameter for YouTrack");
-                return false;
-            }
-
-            if (string.IsNullOrEmpty(context.Authentication.Username))
-            {
-                Log.WriteLine("/Username is a required to authenticate with YouTrack");
-                return false;
-            }
-            if (string.IsNullOrEmpty(context.Authentication.Password))
-            {
-                Log.WriteLine("/Password is a required to authenticate with YouTrack");
-                return false;
-            }
-
-            if (string.IsNullOrEmpty(context.YouTrack.YouTrackFilter))
-            {
-                context.YouTrack.YouTrackFilter = string.Format(
+                youTrackContext.Filter = string.Format(
                     "project:{0} State:Resolved State:-{{Won't fix}} State:-{{Can't Reproduce}} State:-Duplicate", 
-                    context.ProjectId);
-            }
-
-            return true;
-        }
-
-        public IEnumerable<OnlineIssue> GetClosedIssues(DateTimeOffset? since)
-        {
-            return youTrackApi.GetClosedIssues(context, since).ToArray();
-        }
-
-        public bool RemotePresentWhichMatches
-        {
-            get
-            {
-                return false;
+                    youTrackContext.ProjectId);
             }
         }
 
-        public string DiffUrlFormat { get { return string.Empty; }}
+        public IEnumerable<OnlineIssue> GetClosedIssues(IIssueTrackerContext context, DateTimeOffset? since)
+        {
+            return _youTrackApi.GetClosedIssues(context, since).ToArray();
+        }
     }
 }

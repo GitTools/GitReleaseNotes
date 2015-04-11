@@ -1,9 +1,7 @@
 ﻿namespace GitReleaseNotes
 {
-    public class JiraContext
+    public class JiraContext : IssueTrackerContext
     {
         public string Jql { get; set; }
-
-        public string JiraServer { get; set; }
     }
 }
