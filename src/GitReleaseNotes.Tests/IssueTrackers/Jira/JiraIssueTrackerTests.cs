@@ -1,5 +1,5 @@
 ﻿using System;
-using GitReleaseNotes.IssueTrackers.Jira;
+using GitReleaseNotes.IssueTrackers;
 using LibGit2Sharp;
 using NSubstitute;
 
@@ -7,13 +7,13 @@ namespace GitReleaseNotes.Tests.IssueTrackers.Jira
 {
     public class JiraIssueTrackerTests
     {
-        private readonly IJiraApi _jiraApi;
-        private readonly JiraIssueTracker _sut;
+        //private readonly IJiraApi _jiraApi;
+        private readonly IIssueTracker _sut;
 
         public JiraIssueTrackerTests()
         {
-            _jiraApi = Substitute.For<IJiraApi>();
-            _sut = new JiraIssueTracker(_jiraApi, new Context(new JiraContext()));
+            //_jiraApi = Substitute.For<IJiraApi>();
+            //_sut = new JiraIssueTracker(_jiraApi, new Context(new JiraContext()));
         }
 
         //[Fact]

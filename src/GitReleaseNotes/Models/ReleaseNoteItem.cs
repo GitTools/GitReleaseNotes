@@ -7,12 +7,12 @@ namespace GitReleaseNotes
     {
         private readonly string title;
         private readonly string issueNumber;
-        private readonly Uri htmlUrl;
+        private readonly string htmlUrl;
         private readonly string[] tags;
         private readonly DateTimeOffset? resolvedOn;
         private readonly Contributor[] contributors;
 
-        public ReleaseNoteItem(string title, string issueNumber, Uri htmlUrl, string[] tags, DateTimeOffset? resolvedOn, Contributor[] contributors)
+        public ReleaseNoteItem(string title, string issueNumber, string htmlUrl, string[] tags, DateTimeOffset? resolvedOn, Contributor[] contributors)
         {
             this.title = title;
             this.issueNumber = issueNumber;
@@ -27,7 +27,7 @@ namespace GitReleaseNotes
             get { return title; }
         }
 
-        public Uri HtmlUrl
+        public string HtmlUrl
         {
             get { return htmlUrl; }
         }

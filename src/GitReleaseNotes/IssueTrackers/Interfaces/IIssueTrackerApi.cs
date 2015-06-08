@@ -1,4 +1,6 @@
-﻿namespace GitReleaseNotes.IssueTrackers
+﻿using GitTools.IssueTrackers;
+
+namespace GitReleaseNotes.IssueTrackers
 {
     using System;
     using System.Collections.Generic;

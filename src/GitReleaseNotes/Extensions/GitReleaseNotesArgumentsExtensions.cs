@@ -1,5 +1,5 @@
 ﻿using System;
-using GitReleaseNotes.IssueTrackers;
+using GitTools.IssueTrackers;
 
 namespace GitReleaseNotes
 {
@@ -11,21 +11,21 @@ namespace GitReleaseNotes
 
             switch (arguments.IssueTracker)
             {
-                case IssueTracker.BitBucket:
-                    var bitBucketContext = new BitBucketContext
-                    {
-                    };
+                //case IssueTracker.BitBucket:
+                //    var bitBucketContext = new BitBucketContext
+                //    {
+                //    };
 
-                    issueTrackerContext = bitBucketContext;
-                    break;
+                //    issueTrackerContext = bitBucketContext;
+                //    break;
 
-                case IssueTracker.GitHub:
-                    var gitHubContext = new GitHubContext
-                    {
-                    };
+                //case IssueTracker.GitHub:
+                //    var gitHubContext = new GitHubContext
+                //    {
+                //    };
 
-                    issueTrackerContext = gitHubContext;
-                    break;
+                //    issueTrackerContext = gitHubContext;
+                //    break;
 
                 case IssueTracker.Jira:
                     var jiraContext = new JiraContext
@@ -36,28 +36,28 @@ namespace GitReleaseNotes
                     issueTrackerContext = jiraContext;
                     break;
 
-                case IssueTracker.YouTrack:
-                    var youTrackContext = new YouTrackContext
-                    {
-                        Filter = arguments.IssueTrackerFilter
-                    };
+                //case IssueTracker.YouTrack:
+                //    var youTrackContext = new YouTrackContext
+                //    {
+                //        Filter = arguments.IssueTrackerFilter
+                //    };
 
-                    issueTrackerContext = youTrackContext;
-                    break;
+                //    issueTrackerContext = youTrackContext;
+                //    break;
 
                 default:
                     throw new ArgumentOutOfRangeException();
             }
 
-            issueTrackerContext.Url = arguments.IssueTrackerUrl;
-            issueTrackerContext.Username = arguments.IssueTrackerUsername;
-            issueTrackerContext.Password = arguments.IssueTrackerPassword;
-            issueTrackerContext.Token = arguments.IssueTrackerToken;
+            issueTrackerContext.Server = arguments.IssueTrackerUrl;
+            issueTrackerContext.Authentication.Username = arguments.IssueTrackerUsername;
+            issueTrackerContext.Authentication.Password = arguments.IssueTrackerPassword;
+            issueTrackerContext.Authentication.Token = arguments.IssueTrackerToken;
             issueTrackerContext.ProjectId = arguments.IssueTrackerProjectId;
 
             var context = new Context(issueTrackerContext);
 
-            context.WorkingDirectory = arguments.WorkingDirectory;
+            context.Repository.Directory = arguments.WorkingDirectory;
             context.Verbose = arguments.Verbose;
             context.OutputFile = arguments.OutputFile;
             context.Categories = arguments.Categories;
@@ -69,9 +69,9 @@ namespace GitReleaseNotes
             var repository = context.Repository;
             repository.Url = arguments.RepoUrl;
             repository.Branch = arguments.RepoBranch;
-            repository.Username = arguments.RepoUsername;
-            repository.Password = arguments.RepoPassword;
-            repository.Token = arguments.RepoToken;
+            repository.Authentication.Username = arguments.RepoUsername;
+            repository.Authentication.Password = arguments.RepoPassword;
+            repository.Authentication.Token = arguments.RepoToken;
 
             return context;
         }
