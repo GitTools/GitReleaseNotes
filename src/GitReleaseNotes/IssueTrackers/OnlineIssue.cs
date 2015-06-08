@@ -1,3 +1,5 @@
+using GitTools.IssueTrackers;
+
 namespace GitReleaseNotes.IssueTrackers
 {
     using System;

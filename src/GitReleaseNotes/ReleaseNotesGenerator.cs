@@ -1,4 +1,8 @@
-﻿namespace GitReleaseNotes
+﻿using GitTools;
+using GitTools.Git;
+using GitTools.IssueTrackers;
+
+namespace GitReleaseNotes
 {
     using System;
     using System.IO;
@@ -27,19 +31,11 @@
         {
             var context = _context;
 
-            using (var gitRepoContext = GetRepository(context, _fileSystem))
+            using (var temporaryFilesContext = new TemporaryFilesContext())
             {
-                // Remote repo's require some additional preparation before first use.
-                if (gitRepoContext.IsRemote)
-                {
-                    gitRepoContext.PrepareRemoteRepoForUse(context.Repository.Branch);
-                    if (!string.IsNullOrWhiteSpace(context.OutputFile))
-                    {
-                        gitRepoContext.CheckoutFilesIfExist(context.OutputFile);
-                    }
-                }
-
-                var gitRepo = gitRepoContext.Repository;
+                var gitPreparer = new GitPreparer();
+                var gitRepositoryDirectory = gitPreparer.Prepare(context.Repository, temporaryFilesContext);
+                var gitRepository = new Repository(gitRepositoryDirectory);
 
                 if (context.IssueTracker == null)
                 {
@@ -52,7 +48,7 @@
                     //}
                 }
 
-                var issueTracker = _issueTrackerFactory.CreateIssueTracker(context, gitRepo);
+                var issueTracker = _issueTrackerFactory.CreateIssueTracker(context.IssueTracker);
                 if (issueTracker == null)
                 {
                     throw new GitReleaseNotesException("Failed to create issue tracker from context, cannot continue");
@@ -62,7 +58,7 @@
                 string outputFile = null;
                 var previousReleaseNotes = new SemanticReleaseNotes();
 
-                var outputPath = gitRepo.Info.Path;
+                var outputPath = gitRepositoryDirectory;
                 var outputDirectory = new DirectoryInfo(outputPath);
                 if (outputDirectory.Name == ".git")
                 {
@@ -79,9 +75,9 @@
 
                 var categories = new Categories(context.Categories, context.AllLabels);
                 var tagToStartFrom = context.AllTags
-                    ? GitRepositoryInfoFinder.GetFirstCommit(gitRepo)
-                    : GitRepositoryInfoFinder.GetLastTaggedCommit(gitRepo) ?? GitRepositoryInfoFinder.GetFirstCommit(gitRepo);
-                var currentReleaseInfo = GitRepositoryInfoFinder.GetCurrentReleaseInfo(gitRepo);
+                    ? gitRepository.GetFirstCommit()
+                    : gitRepository.GetLastTaggedCommit() ?? gitRepository.GetFirstCommit();
+                var currentReleaseInfo = gitRepository.GetCurrentReleaseInfo();
                 if (!string.IsNullOrEmpty(context.Version))
                 {
                     currentReleaseInfo.Name = context.Version;
@@ -89,7 +85,7 @@
                 }
 
                 var releaseNotes = GenerateReleaseNotes(
-                    context, gitRepo, issueTracker,
+                    context, gitRepository, issueTracker,
                     previousReleaseNotes, categories,
                     tagToStartFrom, currentReleaseInfo);
 
@@ -98,44 +94,6 @@
 
                 return releaseNotes;
             }
-        }
-
-        private GitRepositoryContext GetRepository(Context context, IFileSystem fileSystem)
-        {
-            var workingDir = _fileSystem.GetRepositoryWorkingDirectory(context);
-            var isRemote = !string.IsNullOrWhiteSpace(context.Repository.Url);
-            var repoFactory = GetRepositoryFactory(isRemote, workingDir, context, fileSystem);
-            var repo = repoFactory.GetRepositoryContext();
-
-            return repo;
-        }
-
-        private static IGitRepositoryContextFactory GetRepositoryFactory(bool isRemote, string workingDir, Context context, IFileSystem fileSystem)
-        {
-            IGitRepositoryContextFactory gitRepoFactory = null;
-            if (isRemote)
-            {
-                // clone repo from the remote url
-                var cloneRepoArgs = new GitRemoteRepositoryContextFactory.RemoteRepoArgs();
-                cloneRepoArgs.Url = context.Repository.Url;
-                cloneRepoArgs.Branch = context.Repository.Branch;
-
-                var credentials = new UsernamePasswordCredentials();
-                credentials.Username = context.Repository.Username;
-                credentials.Password = context.Repository.Password;
-
-                cloneRepoArgs.Credentials = credentials;
-                cloneRepoArgs.DestinationPath = workingDir;
-
-                Log.WriteLine("Cloning a git repo from {0}", cloneRepoArgs.Url);
-                gitRepoFactory = new GitRemoteRepositoryContextFactory(cloneRepoArgs, fileSystem);
-            }
-            else
-            {
-                gitRepoFactory = new GitLocalRepositoryContextFactory(workingDir, fileSystem);
-            }
-
-            return gitRepoFactory;
         }
 
         public static SemanticReleaseNotes GenerateReleaseNotes(Context context,
@@ -148,13 +106,15 @@
                 ??
                 tagToStartFrom.Commit.Author.When;
 
-            var closedIssues = issueTracker.GetClosedIssues(context.IssueTracker, findIssuesSince).ToArray();
+            var closedIssues = issueTracker.GetIssues("status in (closed, done)");
+            //var closedIssues = issueTracker.GetClosedIssues(context.IssueTracker, findIssuesSince).ToArray();
 
             var semanticReleases = (
                 from release in releases
                 let releaseNoteItems = closedIssues
                     .Where(i => (release.When == null || i.DateClosed < release.When) && (release.PreviousReleaseDate == null || i.DateClosed > release.PreviousReleaseDate))
-                    .Select(i => new ReleaseNoteItem(i.Title, i.Id, i.HtmlUrl, i.Labels, i.DateClosed, i.Contributors))
+                    //.Select(i => new ReleaseNoteItem(i.Title, i.Id, i.Url, i.Labels, i.DateClosed, i.Contributors))
+                    .Select(i => new ReleaseNoteItem(i.Title, i.Id, i.Url, i.Labels, i.DateClosed, new Contributor[] { /*TODO: implement*/ }))
                     .ToList<IReleaseNoteLine>()
                 let beginningSha = release.FirstCommit == null ? null : release.FirstCommit.Substring(0, 10)
                 let endSha = release.LastCommit == null ? null : release.LastCommit.Substring(0, 10)

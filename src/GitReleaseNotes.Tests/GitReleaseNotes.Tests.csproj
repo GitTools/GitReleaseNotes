@@ -79,11 +79,6 @@
     <Compile Include="CommitGrouperTests.cs" />
     <Compile Include="CommitGrouperTestsMultipleTagsPerCommit.cs" />
     <Compile Include="GitRemoteRepositoryTests.cs" />
-    <Compile Include="IssueTrackers\GitHub\GitHubIssueTrackerTests.cs" />
-    <Compile Include="IssueTrackers\GitHub\NetworkEx.cs" />
-    <Compile Include="IssueTrackers\GitHub\RemoteCollectionEx.cs" />
-    <Compile Include="IssueTrackers\GitHub\RemoteEx.cs" />
-    <Compile Include="IssueTrackers\GitHub\TestUser.cs" />
     <Compile Include="IssueTrackers\IssueNumberExtractor.cs" />
     <Compile Include="IssueTrackers\Jira\JiraIssueTrackerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

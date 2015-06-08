@@ -113,3 +113,4 @@ src/_NCrunch_GitReleaseNotes
 *.received.txt
 src/GitReleaseNotes.sln.ide/
 *.GhostDoc.xml
+src/.vs/config/applicationhost.config
