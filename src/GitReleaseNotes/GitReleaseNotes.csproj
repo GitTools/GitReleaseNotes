@@ -74,7 +74,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Git\Extensions\IRepositoryExtensions.cs" />
-    <Compile Include="IssueTrackers\Interfaces\IIssueTrackerApi.cs" />
     <Compile Include="Models\BlankLine.cs" />
     <Compile Include="Models\Categories.cs" />
     <Compile Include="Context\Context.cs" />
@@ -93,7 +92,6 @@
     <Compile Include="FileSystem\Interfaces\IFileSystem.cs" />
     <Compile Include="Logging\Interfaces\ILog.cs" />
     <Compile Include="GitReleaseNotesArguments.cs" />
-    <Compile Include="IssueTrackers\OnlineIssue.cs" />
     <Compile Include="Models\ReleaseDiffInfo.cs" />
     <Compile Include="Models\ReleaseNoteItem.cs" />
     <Compile Include="IssueTrackers\Interfaces\IIssueNumberExtractor.cs" />

@@ -13,7 +13,7 @@ namespace GitReleaseNotes.Tests
     public class TestDataCreator
     {
         private readonly DateTimeOffset _initialCommitTime;
-        private readonly List<Tuple<string, OnlineIssue[]>> _releases = new List<Tuple<string, OnlineIssue[]>>();
+        private readonly List<Tuple<string, Issue[]>> _releases = new List<Tuple<string, Issue[]>>();
         private int _idCounter;
         private readonly List<string> _additionalIssues = new List<string>();
 
@@ -24,7 +24,7 @@ namespace GitReleaseNotes.Tests
 
         public TestDataCreator CreateRelease(string tag, params string[] issues)
         {
-            _releases.Add(Tuple.Create(tag, issues.Select(i => new OnlineIssue(GetNextId(), DateTime.Now)
+            _releases.Add(Tuple.Create(tag, issues.Select(i => new Issue(GetNextId(), DateTime.Now)
             {
                 IssueType = IssueType.Issue,
                 Title = i
