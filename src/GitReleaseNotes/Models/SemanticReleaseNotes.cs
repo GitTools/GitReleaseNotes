@@ -237,7 +237,7 @@ namespace GitReleaseNotes
 
         private static SemanticRelease CreateMergedSemanticRelease(SemanticRelease r)
         {
-            return new SemanticRelease(r.ReleaseName, r.When, new List<IReleaseNoteLine>(), r.DiffInfo);
+            return new SemanticRelease(r.ReleaseName, r.When, r.DiffInfo);
         }
     }
 }
