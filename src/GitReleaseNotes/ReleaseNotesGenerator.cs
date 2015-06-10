@@ -1,4 +1,5 @@
-﻿using GitTools;
+﻿using System.Collections.Generic;
+using GitTools;
 using GitTools.Git;
 using GitTools.IssueTrackers;
 
@@ -106,26 +107,84 @@ namespace GitReleaseNotes
                 ??
                 tagToStartFrom.Commit.Author.When;
 
-            var closedIssues = issueTracker.GetIssues("status in (closed, done)");
-            //var closedIssues = issueTracker.GetClosedIssues(context.IssueTracker, findIssuesSince).ToArray();
+            var closedIssues = issueTracker.GetIssues(includeOpen: false);
 
-            var semanticReleases = (
-                from release in releases
-                let releaseNoteItems = closedIssues
-                    .Where(i => (release.When == null || i.DateClosed < release.When) && (release.PreviousReleaseDate == null || i.DateClosed > release.PreviousReleaseDate))
-                    //.Select(i => new ReleaseNoteItem(i.Title, i.Id, i.Url, i.Labels, i.DateClosed, i.Contributors))
-                    .Select(i => new ReleaseNoteItem(i.Title, i.Id, i.Url, i.Labels, i.DateClosed, new Contributor[] { /*TODO: implement*/ }))
-                    .ToList<IReleaseNoteLine>()
-                let beginningSha = release.FirstCommit == null ? null : release.FirstCommit.Substring(0, 10)
-                let endSha = release.LastCommit == null ? null : release.LastCommit.Substring(0, 10)
-                select new SemanticRelease(release.Name, release.When, releaseNoteItems, new ReleaseDiffInfo
+            // As discussed here: https://github.com/GitTools/GitReleaseNotes/issues/85
+
+            var semanticReleases = new Dictionary<string, SemanticRelease>();
+
+            foreach (var issue in closedIssues)
+            {
+                // 1) Include all issues from the issue tracker that are assigned to this release
+                foreach (var fixVersion in issue.FixVersions)
                 {
-                    BeginningSha = beginningSha,
-                    EndSha = endSha,
-                    //DiffUrlFormat = issueTracker.DiffUrlFormat
-                })).ToList();
+                    if (!semanticReleases.ContainsKey(fixVersion.Name))
+                    {
+                        semanticReleases.Add(fixVersion.Name, new SemanticRelease(fixVersion.Name, fixVersion.ReleaseDate));
+                    }
 
-            return new SemanticReleaseNotes(semanticReleases, categories).Merge(previousReleaseNotes);
+                    var semanticRelease = semanticReleases[fixVersion.Name];
+
+                    var releaseNoteItem = new ReleaseNoteItem(issue.Title, issue.Id, issue.Url, issue.Labels,
+                        issue.DateClosed, new Contributor[] { /*TODO: implement*/ });
+
+                    semanticRelease.ReleaseNoteLines.Add(releaseNoteItem);
+                }
+
+                // 2) Get closed issues from the issue tracker that have no fixversion but are closed between the last release and this release
+                if (issue.FixVersions.Count == 0)
+                {
+                    foreach (var release in releases)
+                    {
+                        if (issue.DateClosed.HasValue &&
+                            issue.DateClosed.Value > release.PreviousReleaseDate &&
+                            issue.DateClosed <= release.When)
+                        {
+                            if (!semanticReleases.ContainsKey(release.Name))
+                            {
+                                var beginningSha = release.FirstCommit != null ? release.FirstCommit.Substring(0, 10) : null;
+                                var endSha = release.LastCommit != null ? release.LastCommit.Substring(0, 10) : null;
+
+                                semanticReleases.Add(release.Name, new SemanticRelease(release.Name, release.When, new ReleaseDiffInfo
+                                {
+                                    BeginningSha = beginningSha,
+                                    EndSha = endSha,
+                                    //DiffUrlFormat = issueTracker.DiffUrlFormat
+                                }));
+                            }
+
+                            var semanticRelease = semanticReleases[release.Name];
+
+                            var releaseNoteItem = new ReleaseNoteItem(issue.Title, issue.Id, issue.Url, issue.Labels,
+                                issue.DateClosed, new Contributor[] { /*TODO: implement*/ });
+
+                            semanticRelease.ReleaseNoteLines.Add(releaseNoteItem);
+                        }
+                    }
+                }
+            }
+
+            // 3) Remove any duplicates
+            // TODO
+
+
+            //var semanticReleases = (
+            //    from release in releases
+            //    let releaseNoteItems = closedIssues
+            //        .Where(i => (release.When == null || i.DateClosed < release.When) && (release.PreviousReleaseDate == null || i.DateClosed > release.PreviousReleaseDate))
+            //        //.Select(i => new ReleaseNoteItem(i.Title, i.Id, i.Url, i.Labels, i.DateClosed, i.Contributors))
+            //        .Select(i => new ReleaseNoteItem(i.Title, i.Id, i.Url, i.Labels, i.DateClosed, new Contributor[] { /*TODO: implement*/ }))
+            //        .ToList<IReleaseNoteLine>()
+            //    let beginningSha = release.FirstCommit == null ? null : release.FirstCommit.Substring(0, 10)
+            //    let endSha = release.LastCommit == null ? null : release.LastCommit.Substring(0, 10)
+            //    select new SemanticRelease(release.Name, release.When, releaseNoteItems, new ReleaseDiffInfo
+            //    {
+            //        BeginningSha = beginningSha,
+            //        EndSha = endSha,
+            //        //DiffUrlFormat = issueTracker.DiffUrlFormat
+            //    })).ToList();
+
+            return new SemanticReleaseNotes(semanticReleases.Values, categories).Merge(previousReleaseNotes);
         }
 
         private static DateTimeOffset? IssueStartDateBasedOnPreviousReleaseNotes(IRepository gitRepo,
