@@ -118,6 +118,11 @@ namespace GitReleaseNotes
                 // 1) Include all issues from the issue tracker that are assigned to this release
                 foreach (var fixVersion in issue.FixVersions)
                 {
+                    if (!fixVersion.IsReleased)
+                    {
+                        continue;
+                    }
+
                     if (!semanticReleases.ContainsKey(fixVersion.Name))
                     {
                         semanticReleases.Add(fixVersion.Name, new SemanticRelease(fixVersion.Name, fixVersion.ReleaseDate));
