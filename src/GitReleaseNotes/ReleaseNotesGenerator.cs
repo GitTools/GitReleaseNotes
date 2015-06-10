@@ -170,8 +170,27 @@ namespace GitReleaseNotes
             }
 
             // 3) Remove any duplicates
-            // TODO
+            foreach (var semanticRelease in semanticReleases.Values)
+            {
+                var handledIssues = new HashSet<string>();
 
+                for (var i = 0; i < semanticRelease.ReleaseNoteLines.Count; i++)
+                {
+                    var releaseNoteLine = semanticRelease.ReleaseNoteLines[i] as ReleaseNoteItem;
+                    if (releaseNoteLine == null)
+                    {
+                        continue;
+                    }
+
+                    if (handledIssues.Contains(releaseNoteLine.IssueNumber))
+                    {
+                        semanticRelease.ReleaseNoteLines.RemoveAt(i--);
+                        continue;
+                    }
+
+                    handledIssues.Add(releaseNoteLine.IssueNumber);
+                }
+            }
 
             //var semanticReleases = (
             //    from release in releases
