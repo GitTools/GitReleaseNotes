@@ -5,8 +5,8 @@
     <version>$version$</version>
     <authors>JakeGinnivan</authors>
     <owners>JakeGinnivan</owners>
-    <licenseUrl>https://github.com/JakeGinnivan/GitReleaseNotes/blob/master/LICENSE</licenseUrl>
-    <projectUrl>https://github.com/JakeGinnivan/GitReleaseNotes</projectUrl>
+    <licenseUrl>https://github.com/GitTools/GitReleaseNotes/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/GitTools/GitReleaseNotes</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>The easy way to generate release notes for your Git projects</description>
     <releaseNotes>Initial release</releaseNotes>
