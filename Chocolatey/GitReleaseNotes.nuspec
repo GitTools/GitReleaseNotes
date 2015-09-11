@@ -8,11 +8,11 @@
     <owners>Jake Ginnivan</owners>
     <summary>GitReleaseNotes</summary>
     <description>GitReleaseNotes generates release notes for any Git repository</description>
-    <projectUrl>https://github.com/JakeGinnivan/GitReleaseNotes</projectUrl>
+    <projectUrl>https://github.com/GitTools/GitReleaseNotes</projectUrl>
     <tags>GitReleaseNotes, Release Notes, Jira, GitHub, YouTrack, Git</tags>
-    <licenseUrl>https://github.com/JakeGinnivan/GitReleaseNotes/blob/master/LICENSE</licenseUrl>
+    <licenseUrl>https://github.com/GitTools/GitReleaseNotes/blob/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <releaseNotes>https://github.com/JakeGinnivan/GitReleaseNotes/releases</releaseNotes>
+    <releaseNotes>https://github.com/GitTools/GitReleaseNotes/releases</releaseNotes>
   </metadata>
   <files>
     <file src="tools\**" target="tools" />
