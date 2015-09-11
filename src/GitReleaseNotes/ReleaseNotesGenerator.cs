@@ -192,22 +192,6 @@ namespace GitReleaseNotes
                 }
             }
 
-            //var semanticReleases = (
-            //    from release in releases
-            //    let releaseNoteItems = closedIssues
-            //        .Where(i => (release.When == null || i.DateClosed < release.When) && (release.PreviousReleaseDate == null || i.DateClosed > release.PreviousReleaseDate))
-            //        //.Select(i => new ReleaseNoteItem(i.Title, i.Id, i.Url, i.Labels, i.DateClosed, i.Contributors))
-            //        .Select(i => new ReleaseNoteItem(i.Title, i.Id, i.Url, i.Labels, i.DateClosed, new Contributor[] { /*TODO: implement*/ }))
-            //        .ToList<IReleaseNoteLine>()
-            //    let beginningSha = release.FirstCommit == null ? null : release.FirstCommit.Substring(0, 10)
-            //    let endSha = release.LastCommit == null ? null : release.LastCommit.Substring(0, 10)
-            //    select new SemanticRelease(release.Name, release.When, releaseNoteItems, new ReleaseDiffInfo
-            //    {
-            //        BeginningSha = beginningSha,
-            //        EndSha = endSha,
-            //        //DiffUrlFormat = issueTracker.DiffUrlFormat
-            //    })).ToList();
-
             return new SemanticReleaseNotes(semanticReleases.Values, categories).Merge(previousReleaseNotes);
         }
 
