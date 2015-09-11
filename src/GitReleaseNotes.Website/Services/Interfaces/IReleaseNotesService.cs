@@ -1,7 +1,9 @@
-﻿namespace GitReleaseNotes.Website.Services
+﻿using System.Threading.Tasks;
+
+namespace GitReleaseNotes.Website.Services
 {
     public interface IReleaseNotesService
     {
-        SemanticReleaseNotes GetReleaseNotes(Context context);
+        Task<SemanticReleaseNotes> GetReleaseNotesAsync(Context context);
     }
 }

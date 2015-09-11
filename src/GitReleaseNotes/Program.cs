@@ -39,7 +39,8 @@ namespace GitReleaseNotes
             try
             {
                 var releaseNotesGenerator = new ReleaseNotesGenerator(context, new FileSystem.FileSystem(), new GitTools.IssueTrackers.IssueTrackerFactory());
-                releaseNotesGenerator.GenerateReleaseNotes();
+                var task = releaseNotesGenerator.GenerateReleaseNotesAsync();
+                task.Wait();
 
                 Log.WriteLine("Done");
             }

@@ -31,7 +31,7 @@ namespace GitReleaseNotes.Website.Controllers.Api
             var context = releaseNotesRequest.ToContext();
             context.AllTags = true;
 
-            var releaseNotes = _releaseNotesService.GetReleaseNotes(context);
+            var releaseNotes = await _releaseNotesService.GetReleaseNotesAsync(context);
             
             return new HttpResponseMessage
             {

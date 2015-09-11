@@ -8,10 +8,15 @@ app.controller('HomeController', ['$scope', 'releaseNotesService', 'releaseNotes
     $scope.releaseNotes = '';
 
     $scope.useExampleValues = function () {
-        $scope.repositoryUrl = 'https://github.com/catel/catel';
-        $scope.repositoryBranch = 'develop';
-        $scope.issueTrackerUrl = 'https://catelproject.atlassian.net';
-        $scope.issueTrackerProjectId = 'CTL';
+        //$scope.repositoryUrl = 'https://github.com/catel/catel';
+        //$scope.repositoryBranch = 'develop';
+        //$scope.issueTrackerUrl = 'https://catelproject.atlassian.net';
+        //$scope.issueTrackerProjectId = 'CTL';
+
+        $scope.repositoryUrl = 'https://github.com/gittools/gitversion';
+        $scope.repositoryBranch = 'master';
+        $scope.issueTrackerUrl = 'https://github.com/gittools/gitversion';
+        $scope.issueTrackerProjectId = 'gittools/gitversion';
     };
 
     $scope.generateReleaseNotes = function () {
