@@ -25,13 +25,13 @@ namespace GitReleaseNotes.Website.Models.Api
                 };
             }
 
-            //if (lowercaseUrl.Contains("github"))
-            //{
-            //    issueTrackerContext = new GitHubContext
-            //    {
-            //        Url = releaseNotesRequest.IssueTrackerUrl
-            //    };
-            //}
+            if (lowercaseUrl.Contains("github"))
+            {
+                issueTrackerContext = new IssueTrackerContext
+                {
+                    Server = releaseNotesRequest.IssueTrackerUrl
+                };
+            }
 
             //if (lowercaseUrl.Contains("youtrack"))
             //{

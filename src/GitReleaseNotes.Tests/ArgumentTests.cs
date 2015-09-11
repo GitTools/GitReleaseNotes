@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Reflection;
 using GitReleaseNotes.IssueTrackers;
+using GitTools.IssueTrackers;
 using Shouldly;
 using Xunit;
 

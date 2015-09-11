@@ -15,7 +15,24 @@
 
             for (var j = 0; j < release.releaseNoteItems.length; j++) {
                 var releaseNoteItem = release.releaseNoteItems[j];
-                fullReleaseNotes += '[' + releaseNoteItem.issueNumber + '] ' + releaseNoteItem.title + '\n';
+                fullReleaseNotes += '[' + releaseNoteItem.issueNumber + '] ' + releaseNoteItem.title;
+
+                if (releaseNoteItem.contributors.length > 0) {
+                    fullReleaseNotes += ' (contributed by ';
+
+                    for (var k = 0; k < releaseNoteItem.contributors.length; k++) {
+                        if (k > 0) {
+                            fullReleaseNotes += ', ';
+                        }
+
+                        var contributor = releaseNoteItem.contributors[k];
+                        fullReleaseNotes += contributor.name + ' [' + contributor.username + ']';
+                    }
+
+                    fullReleaseNotes += ')';
+                }
+
+                fullReleaseNotes += '\n';
             }
 
             fullReleaseNotes += '\n';

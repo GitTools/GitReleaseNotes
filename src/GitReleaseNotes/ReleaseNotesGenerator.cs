@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using GitTools;
 using GitTools.Git;
 using GitTools.IssueTrackers;
@@ -10,7 +11,6 @@ namespace GitReleaseNotes
     using System.Linq;
     using GitReleaseNotes.FileSystem;
     using GitReleaseNotes.Git;
-    using GitReleaseNotes.IssueTrackers;
     using LibGit2Sharp;
 
     public class ReleaseNotesGenerator
@@ -28,7 +28,7 @@ namespace GitReleaseNotes
             _issueTrackerFactory = issueTrackerFactory;
         }
 
-        public SemanticReleaseNotes GenerateReleaseNotes()
+        public async Task<SemanticReleaseNotes> GenerateReleaseNotesAsync()
         {
             var context = _context;
 
@@ -85,7 +85,7 @@ namespace GitReleaseNotes
                     currentReleaseInfo.When = DateTimeOffset.Now;
                 }
 
-                var releaseNotes = GenerateReleaseNotes(
+                var releaseNotes = await GenerateReleaseNotesAsync(
                     context, gitRepository, issueTracker,
                     previousReleaseNotes, categories,
                     tagToStartFrom, currentReleaseInfo);
@@ -97,17 +97,24 @@ namespace GitReleaseNotes
             }
         }
 
-        public static SemanticReleaseNotes GenerateReleaseNotes(Context context,
+        public static async Task<SemanticReleaseNotes> GenerateReleaseNotesAsync(Context context,
             IRepository gitRepo, IIssueTracker issueTracker, SemanticReleaseNotes previousReleaseNotes,
             Categories categories, TaggedCommit tagToStartFrom, ReleaseInfo currentReleaseInfo)
         {
             var releases = ReleaseFinder.FindReleases(gitRepo, tagToStartFrom, currentReleaseInfo);
+
             var findIssuesSince =
                 IssueStartDateBasedOnPreviousReleaseNotes(gitRepo, previousReleaseNotes)
                 ??
                 tagToStartFrom.Commit.Author.When;
 
-            var closedIssues = issueTracker.GetIssues(includeOpen: false);
+            var filter = new IssueTrackerFilter
+            {
+                Since = findIssuesSince,
+                IncludeOpen = false
+            };
+
+            var closedIssues = await issueTracker.GetIssuesAsync(filter);
 
             // As discussed here: https://github.com/GitTools/GitReleaseNotes/issues/85
 
@@ -154,14 +161,14 @@ namespace GitReleaseNotes
                                 {
                                     BeginningSha = beginningSha,
                                     EndSha = endSha,
-                                    //DiffUrlFormat = issueTracker.DiffUrlFormat
+                                    DiffUrlFormat = context.IssueTracker.DiffUrlFormat
                                 }));
                             }
 
                             var semanticRelease = semanticReleases[release.Name];
 
                             var releaseNoteItem = new ReleaseNoteItem(issue.Title, issue.Id, issue.Url, issue.Labels,
-                                issue.DateClosed, new Contributor[] { /*TODO: implement*/ });
+                                issue.DateClosed, issue.Contributors);
 
                             semanticRelease.ReleaseNoteLines.Add(releaseNoteItem);
                         }
@@ -192,7 +199,9 @@ namespace GitReleaseNotes
                 }
             }
 
-            return new SemanticReleaseNotes(semanticReleases.Values, categories).Merge(previousReleaseNotes);
+            var semanticReleaseNotes = new SemanticReleaseNotes(semanticReleases.Values, categories);
+            var mergedReleaseNotes = semanticReleaseNotes.Merge(previousReleaseNotes);
+            return mergedReleaseNotes;
         }
 
         private static DateTimeOffset? IssueStartDateBasedOnPreviousReleaseNotes(IRepository gitRepo,

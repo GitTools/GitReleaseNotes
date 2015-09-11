@@ -1,5 +1,6 @@
 ﻿
 
+using System.Threading.Tasks;
 using Catel;
 using Catel.IoC;
 
@@ -26,28 +27,28 @@ namespace GitReleaseNotes.Website.Services
             _typeFactory = typeFactory;
         }
 
-        public SemanticReleaseNotes GetReleaseNotes(Context context)
+        public async Task<SemanticReleaseNotes> GetReleaseNotesAsync(Context context)
         {
             var key = context.GetContextKey();
 
-            var cachedReleaseNotes = _releaseNotesCacheStorage.GetFromCacheOrFetch(key, () =>
+            //var cachedReleaseNotes = _releaseNotesCacheStorage.GetFromCacheOrFetchAsync(key, async () =>
+            //{
+            try
             {
-                try
-                {
-                    Log.Info("Generating release notes for context '{0}'", key);
+                Log.Info("Generating release notes for context '{0}'", key);
 
-                    var releaseNotesGenerator = _typeFactory.CreateInstanceWithParametersAndAutoCompletion<ReleaseNotesGenerator>(context);
-                    var releaseNotes = releaseNotesGenerator.GenerateReleaseNotes();
-                    return releaseNotes;
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex, "Failed to generate release notes for context '{0}'", key);
-                    return null;
-                }
-            });
+                var releaseNotesGenerator = _typeFactory.CreateInstanceWithParametersAndAutoCompletion<ReleaseNotesGenerator>(context);
+                var releaseNotes = await releaseNotesGenerator.GenerateReleaseNotesAsync();
+                return releaseNotes;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to generate release notes for context '{0}'", key);
+                return null;
+            }
+            //});
 
-            return cachedReleaseNotes;
+            //return cachedReleaseNotes;
         }
     }
 }

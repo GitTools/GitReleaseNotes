@@ -44,6 +44,14 @@
     <Reference Include="ApprovalUtilities.Net45">
       <HintPath>..\packages\ApprovalUtilities.3.0.8\lib\net45\ApprovalUtilities.Net45.dll</HintPath>
     </Reference>
+    <Reference Include="GitTools.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\GitTools.Core.1.0.0-unstable0043\lib\net45\GitTools.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="GitTools.IssueTrackers, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\GitTools.IssueTrackers.1.0.0-unstable0043\lib\net45\GitTools.IssueTrackers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="LibGit2Sharp, Version=0.21.0.176, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\LibGit2Sharp.0.21.0.176\lib\net40\LibGit2Sharp.dll</HintPath>
       <Private>True</Private>

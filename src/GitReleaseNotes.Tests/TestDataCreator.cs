@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using GitReleaseNotes.IssueTrackers;
+using GitTools.IssueTrackers;
 using LibGit2Sharp;
 using NSubstitute;
 
@@ -24,7 +25,7 @@ namespace GitReleaseNotes.Tests
 
         public TestDataCreator CreateRelease(string tag, params string[] issues)
         {
-            _releases.Add(Tuple.Create(tag, issues.Select(i => new Issue(GetNextId(), DateTime.Now)
+            _releases.Add(Tuple.Create(tag, issues.Select(i => new Issue(GetNextId())
             {
                 IssueType = IssueType.Issue,
                 Title = i
@@ -43,7 +44,7 @@ namespace GitReleaseNotes.Tests
         {
             var commits = new List<Commit>();
             var tags = new List<Tag>();
-            var closedIssues = new List<OnlineIssue>();
+            var closedIssues = new List<Issue>();
             repo = Substitute.For<IRepository>();
             issueTracker = Substitute.For<IIssueTracker>();
 
@@ -71,8 +72,9 @@ namespace GitReleaseNotes.Tests
             }
             foreach (var additionalIssue in _additionalIssues)
             {
-                closedIssues.Add(new OnlineIssue(GetNextId(), currentDate)
+                closedIssues.Add(new Issue(GetNextId())
                 {
+                    DateCreated = currentDate,
                     Title = additionalIssue,
                     IssueType = IssueType.Issue
                 });
@@ -81,9 +83,16 @@ namespace GitReleaseNotes.Tests
             }
 
             SubstituteCommitLog(repo, commits, tags);
-            issueTracker
-                .GetClosedIssues(new JiraContext(), Arg.Any<DateTimeOffset?>())
-                .Returns(c => closedIssues.Where(i => c.Arg<DateTimeOffset?>() == null || i.DateClosed > c.Arg<DateTimeOffset?>()));
+
+            var filter = new IssueTrackerFilter
+            {
+                IncludeClosed = true
+            };
+
+            var issuesTask = issueTracker.GetIssuesAsync(filter);
+            var issues = issuesTask.Result;
+
+            issues.Returns(c => closedIssues.Where(i => c.Arg<DateTimeOffset?>() == null || i.DateClosed > c.Arg<DateTimeOffset?>()));
         }
 
         private string GetNextId()

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using GitReleaseNotes.Git;
+using GitTools.Git;
 using LibGit2Sharp;
 using NSubstitute;
 using Shouldly;
