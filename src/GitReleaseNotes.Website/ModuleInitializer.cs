@@ -3,6 +3,7 @@ using GitReleaseNotes;
 using GitReleaseNotes.FileSystem;
 using GitReleaseNotes.IssueTrackers;
 using GitReleaseNotes.Website.Services;
+using GitTools.IssueTrackers;
 using FileSystem = GitReleaseNotes.Website.Services.FileSystem;
 
 /// <summary>

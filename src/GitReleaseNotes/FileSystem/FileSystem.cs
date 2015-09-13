@@ -7,9 +7,9 @@ namespace GitReleaseNotes.FileSystem
     {
         public virtual string GetRepositoryWorkingDirectory(Context context)
         {
-            if (!string.IsNullOrWhiteSpace(context.WorkingDirectory))
+            if (!string.IsNullOrWhiteSpace(context.Repository.Directory))
             {
-                return context.WorkingDirectory;
+                return context.Repository.Directory;
             }
 
             var key = context.GetContextKey();

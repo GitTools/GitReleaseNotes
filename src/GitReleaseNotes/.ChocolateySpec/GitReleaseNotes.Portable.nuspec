@@ -1,20 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
-    <id>GitReleaseNotes</id>
-    <title>GitReleaseNotes</title>
-    <version>__version__</version>
-    <authors>Jake Ginnivan</authors>
-    <owners>Jake Ginnivan</owners>
-    <summary>GitReleaseNotes</summary>
+    <id>GitReleaseNotes.Portable</id>
+    <title>GitReleaseNotes.Portable</title>
+    <version>$version$</version>
+    <authors>GitTools Contributors</authors>
+    <owners>GitTools Contributors</owners>
     <description>GitReleaseNotes generates release notes for any Git repository</description>
     <projectUrl>https://github.com/GitTools/GitReleaseNotes</projectUrl>
-    <tags>GitReleaseNotes, Release Notes, Jira, GitHub, YouTrack, Git</tags>
+    <tags>GitReleaseNotes Release Notes Jira GitHub YouTrack Git</tags>
     <licenseUrl>https://github.com/GitTools/GitReleaseNotes/blob/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <releaseNotes>https://github.com/GitTools/GitReleaseNotes/releases</releaseNotes>
   </metadata>
-  <files>
-    <file src="tools\**" target="tools" />
-  </files>
 </package>

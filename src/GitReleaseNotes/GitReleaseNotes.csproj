@@ -39,8 +39,12 @@
     <Reference Include="Args">
       <HintPath>..\packages\Args.1.1.2\lib\Net40\Args.dll</HintPath>
     </Reference>
-    <Reference Include="Atlassian.Jira, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Atlassian.SDK.2.5.0\lib\Atlassian.Jira.dll</HintPath>
+    <Reference Include="GitTools.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\GitTools.Core.1.0.0-unstable0043\lib\net45\GitTools.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="GitTools.IssueTrackers, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\GitTools.IssueTrackers.1.0.0-unstable0043\lib\net45\GitTools.IssueTrackers.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="LibGit2Sharp, Version=0.21.0.176, Culture=neutral, processorArchitecture=MSIL">
@@ -71,67 +75,31 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Context\Extensions\RepositoryContextExtensions.cs" />
-    <Compile Include="Context\Extensions\IIssueTrackerContextExtensions.cs" />
-    <Compile Include="Context\Interfaces\IAuthenticationContext.cs" />
-    <Compile Include="Context\Interfaces\IIssueTrackerContext.cs" />
-    <Compile Include="Context\IssueTrackerContext.cs" />
-    <Compile Include="IssueTrackers\Interfaces\IIssueTrackerFactory.cs" />
-    <Compile Include="IssueTrackers\Interfaces\IIssueTrackerApi.cs" />
-    <Compile Include="IssueTrackers\IssueTrackerFactory.cs" />
+    <Compile Include="Git\Extensions\IRepositoryExtensions.cs" />
     <Compile Include="Models\BlankLine.cs" />
     <Compile Include="Models\Categories.cs" />
-    <Compile Include="Context\AuthenticationContext.cs" />
-    <Compile Include="Context\IssueTrackers\BitBucketContext.cs" />
     <Compile Include="Context\Context.cs" />
     <Compile Include="Context\Extensions\ContextExtensions.cs" />
-    <Compile Include="Context\IssueTrackers\GitHubContext.cs" />
     <Compile Include="Context\IssueTrackers\JiraContext.cs" />
-    <Compile Include="Context\RepositoryContext.cs" />
-    <Compile Include="Context\IssueTrackers\YouTrackContext.cs" />
-    <Compile Include="Models\Contributor.cs" />
     <Compile Include="Exceptions\GitReleaseNotesException.cs" />
     <Compile Include="Extensions\GitReleaseNotesArgumentsExtensions.cs" />
     <Compile Include="Extensions\ILogExtensions.cs" />
     <Compile Include="GitReleaseNotesEnvironment.cs" />
     <Compile Include="Git\GitBranchNameInfo.cs" />
-    <Compile Include="Git\GitLocalRepositoryContextFactory.cs" />
-    <Compile Include="Git\GitRemoteRepositoryContextFactory.cs" />
-    <Compile Include="Git\GitRepositoryContext.cs" />
-    <Compile Include="Git\Interfaces\IGitRepositoryContextFactory.cs" />
     <Compile Include="Models\Interfaces\IReleaseNoteLine.cs" />
-    <Compile Include="IssueTrackers\BitBucket\BitBucketIssueTracker.cs" />
-    <Compile Include="IssueTrackers\BitBucket\Interfaces\IBitBucketApi.cs" />
-    <Compile Include="IssueTrackers\BitBucket\BitBucketApi.cs" />
-    <Compile Include="IssueTrackers\BitBucket\OAuthBase.cs" />
     <Compile Include="Logging\CustomLog.cs" />
     <Compile Include="ReleaseFinder.cs" />
     <Compile Include="FileSystem\FileSystem.cs" />
     <Compile Include="FileSystem\Interfaces\IFileSystem.cs" />
     <Compile Include="Logging\Interfaces\ILog.cs" />
-    <Compile Include="IssueTrackers\GitHub\GitHubIssueTracker.cs" />
     <Compile Include="GitReleaseNotesArguments.cs" />
-    <Compile Include="Git\GitDirFinder.cs" />
-    <Compile Include="IssueTrackers\IssueType.cs" />
-    <Compile Include="IssueTrackers\OnlineIssue.cs" />
-    <Compile Include="IssueTrackers\YouTrack\Interfaces\IYouTrackApi.cs" />
-    <Compile Include="IssueTrackers\YouTrack\YouTrackApi.cs" />
-    <Compile Include="IssueTrackers\YouTrack\YouTrackIssueTracker.cs" />
     <Compile Include="Models\ReleaseDiffInfo.cs" />
     <Compile Include="Models\ReleaseNoteItem.cs" />
     <Compile Include="IssueTrackers\Interfaces\IIssueNumberExtractor.cs" />
     <Compile Include="IssueTrackers\IssueNumberExtractor.cs" />
-    <Compile Include="IssueTrackers\Interfaces\IIssueTracker.cs" />
-    <Compile Include="IssueTrackers\IssueTracker.cs" />
-    <Compile Include="IssueTrackers\Jira\Interfaces\IJiraApi.cs" />
-    <Compile Include="IssueTrackers\Jira\JiraApi.cs" />
-    <Compile Include="IssueTrackers\Jira\JiraIssue.cs" />
-    <Compile Include="IssueTrackers\Jira\JiraIssueTracker.cs" />
     <Compile Include="Logging\ConsoleLog.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Git\TaggedCommit.cs" />
-    <Compile Include="Git\GitRepositoryInfoFinder.cs" />
     <Compile Include="FileSystem\ReleaseFileWriter.cs" />
     <Compile Include="Models\ReleaseInfo.cs" />
     <Compile Include="FileSystem\ReleaseNotesFileReader.cs" />
@@ -141,18 +109,12 @@
     <Compile Include="Models\SemanticReleaseNotes.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config">
-      <SubType>Designer</SubType>
-    </None>
+    <None Include=".ChocolateySpec\GitReleaseNotes.Portable.nuspec" />
+    <None Include=".ChocolateySpec\tools\chocolateyInstall.ps1" />
+    <None Include=".NuGetSpec\GitReleaseNotes.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\packages\LibGit2Sharp.0.21.0.176\lib\net40\NativeBinaries\amd64\git2-e0902fb.dll">
-      <Link>costura64\git2-e0902fb.dll</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\packages\LibGit2Sharp.0.21.0.176\lib\net40\NativeBinaries\x86\git2-e0902fb.dll">
-      <Link>costura32\git2-e0902fb.dll</Link>
-    </EmbeddedResource>
     <Content Include="FodyWeavers.xml" />
   </ItemGroup>
   <ItemGroup />

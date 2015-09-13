@@ -1,5 +1,5 @@
 using System.ComponentModel;
-using GitReleaseNotes.IssueTrackers;
+using GitTools.IssueTrackers;
 
 namespace GitReleaseNotes
 {

@@ -44,6 +44,14 @@
     <Reference Include="ApprovalUtilities.Net45">
       <HintPath>..\packages\ApprovalUtilities.3.0.8\lib\net45\ApprovalUtilities.Net45.dll</HintPath>
     </Reference>
+    <Reference Include="GitTools.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\GitTools.Core.1.0.0-unstable0043\lib\net45\GitTools.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="GitTools.IssueTrackers, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\GitTools.IssueTrackers.1.0.0-unstable0043\lib\net45\GitTools.IssueTrackers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="LibGit2Sharp, Version=0.21.0.176, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\LibGit2Sharp.0.21.0.176\lib\net40\LibGit2Sharp.dll</HintPath>
       <Private>True</Private>
@@ -59,8 +67,8 @@
       <HintPath>..\packages\Octokit.0.9.0\lib\net45\Octokit.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Shouldly, Version=2.4.0.0, Culture=neutral, PublicKeyToken=6042cbcb05cbc941, processorArchitecture=MSIL">
-      <HintPath>..\packages\Shouldly.2.4.0\lib\net40\Shouldly.dll</HintPath>
+    <Reference Include="Shouldly, Version=2.6.0.0, Culture=neutral, PublicKeyToken=6042cbcb05cbc941, processorArchitecture=MSIL">
+      <HintPath>..\packages\Shouldly.2.6.0\lib\net40\Shouldly.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -79,11 +87,6 @@
     <Compile Include="CommitGrouperTests.cs" />
     <Compile Include="CommitGrouperTestsMultipleTagsPerCommit.cs" />
     <Compile Include="GitRemoteRepositoryTests.cs" />
-    <Compile Include="IssueTrackers\GitHub\GitHubIssueTrackerTests.cs" />
-    <Compile Include="IssueTrackers\GitHub\NetworkEx.cs" />
-    <Compile Include="IssueTrackers\GitHub\RemoteCollectionEx.cs" />
-    <Compile Include="IssueTrackers\GitHub\RemoteEx.cs" />
-    <Compile Include="IssueTrackers\GitHub\TestUser.cs" />
     <Compile Include="IssueTrackers\IssueNumberExtractor.cs" />
     <Compile Include="IssueTrackers\Jira\JiraIssueTrackerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

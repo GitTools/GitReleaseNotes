@@ -1,29 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitReleaseNotes", "GitReleaseNotes\GitReleaseNotes.csproj", "{61D661AC-DC68-4862-8830-FE730C9B15FE}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "misc", "misc", "{A1F62FBD-CDAC-45AF-A89F-898114F27337}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".config", ".config", "{A1F62FBD-CDAC-45AF-A89F-898114F27337}"
 	ProjectSection(SolutionItems) = preProject
-		..\Build.cmd = ..\Build.cmd
-		..\GitReleaseNotes.nuspec = ..\GitReleaseNotes.nuspec
-		..\GitReleaseNotes.proj = ..\GitReleaseNotes.proj
+		..\appveyor.yml = ..\appveyor.yml
 		..\LICENSE = ..\LICENSE
-		..\NextVersion.txt = ..\NextVersion.txt
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitReleaseNotes.Tests", "GitReleaseNotes.Tests\GitReleaseNotes.Tests.csproj", "{CBA088EC-CF1D-43B6-A53D-ECCD89728AA9}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{57788E4D-B495-444B-930E-45FB4708DB24}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B0C7CD2E-1DE1-4F2E-921A-D772763BE725}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{274193A6-46C7-4E3E-ADE0-1AAA7F01092C}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core.Web", "Core.Web", "{E6BB9A8D-A9A0-40A5-9050-CE841820045C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitReleaseNotes.Website", "GitReleaseNotes.Website\GitReleaseNotes.Website.csproj", "{9D0EC650-94D4-4BBD-92A9-8197FC7F65EE}"
 EndProject
@@ -48,13 +37,5 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{61D661AC-DC68-4862-8830-FE730C9B15FE} = {57788E4D-B495-444B-930E-45FB4708DB24}
-		{CBA088EC-CF1D-43B6-A53D-ECCD89728AA9} = {274193A6-46C7-4E3E-ADE0-1AAA7F01092C}
-		{57788E4D-B495-444B-930E-45FB4708DB24} = {B0C7CD2E-1DE1-4F2E-921A-D772763BE725}
-		{274193A6-46C7-4E3E-ADE0-1AAA7F01092C} = {B0C7CD2E-1DE1-4F2E-921A-D772763BE725}
-		{E6BB9A8D-A9A0-40A5-9050-CE841820045C} = {B0C7CD2E-1DE1-4F2E-921A-D772763BE725}
-		{9D0EC650-94D4-4BBD-92A9-8197FC7F65EE} = {E6BB9A8D-A9A0-40A5-9050-CE841820045C}
 	EndGlobalSection
 EndGlobal

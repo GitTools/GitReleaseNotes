@@ -1,7 +1,8 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
-using GitReleaseNotes.IssueTrackers;
+using GitTools.IssueTrackers;
 using Shouldly;
 using Xunit;
 
@@ -12,10 +13,11 @@ namespace GitReleaseNotes.Tests
         [Fact]
         public void VerifyProviderDescriptions()
         {
-            var propertyInfo = typeof (GitReleaseNotesArguments).GetProperty("IssueTracker");
+            var propertyInfo = typeof(GitReleaseNotesArguments).GetProperty("IssueTracker");
             var description = propertyInfo.GetCustomAttribute<DescriptionAttribute>();
 
-            foreach (IssueTracker issueTracker in Enum.GetValues(typeof(IssueTracker)))
+            var issueTrackers = Enum.GetValues(typeof(IssueTracker)).Cast<IssueTracker>().Except(new[] { IssueTracker.Unknown });
+            foreach (var issueTracker in issueTrackers)
             {
                 description.Description.ShouldContain(issueTracker.ToString());
             }

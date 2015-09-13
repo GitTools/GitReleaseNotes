@@ -1,4 +1,6 @@
-﻿namespace GitReleaseNotes
+﻿using GitTools.IssueTrackers;
+
+namespace GitReleaseNotes
 {
     public class JiraContext : IssueTrackerContext
     {

@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using GitTools.IssueTrackers;
 
 namespace GitReleaseNotes
 {
@@ -237,7 +238,7 @@ namespace GitReleaseNotes
 
         private static SemanticRelease CreateMergedSemanticRelease(SemanticRelease r)
         {
-            return new SemanticRelease(r.ReleaseName, r.When, new List<IReleaseNoteLine>(), r.DiffInfo);
+            return new SemanticRelease(r.ReleaseName, r.When, r.DiffInfo);
         }
     }
 }

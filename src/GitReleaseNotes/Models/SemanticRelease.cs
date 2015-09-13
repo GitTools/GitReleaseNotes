@@ -12,12 +12,21 @@ namespace GitReleaseNotes
             ReleaseNoteLines = new List<IReleaseNoteLine>();
         }
 
-        public SemanticRelease(string releaseName, DateTimeOffset? when, List<IReleaseNoteLine> releaseNoteLines, ReleaseDiffInfo diffInfo)
+        public SemanticRelease(string releaseName, DateTimeOffset? when, ReleaseDiffInfo diffInfo = null, IEnumerable<IReleaseNoteLine> releaseNoteLines = null)
+            : this()
         {
-            DiffInfo = diffInfo;
             ReleaseName = releaseName;
             When = when;
-            ReleaseNoteLines = releaseNoteLines;
+
+            if (diffInfo != null)
+            {
+                DiffInfo = diffInfo;
+            }
+
+            if (releaseNoteLines != null)
+            {
+                ReleaseNoteLines.AddRange(releaseNoteLines);
+            }
         }
 
         public string ReleaseName { get; set; }

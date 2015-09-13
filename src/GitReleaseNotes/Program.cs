@@ -4,7 +4,6 @@ using System.Linq;
 using Args;
 using Args.Help;
 using Args.Help.Formatters;
-using GitReleaseNotes.IssueTrackers;
 
 namespace GitReleaseNotes
 {
@@ -38,8 +37,9 @@ namespace GitReleaseNotes
 
             try
             {
-                var releaseNotesGenerator = new ReleaseNotesGenerator(context, new FileSystem.FileSystem(), new IssueTrackerFactory());
-                releaseNotesGenerator.GenerateReleaseNotes();
+                var releaseNotesGenerator = new ReleaseNotesGenerator(context, new FileSystem.FileSystem(), new GitTools.IssueTrackers.IssueTrackerFactory());
+                var task = releaseNotesGenerator.GenerateReleaseNotesAsync();
+                task.Wait();
 
                 Log.WriteLine("Done");
             }
