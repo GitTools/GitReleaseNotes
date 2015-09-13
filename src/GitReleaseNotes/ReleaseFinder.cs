@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using GitReleaseNotes.Git;
 using GitTools.Git;
 using LibGit2Sharp;
 
