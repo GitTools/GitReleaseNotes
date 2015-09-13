@@ -4,7 +4,6 @@ using System.Linq;
 using Args;
 using Args.Help;
 using Args.Help.Formatters;
-using GitReleaseNotes.IssueTrackers;
 
 namespace GitReleaseNotes
 {

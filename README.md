@@ -1,7 +1,14 @@
+![Icon](https://raw.github.com/GitTools/GitTools.Core/develop/GitTools_logo.png)
+
 GitReleaseNotes
 ==============
 
 [![Join the chat at https://gitter.im/GitTools/GitReleaseNotes](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/GitTools/GitReleaseNotes?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+![License](https://img.shields.io/github/license/gittools/gittools.core.svg)
+![NuGet downloads](https://img.shields.io/chocolatey/dt/gitreleasenotes.svg)
+[![Chocolatey](https://img.shields.io/chocolatey/v/gitreleasenotes.svg)](https://chocolatey.org/packages/GitReleaseNotes)
+[![Build status](https://ci.appveyor.com/api/projects/status/br0rijb3rgn1qb0c/branch/master?svg=true)](https://ci.appveyor.com/project/GitTools/gitreleasenotes/branch/master)
 
 Utility which makes it really easy to generate release notes for your Git project. Works with GitHub, Jira and YouTrack. TFS Support coming soon
 

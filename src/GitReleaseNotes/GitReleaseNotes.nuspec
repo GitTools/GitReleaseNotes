@@ -13,10 +13,4 @@
     <copyright>Copyright Jake Ginnivan 2015</copyright>
     <tags>Release notes generate github git</tags>
   </metadata>
-  <files>
-    <file src="GitReleaseNotes.exe" target="tools"/>
-    <file src="GitReleaseNotes.pdb" target="tools"/>
-    <file src="NativeBinaries/amd64/git2-4a30c53.dll" target="tools/NativeBinaries/amd64/"/>
-    <file src="NativeBinaries/x86/git2-4a30c53.dll" target="tools/NativeBinaries/x86/"/>
-  </files>
 </package>
