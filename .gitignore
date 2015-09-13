@@ -115,3 +115,5 @@ src/_NCrunch_GitReleaseNotes
 src/GitReleaseNotes.sln.ide/
 *.GhostDoc.xml
 src/.vs/config/applicationhost.config
+GitReleaseNotes.*.nupkg
+output/

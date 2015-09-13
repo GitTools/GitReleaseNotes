@@ -2,15 +2,18 @@
 <package >
   <metadata>
     <id>GitReleaseNotes</id>
+    <title>GitReleaseNotes Commandline Tool</title>
     <version>$version$</version>
-    <authors>JakeGinnivan</authors>
-    <owners>JakeGinnivan</owners>
+    <authors>GitTools Contributors</authors>
+    <owners>GitTools Contributors</owners>
     <licenseUrl>https://github.com/GitTools/GitReleaseNotes/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/GitTools/GitReleaseNotes</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>The easy way to generate release notes for your Git projects</description>
-    <releaseNotes>Initial release</releaseNotes>
-    <copyright>Copyright Jake Ginnivan 2015</copyright>
+    <copyright>Copyright GitTools 2015</copyright>
     <tags>Release notes generate github git</tags>
   </metadata>
+  <files>
+    <file src="**" target="tools" />
+  </files>
 </package>
