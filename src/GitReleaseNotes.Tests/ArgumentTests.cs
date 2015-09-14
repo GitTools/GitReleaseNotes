@@ -16,7 +16,7 @@ namespace GitReleaseNotes.Tests
             var propertyInfo = typeof(GitReleaseNotesArguments).GetProperty("IssueTracker");
             var description = propertyInfo.GetCustomAttribute<DescriptionAttribute>();
 
-            var issueTrackers = Enum.GetValues(typeof(IssueTracker)).Cast<IssueTracker>().Except(new[] { IssueTracker.Unknown });
+            var issueTrackers = Enum.GetValues(typeof(IssueTrackerType)).Cast<IssueTrackerType>();
             foreach (var issueTracker in issueTrackers)
             {
                 description.Description.ShouldContain(issueTracker.ToString());

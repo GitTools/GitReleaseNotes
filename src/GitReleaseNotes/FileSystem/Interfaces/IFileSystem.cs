@@ -7,6 +7,5 @@
         string ReadAllText(string path);
         bool DirectoryExists(string path);
         bool FileExists(string path);
-        string GetRepositoryWorkingDirectory(Context context);
     }
 }

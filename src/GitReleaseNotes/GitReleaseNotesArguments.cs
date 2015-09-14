@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using Args;
 using GitTools.IssueTrackers;
 
 namespace GitReleaseNotes
@@ -7,13 +8,14 @@ namespace GitReleaseNotes
     {
         [Description("The directory of the Git repository to determine the version for; " +
                      "if unspecified it will search parent directories recursively until finding a Git repository.")]
+        [ArgsMemberSwitch(0)]
         public string WorkingDirectory { get; set; }
 
         [Description("Enables verbose logging")]
         public bool Verbose { get; set; }
 
         [Description("Specifies the issue tracker used, possible Options: BitBucket, GitHub, Jira, YouTrack")]
-        public IssueTracker? IssueTracker { get; set; }
+        public IssueTrackerType? IssueTracker { get; set; }
 
         [Description("Specifies that all tags should be included in the release notes, if not specified then only the issues since the last tag are included.")]
         public bool AllTags { get; set; }

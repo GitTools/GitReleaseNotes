@@ -1,8 +1,6 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web;
 using Catel;
-using GitReleaseNotes.Website.Models;
 using GitReleaseNotes.Website.Models.Api;
 using GitReleaseNotes.Website.Services;
 
@@ -13,13 +11,13 @@ namespace GitReleaseNotes.Website.Controllers.Api
     [RoutePrefix("api/releasenotes")]
     public class ReleaseNotesController : ApiControllerBase
     {
-        private readonly IReleaseNotesService _releaseNotesService;
+        private readonly IReleaseNotesService releaseNotesService;
 
         public ReleaseNotesController(IReleaseNotesService releaseNotesService)
         {
             Argument.IsNotNull(() => releaseNotesService);
 
-            _releaseNotesService = releaseNotesService;
+            this.releaseNotesService = releaseNotesService;
         }
 
         [HttpPost]
@@ -28,10 +26,19 @@ namespace GitReleaseNotes.Website.Controllers.Api
         {
             Argument.IsNotNull(() => releaseNotesRequest);
 
-            var context = releaseNotesRequest.ToContext();
-            context.AllTags = true;
+            var context1 = new ReleaseNotesGenerationParameters
+            {
+                RepositorySettings =
+                {
+                    Url = releaseNotesRequest.RepositoryUrl,
+                    Branch = releaseNotesRequest.RepositoryBranch
+                },
+                IssueTracker = {ProjectId = releaseNotesRequest.IssueTrackerProjectId}
+            };
 
-            var releaseNotes = await _releaseNotesService.GetReleaseNotesAsync(context);
+            var context = context1;
+            context.AllTags = true;
+            var releaseNotes = await releaseNotesService.GetReleaseNotesAsync(context);
             
             return new HttpResponseMessage
             {

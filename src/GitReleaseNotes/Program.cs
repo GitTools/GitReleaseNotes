@@ -9,6 +9,7 @@ namespace GitReleaseNotes
 {
     public static class Program
     {
+        // TODO Fix logging.. Just choose serilog or something which liblog picks up
         private static readonly ILog Log = GitReleaseNotesEnvironment.Log;
 
         static int Main(string[] args)
@@ -30,15 +31,18 @@ namespace GitReleaseNotes
 
             var arguments = modelBindingDefinition.CreateAndBind(args);
             var context = arguments.ToContext();
-            if (!context.Validate())
-            {
-                return -1;
-            }
+            //if (!context.Validate())
+            //{
+            //    return -1;
+            //}
 
             try
             {
-                var releaseNotesGenerator = new ReleaseNotesGenerator(context, new FileSystem.FileSystem(), new GitTools.IssueTrackers.IssueTrackerFactory());
+                var releaseNotesGenerator = new ReleaseNotesGenerator(context, new FileSystem.FileSystem());
                 var task = releaseNotesGenerator.GenerateReleaseNotesAsync();
+
+                // TODO Write out the file based on the argument
+                
                 task.Wait();
 
                 Log.WriteLine("Done");
