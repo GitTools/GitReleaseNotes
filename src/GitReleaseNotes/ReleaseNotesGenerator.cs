@@ -84,6 +84,10 @@ namespace GitReleaseNotes
                     currentReleaseInfo.Name = context.Version;
                     currentReleaseInfo.When = DateTimeOffset.Now;
                 }
+                else
+                {
+                    currentReleaseInfo.Name = "vNext";
+                }
 
                 var releaseNotes = await GenerateReleaseNotesAsync(
                     context, gitRepository, issueTracker,
@@ -129,7 +133,7 @@ namespace GitReleaseNotes
                 IncludeOpen = false
             };
 
-            var closedIssues = await issueTracker.GetIssuesAsync(filter);
+            var closedIssues = (await issueTracker.GetIssuesAsync(filter)).ToArray();
 
             // As discussed here: https://github.com/GitTools/GitReleaseNotes/issues/85
 
@@ -165,7 +169,7 @@ namespace GitReleaseNotes
                     {
                         if (issue.DateClosed.HasValue &&
                             issue.DateClosed.Value > release.PreviousReleaseDate &&
-                            issue.DateClosed <= release.When)
+                            (release.When == null || issue.DateClosed <= release.When))
                         {
                             if (!semanticReleases.ContainsKey(release.Name))
                             {
