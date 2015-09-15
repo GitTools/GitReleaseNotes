@@ -19,9 +19,6 @@ namespace GitReleaseNotes
         public RepositoryContext RepositorySettings { get; private set; }
         public IssueTrackerParameters IssueTracker { get; private set; }
 
-        [Obsolete("Release notes generation should have nothing to do with an output file")]
-        public string OutputFile { get; set; }
-
         public string WorkingDirectory { get; set; }
     }
 }

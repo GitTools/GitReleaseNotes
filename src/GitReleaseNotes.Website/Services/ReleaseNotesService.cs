@@ -36,7 +36,7 @@ namespace GitReleaseNotes.Website.Services
                 Log.Info("Generating release notes for '{0}'", "..."); // TODO log properly
 
                 var releaseNotesGenerator = _typeFactory.CreateInstanceWithParametersAndAutoCompletion<ReleaseNotesGenerator>(generationParameters);
-                var releaseNotes = await releaseNotesGenerator.GenerateReleaseNotesAsync();
+                var releaseNotes = await releaseNotesGenerator.GenerateReleaseNotesAsync(new SemanticReleaseNotes());
                 return releaseNotes;
             }
             catch (Exception ex)

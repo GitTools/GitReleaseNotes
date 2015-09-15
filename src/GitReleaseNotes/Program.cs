@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using Args;
 using Args.Help;
 using Args.Help.Formatters;
+using GitReleaseNotes.FileSystem;
 
 namespace GitReleaseNotes
 {
@@ -20,9 +22,7 @@ namespace GitReleaseNotes
 
             if (args.Any(a => a == "/?" || a == "?" || a.Equals("/help", StringComparison.InvariantCultureIgnoreCase)))
             {
-                var help = new HelpProvider().GenerateModelHelp(modelBindingDefinition);
-                var f = new ConsoleHelpFormatter();
-                f.WriteHelp(help, Console.Out);
+                ShowHelp(modelBindingDefinition);
 
                 return 0;
             }
@@ -30,6 +30,11 @@ namespace GitReleaseNotes
             var exitCode = 0;
 
             var arguments = modelBindingDefinition.CreateAndBind(args);
+            if (string.IsNullOrEmpty(arguments.OutputFile))
+            {
+                ShowHelp(modelBindingDefinition);
+                return 1;
+            }
             var context = arguments.ToContext();
             //if (!context.Validate())
             //{
@@ -38,12 +43,31 @@ namespace GitReleaseNotes
 
             try
             {
-                var releaseNotesGenerator = new ReleaseNotesGenerator(context, new FileSystem.FileSystem());
-                var task = releaseNotesGenerator.GenerateReleaseNotesAsync();
+                var fileSystem = new FileSystem.FileSystem();
+                var releaseFileWriter = new ReleaseFileWriter(fileSystem);
+                string outputFile = null;
+                var previousReleaseNotes = new SemanticReleaseNotes();
 
-                // TODO Write out the file based on the argument
-                
-                task.Wait();
+                var outputPath = context.WorkingDirectory;
+                var outputDirectory = new DirectoryInfo(outputPath);
+                if (outputDirectory.Name == ".git")
+                {
+                    outputPath = outputDirectory.Parent.FullName;
+                }
+
+                if (!string.IsNullOrEmpty(arguments.OutputFile))
+                {
+                    outputFile = Path.IsPathRooted(arguments.OutputFile)
+                        ? arguments.OutputFile
+                        : Path.Combine(outputPath, arguments.OutputFile);
+                    previousReleaseNotes = new ReleaseNotesFileReader(fileSystem, outputPath).ReadPreviousReleaseNotes(outputFile);
+                }
+
+                var releaseNotesGenerator = new ReleaseNotesGenerator(context);
+                var releaseNotes = releaseNotesGenerator.GenerateReleaseNotesAsync(previousReleaseNotes).Result;
+
+                var releaseNotesOutput = releaseNotes.ToString();
+                releaseFileWriter.OutputReleaseNotesFile(releaseNotesOutput, outputFile);
 
                 Log.WriteLine("Done");
             }
@@ -65,6 +89,19 @@ namespace GitReleaseNotes
             }
 
             return exitCode;
+        }
+
+        private static void ShowHelp(IModelBindingDefinition<GitReleaseNotesArguments> modelBindingDefinition, string reason = null)
+        {
+            var help = new HelpProvider().GenerateModelHelp(modelBindingDefinition);
+            var f = new ConsoleHelpFormatter();
+            f.WriteHelp(help, Console.Out);
+
+            if (reason != null)
+            {
+                Console.WriteLine();
+                Console.WriteLine(reason);
+            }
         }
     }
 }

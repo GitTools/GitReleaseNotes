@@ -1,4 +1,4 @@
-﻿using GitTools;
+﻿using System.IO;
 
 namespace GitReleaseNotes
 {
@@ -8,8 +8,7 @@ namespace GitReleaseNotes
         {
             return new ReleaseNotesGenerationParameters
             {
-                WorkingDirectory = arguments.WorkingDirectory,
-                OutputFile = arguments.OutputFile,
+                WorkingDirectory = arguments.WorkingDirectory ?? Directory.GetCurrentDirectory(),
                 Categories = arguments.Categories,
                 Version = arguments.Version,
                 AllTags = arguments.AllTags,

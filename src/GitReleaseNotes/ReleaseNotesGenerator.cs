@@ -18,87 +18,55 @@ namespace GitReleaseNotes
         private static readonly ILog Log = GitReleaseNotesEnvironment.Log;
 
         private readonly ReleaseNotesGenerationParameters _generationParameters;
-        private readonly IFileSystem _fileSystem;
 
-        public ReleaseNotesGenerator(ReleaseNotesGenerationParameters generationParameters, IFileSystem fileSystem)
+        public ReleaseNotesGenerator(ReleaseNotesGenerationParameters generationParameters)
         {
             _generationParameters = generationParameters;
-            _fileSystem = fileSystem;
         }
 
-        public async Task<SemanticReleaseNotes> GenerateReleaseNotesAsync()
+        public async Task<SemanticReleaseNotes> GenerateReleaseNotesAsync(SemanticReleaseNotes releaseNotesToUpdate)
         {
-            var context = _generationParameters;
-
-            using (var temporaryFilesContext = new TemporaryFilesContext())
+            var gitRepository = new Repository(Repository.Discover(_generationParameters.WorkingDirectory));
+            IIssueTracker issueTracker;
+            if (_generationParameters.IssueTracker.Type.HasValue)
             {
-                //var gitPreparer = new GitPreparer();
-                //var gitRepositoryDirectory = gitPreparer.Prepare(_generationParameters.RepositorySettings, temporaryFilesContext);
-                var startingPath = context.WorkingDirectory ?? Directory.GetCurrentDirectory();
-                var gitRepository = new Repository(Repository.Discover(startingPath));
-                IIssueTracker issueTracker;
-                if (context.IssueTracker.Type.HasValue)
-                {
-                    issueTracker = IssueTrackerFactory.CreateIssueTracker(new IssueTrackerSettings(context.IssueTracker.Server,
-                            context.IssueTracker.Type.Value)
-                        {
-                            Project = context.IssueTracker.ProjectId,
-                            Authentication = context.IssueTracker.Authentication
-                        });
-                }
-                else
-                {
-                    if (!TryRemote(gitRepository, "upstream", context, out issueTracker) &&
-                        !TryRemote(gitRepository, "origin", context, out issueTracker))
+                issueTracker = IssueTrackerFactory.CreateIssueTracker(new IssueTrackerSettings(_generationParameters.IssueTracker.Server,
+                        _generationParameters.IssueTracker.Type.Value)
                     {
-                        throw new Exception("Unable to guess issue tracker through remote, specify issue tracker type on the command line");
-                    }
-                }
-
-                var releaseFileWriter = new ReleaseFileWriter(_fileSystem);
-                string outputFile = null;
-                var previousReleaseNotes = new SemanticReleaseNotes();
-
-                var outputPath = startingPath;
-                var outputDirectory = new DirectoryInfo(outputPath);
-                if (outputDirectory.Name == ".git")
-                {
-                    outputPath = outputDirectory.Parent.FullName;
-                }
-
-                if (!string.IsNullOrEmpty(context.OutputFile))
-                {
-                    outputFile = Path.IsPathRooted(context.OutputFile)
-                        ? context.OutputFile
-                        : Path.Combine(outputPath, context.OutputFile);
-                    previousReleaseNotes = new ReleaseNotesFileReader(_fileSystem, outputPath).ReadPreviousReleaseNotes(outputFile);
-                }
-
-                var categories = new Categories(context.Categories, context.AllLabels);
-                var tagToStartFrom = context.AllTags
-                    ? gitRepository.GetFirstCommit()
-                    : gitRepository.GetLastTaggedCommit() ?? gitRepository.GetFirstCommit();
-                var currentReleaseInfo = gitRepository.GetCurrentReleaseInfo();
-                if (!string.IsNullOrEmpty(context.Version))
-                {
-                    currentReleaseInfo.Name = context.Version;
-                    currentReleaseInfo.When = DateTimeOffset.Now;
-                }
-                else
-                {
-                    currentReleaseInfo.Name = "vNext";
-                }
-
-                var releaseNotes = await GenerateReleaseNotesAsync(
-                    context, gitRepository, issueTracker,
-                    previousReleaseNotes, categories,
-                    tagToStartFrom, currentReleaseInfo);
-
-                var releaseNotesOutput = releaseNotes.ToString();
-                releaseFileWriter.OutputReleaseNotesFile(releaseNotesOutput, outputFile);
-
-                return releaseNotes;
+                        Project = _generationParameters.IssueTracker.ProjectId,
+                        Authentication = _generationParameters.IssueTracker.Authentication
+                    });
             }
+            else
+            {
+                if (!TryRemote(gitRepository, "upstream", _generationParameters, out issueTracker) &&
+                    !TryRemote(gitRepository, "origin", _generationParameters, out issueTracker))
+                {
+                    throw new Exception("Unable to guess issue tracker through remote, specify issue tracker type on the command line");
+                }
+            }
+
+            var categories = new Categories(_generationParameters.Categories, _generationParameters.AllLabels);
+            var tagToStartFrom = _generationParameters.AllTags
+                ? gitRepository.GetFirstCommit()
+                : gitRepository.GetLastTaggedCommit() ?? gitRepository.GetFirstCommit();
+            var currentReleaseInfo = gitRepository.GetCurrentReleaseInfo();
+            if (!string.IsNullOrEmpty(_generationParameters.Version))
+            {
+                currentReleaseInfo.Name = _generationParameters.Version;
+                currentReleaseInfo.When = DateTimeOffset.Now;
+            }
+            else
+            {
+                currentReleaseInfo.Name = "vNext";
+            }
+
+            var releaseNotes = await GenerateReleaseNotesAsync(
+                _generationParameters, gitRepository, issueTracker,
+                releaseNotesToUpdate, categories,
+                tagToStartFrom, currentReleaseInfo);
+
+            return releaseNotes;
         }
 
         private static bool TryRemote(Repository gitRepository, string name, ReleaseNotesGenerationParameters context,
