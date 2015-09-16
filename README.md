@@ -41,7 +41,7 @@ You can also use GitReleaseNotes to create a GitHub release, and generate the re
 If you use GitHub milestones to manage your releases [GitHubReleaseNotes](https://github.com/Particular/GitHubReleaseNotes) is a similar project.
 
 ## Versioning a release
-[GitVersion](https://github.com/Particular/GitVersion) is another project which can help you generate version numbers and make following Semantic Versions easily
+[GitVersion](https://github.com/GitTools/GitVersion) is another project which can help you generate version numbers and make following Semantic Versions easily
 
 ## Publishing a release
 Initial versions of this tool allowed publishing to GitHub. This has been removed.
