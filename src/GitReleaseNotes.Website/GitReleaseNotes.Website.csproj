@@ -248,7 +248,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\" />
     <Folder Include="content\angular\directives\" />
     <Folder Include="content\angular\mixins\" />
     <Folder Include="content\img\" />

@@ -1,7 +1,6 @@
 ﻿using Catel.IoC;
 using GitReleaseNotes.FileSystem;
 using GitReleaseNotes.Website.Services;
-using FileSystem = GitReleaseNotes.Website.Services.FileSystem;
 
 /// <summary>
 /// Used by the ModuleInit. All code inside the Initialize method is ran as soon as the assembly is loaded.
