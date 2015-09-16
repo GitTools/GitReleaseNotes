@@ -27,28 +27,37 @@ namespace GitReleaseNotes.Website.Services
             _typeFactory = typeFactory;
         }
 
-        public async Task<SemanticReleaseNotes> GetReleaseNotesAsync(Context context)
+        public async Task<SemanticReleaseNotes> GetReleaseNotesAsync(ReleaseNotesGenerationParameters generationParameters)
         {
-            var key = context.GetContextKey();
-
             //var cachedReleaseNotes = _releaseNotesCacheStorage.GetFromCacheOrFetchAsync(key, async () =>
             //{
             try
             {
-                Log.Info("Generating release notes for context '{0}'", key);
+                Log.Info("Generating release notes for '{0}'", "..."); // TODO log properly
 
-                var releaseNotesGenerator = _typeFactory.CreateInstanceWithParametersAndAutoCompletion<ReleaseNotesGenerator>(context);
-                var releaseNotes = await releaseNotesGenerator.GenerateReleaseNotesAsync();
+                var releaseNotesGenerator = _typeFactory.CreateInstanceWithParametersAndAutoCompletion<ReleaseNotesGenerator>(generationParameters);
+                var releaseNotes = await releaseNotesGenerator.GenerateReleaseNotesAsync(new SemanticReleaseNotes());
                 return releaseNotes;
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Failed to generate release notes for context '{0}'", key);
+                Log.Error(ex, "Failed to generate release notes for context '{0}'", "...");
                 return null;
             }
             //});
 
             //return cachedReleaseNotes;
         }
+
+        //public static string GetContextKey(Context context)
+        //{
+        //    var key = string.Join("_", context.Repository.Url, context.Repository.Branch, context.IssueTracker.Server, context.IssueTracker.ProjectId);
+
+        //    key = key.Replace("/", "_")
+        //        .Replace("\\", "_")
+        //        .Replace(":", "_");
+
+        //    return key;
+        //}
     }
 }

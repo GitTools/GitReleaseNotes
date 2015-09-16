@@ -39,12 +39,16 @@
     <Reference Include="Args">
       <HintPath>..\packages\Args.1.1.2\lib\Net40\Args.dll</HintPath>
     </Reference>
+    <Reference Include="Atlassian.Jira, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Atlassian.SDK.2.5.0\lib\Atlassian.Jira.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="GitTools.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\GitTools.Core.1.0.0-unstable0043\lib\net45\GitTools.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="GitTools.IssueTrackers, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\GitTools.IssueTrackers.1.0.0-unstable0043\lib\net45\GitTools.IssueTrackers.dll</HintPath>
+    <Reference Include="GitTools.IssueTrackers, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\GitTools.IssueTrackers.0.1.0-beta0002\lib\net45\GitTools.IssueTrackers.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="LibGit2Sharp, Version=0.21.0.176, Culture=neutral, processorArchitecture=MSIL">
@@ -55,8 +59,8 @@
       <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Octokit, Version=0.9.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Octokit.0.9.0\lib\net45\Octokit.dll</HintPath>
+    <Reference Include="Octokit, Version=0.15.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Octokit.0.15.0\lib\net45\Octokit.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="RestSharp">
@@ -76,16 +80,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Git\Extensions\IRepositoryExtensions.cs" />
+    <Compile Include="IssueTrackerParameters.cs" />
     <Compile Include="Models\BlankLine.cs" />
     <Compile Include="Models\Categories.cs" />
-    <Compile Include="Context\Context.cs" />
-    <Compile Include="Context\Extensions\ContextExtensions.cs" />
-    <Compile Include="Context\IssueTrackers\JiraContext.cs" />
+    <Compile Include="ReleaseNotesGenerationParameters.cs" />
     <Compile Include="Exceptions\GitReleaseNotesException.cs" />
     <Compile Include="Extensions\GitReleaseNotesArgumentsExtensions.cs" />
     <Compile Include="Extensions\ILogExtensions.cs" />
     <Compile Include="GitReleaseNotesEnvironment.cs" />
-    <Compile Include="Git\GitBranchNameInfo.cs" />
     <Compile Include="Models\Interfaces\IReleaseNoteLine.cs" />
     <Compile Include="Logging\CustomLog.cs" />
     <Compile Include="ReleaseFinder.cs" />

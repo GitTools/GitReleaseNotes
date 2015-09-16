@@ -4,6 +4,6 @@ namespace GitReleaseNotes.Website.Services
 {
     public interface IReleaseNotesService
     {
-        Task<SemanticReleaseNotes> GetReleaseNotesAsync(Context context);
+        Task<SemanticReleaseNotes> GetReleaseNotesAsync(ReleaseNotesGenerationParameters generationParameters);
     }
 }

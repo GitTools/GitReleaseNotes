@@ -46,6 +46,10 @@
       <HintPath>..\packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Atlassian.Jira, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Atlassian.SDK.2.5.0\lib\Atlassian.Jira.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Catel.Core, Version=4.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Catel.Core.4.1.0\lib\net45\Catel.Core.dll</HintPath>
       <Private>True</Private>
@@ -58,8 +62,8 @@
       <HintPath>..\packages\GitTools.Core.1.0.0-unstable0043\lib\net45\GitTools.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="GitTools.IssueTrackers, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\GitTools.IssueTrackers.1.0.0-unstable0043\lib\net45\GitTools.IssueTrackers.dll</HintPath>
+    <Reference Include="GitTools.IssueTrackers, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\GitTools.IssueTrackers.0.1.0-beta0002\lib\net45\GitTools.IssueTrackers.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="LibGit2Sharp, Version=0.21.0.176, Culture=neutral, processorArchitecture=MSIL">
@@ -77,6 +81,10 @@
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Octokit, Version=0.15.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Octokit.0.15.0\lib\net45\Octokit.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
@@ -214,12 +222,10 @@
     </Compile>
     <Compile Include="IoC\CatelWebApiDependencyResolver.cs" />
     <Compile Include="Logging\GitReleaseNotesLogger.cs" />
-    <Compile Include="Models\Api\Extensions\ReleaseNotesRequestExtensions.cs" />
     <Compile Include="Models\Api\Response.cs" />
     <Compile Include="Models\Api\ReleaseNotesRequest.cs" />
     <Compile Include="ModuleInitializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\FileSystem.cs" />
     <Compile Include="Services\Interfaces\IReleaseNotesService.cs" />
     <Compile Include="Services\ReleaseNotesService.cs" />
   </ItemGroup>
@@ -242,7 +248,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\" />
     <Folder Include="content\angular\directives\" />
     <Folder Include="content\angular\mixins\" />
     <Folder Include="content\img\" />

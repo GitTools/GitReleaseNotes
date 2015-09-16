@@ -1,10 +1,6 @@
 ﻿using Catel.IoC;
-using GitReleaseNotes;
 using GitReleaseNotes.FileSystem;
-using GitReleaseNotes.IssueTrackers;
 using GitReleaseNotes.Website.Services;
-using GitTools.IssueTrackers;
-using FileSystem = GitReleaseNotes.Website.Services.FileSystem;
 
 /// <summary>
 /// Used by the ModuleInit. All code inside the Initialize method is ran as soon as the assembly is loaded.
@@ -20,6 +16,5 @@ public static class ModuleInitializer
 
         serviceLocator.RegisterType<IReleaseNotesService, ReleaseNotesService>();
         serviceLocator.RegisterType<IFileSystem, FileSystem>();
-        serviceLocator.RegisterType<IIssueTrackerFactory, IssueTrackerFactory>();
     }
 }

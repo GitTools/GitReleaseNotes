@@ -17,87 +17,74 @@ namespace GitReleaseNotes
     {
         private static readonly ILog Log = GitReleaseNotesEnvironment.Log;
 
-        private readonly Context _context;
-        private readonly IFileSystem _fileSystem;
-        private readonly IIssueTrackerFactory _issueTrackerFactory;
+        private readonly ReleaseNotesGenerationParameters _generationParameters;
 
-        public ReleaseNotesGenerator(Context context, IFileSystem fileSystem, IIssueTrackerFactory issueTrackerFactory)
+        public ReleaseNotesGenerator(ReleaseNotesGenerationParameters generationParameters)
         {
-            _context = context;
-            _fileSystem = fileSystem;
-            _issueTrackerFactory = issueTrackerFactory;
+            _generationParameters = generationParameters;
         }
 
-        public async Task<SemanticReleaseNotes> GenerateReleaseNotesAsync()
+        public async Task<SemanticReleaseNotes> GenerateReleaseNotesAsync(SemanticReleaseNotes releaseNotesToUpdate)
         {
-            var context = _context;
-
-            using (var temporaryFilesContext = new TemporaryFilesContext())
+            var gitRepository = new Repository(Repository.Discover(_generationParameters.WorkingDirectory));
+            IIssueTracker issueTracker;
+            if (_generationParameters.IssueTracker.Type.HasValue)
             {
-                var gitPreparer = new GitPreparer();
-                var gitRepositoryDirectory = gitPreparer.Prepare(context.Repository, temporaryFilesContext);
-                var gitRepository = new Repository(gitRepositoryDirectory);
-
-                if (context.IssueTracker == null)
-                {
-                    // TODO: Write auto detection mechanism which is better than this
-                    throw new GitReleaseNotesException("Feature to automatically detect issue tracker must be written");
-                    //var firstOrDefault = _issueTrackers.FirstOrDefault(i => i.Value.RemotePresentWhichMatches);
-                    //if (firstOrDefault.Value != null)
-                    //{
-                    //    issueTracker = firstOrDefault.Value;
-                    //}
-                }
-
-                var issueTracker = _issueTrackerFactory.CreateIssueTracker(context.IssueTracker);
-                if (issueTracker == null)
-                {
-                    throw new GitReleaseNotesException("Failed to create issue tracker from context, cannot continue");
-                }
-
-                var releaseFileWriter = new ReleaseFileWriter(_fileSystem);
-                string outputFile = null;
-                var previousReleaseNotes = new SemanticReleaseNotes();
-
-                var outputPath = gitRepositoryDirectory;
-                var outputDirectory = new DirectoryInfo(outputPath);
-                if (outputDirectory.Name == ".git")
-                {
-                    outputPath = outputDirectory.Parent.FullName;
-                }
-
-                if (!string.IsNullOrEmpty(context.OutputFile))
-                {
-                    outputFile = Path.IsPathRooted(context.OutputFile)
-                        ? context.OutputFile
-                        : Path.Combine(outputPath, context.OutputFile);
-                    previousReleaseNotes = new ReleaseNotesFileReader(_fileSystem, outputPath).ReadPreviousReleaseNotes(outputFile);
-                }
-
-                var categories = new Categories(context.Categories, context.AllLabels);
-                var tagToStartFrom = context.AllTags
-                    ? gitRepository.GetFirstCommit()
-                    : gitRepository.GetLastTaggedCommit() ?? gitRepository.GetFirstCommit();
-                var currentReleaseInfo = gitRepository.GetCurrentReleaseInfo();
-                if (!string.IsNullOrEmpty(context.Version))
-                {
-                    currentReleaseInfo.Name = context.Version;
-                    currentReleaseInfo.When = DateTimeOffset.Now;
-                }
-
-                var releaseNotes = await GenerateReleaseNotesAsync(
-                    context, gitRepository, issueTracker,
-                    previousReleaseNotes, categories,
-                    tagToStartFrom, currentReleaseInfo);
-
-                var releaseNotesOutput = releaseNotes.ToString();
-                releaseFileWriter.OutputReleaseNotesFile(releaseNotesOutput, outputFile);
-
-                return releaseNotes;
+                issueTracker = IssueTrackerFactory.CreateIssueTracker(new IssueTrackerSettings(_generationParameters.IssueTracker.Server,
+                        _generationParameters.IssueTracker.Type.Value)
+                    {
+                        Project = _generationParameters.IssueTracker.ProjectId,
+                        Authentication = _generationParameters.IssueTracker.Authentication.ToIssueTrackerSettings()
+                    });
             }
+            else
+            {
+                if (!TryRemote(gitRepository, "upstream", _generationParameters, out issueTracker) &&
+                    !TryRemote(gitRepository, "origin", _generationParameters, out issueTracker))
+                {
+                    throw new Exception("Unable to guess issue tracker through remote, specify issue tracker type on the command line");
+                }
+            }
+
+            var categories = new Categories(_generationParameters.Categories, _generationParameters.AllLabels);
+            var tagToStartFrom = _generationParameters.AllTags
+                ? gitRepository.GetFirstCommit()
+                : gitRepository.GetLastTaggedCommit() ?? gitRepository.GetFirstCommit();
+            var currentReleaseInfo = gitRepository.GetCurrentReleaseInfo();
+            if (!string.IsNullOrEmpty(_generationParameters.Version))
+            {
+                currentReleaseInfo.Name = _generationParameters.Version;
+                currentReleaseInfo.When = DateTimeOffset.Now;
+            }
+            else
+            {
+                currentReleaseInfo.Name = "vNext";
+            }
+
+            var releaseNotes = await GenerateReleaseNotesAsync(
+                _generationParameters, gitRepository, issueTracker,
+                releaseNotesToUpdate, categories,
+                tagToStartFrom, currentReleaseInfo);
+
+            return releaseNotes;
         }
 
-        public static async Task<SemanticReleaseNotes> GenerateReleaseNotesAsync(Context context,
+        private static bool TryRemote(Repository gitRepository, string name, ReleaseNotesGenerationParameters context,
+            out IIssueTracker issueTracker)
+        {
+            var upstream = gitRepository.Network.Remotes[name];
+            if (upstream == null)
+            {
+                issueTracker = null;
+                return false;
+            }
+            return IssueTrackerFactory.TryCreateIssueTrackerFromUrl(
+                upstream.Url,
+                context.IssueTracker.Authentication.ToIssueTrackerSettings(),
+                out issueTracker);
+        }
+
+        public static async Task<SemanticReleaseNotes> GenerateReleaseNotesAsync(ReleaseNotesGenerationParameters generationParameters,
             IRepository gitRepo, IIssueTracker issueTracker, SemanticReleaseNotes previousReleaseNotes,
             Categories categories, TaggedCommit tagToStartFrom, ReleaseInfo currentReleaseInfo)
         {
@@ -114,7 +101,7 @@ namespace GitReleaseNotes
                 IncludeOpen = false
             };
 
-            var closedIssues = await issueTracker.GetIssuesAsync(filter);
+            var closedIssues = (await issueTracker.GetIssuesAsync(filter)).ToArray();
 
             // As discussed here: https://github.com/GitTools/GitReleaseNotes/issues/85
 
@@ -150,7 +137,7 @@ namespace GitReleaseNotes
                     {
                         if (issue.DateClosed.HasValue &&
                             issue.DateClosed.Value > release.PreviousReleaseDate &&
-                            issue.DateClosed <= release.When)
+                            (release.When == null || issue.DateClosed <= release.When))
                         {
                             if (!semanticReleases.ContainsKey(release.Name))
                             {
@@ -161,7 +148,7 @@ namespace GitReleaseNotes
                                 {
                                     BeginningSha = beginningSha,
                                     EndSha = endSha,
-                                    DiffUrlFormat = context.IssueTracker.DiffUrlFormat
+                                    // TODO DiffUrlFormat = context.Repository.DiffUrlFormat
                                 }));
                             }
 
