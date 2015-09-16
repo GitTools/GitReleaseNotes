@@ -1,4 +1,4 @@
-![Icon](https://raw.github.com/GitTools/GitTools.Core/develop/GitTools_logo.png)
+![Icon](https://raw.github.com/GitTools/GitTools.Core/master/GitTools_logo.png)
 
 GitReleaseNotes
 ==============
