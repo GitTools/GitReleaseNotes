@@ -1,0 +1,1 @@
+Remove-BinFile "grn" "$packageFolder\Tools\GitReleaseNotes.exe"

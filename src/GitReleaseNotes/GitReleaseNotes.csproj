@@ -112,6 +112,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include=".ChocolateySpec\GitReleaseNotes.Portable.nuspec" />
+    <None Include=".ChocolateySpec\tools\chocolateyUninstall.ps1" />
     <None Include=".ChocolateySpec\tools\chocolateyInstall.ps1" />
     <None Include=".NuGetSpec\GitReleaseNotes.nuspec" />
     <None Include="packages.config" />
