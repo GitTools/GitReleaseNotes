@@ -16,7 +16,7 @@ Have a look at the release notes in this Repo for a sample of what is generated 
 
 ## Install
 
-    cinst GitReleaseNotes.Portable
+    choco install GitReleaseNotes.Portable
 
 **NOTE:** This used to be `GitReleaseNotes`, we have moved to the proper chocolatey naming convention. We have created a dependency so it will still work, but it is something to keep in mind.
 
