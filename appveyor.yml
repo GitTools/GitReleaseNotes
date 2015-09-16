@@ -22,7 +22,7 @@ after_build:
   - ps: (Get-Content src\GitReleaseNotes\.ChocolateySpec\tools\chocolateyInstall.ps1).replace('__version__', $env:GitVersion_SemVer) | Set-Content src\GitReleaseNotes\.ChocolateySpec\tools\chocolateyInstall.ps1
   - cmd: xcopy src\GitReleaseNotes\bin\%CONFIGURATION% output\Chocolatey\tools /S /I
   - cmd: xcopy src\GitReleaseNotes\.ChocolateySpec output\Chocolatey /S /I
-  - cmd: nuget pack src\GitReleaseNotes\.ChocolateySpec\GitReleaseNotes.Portable.nuspec -version "%GitVersion_NuGetVersion%" -Tool
+  - cmd: nuget pack output\Chocolatey\GitReleaseNotes.Portable.nuspec -version "%GitVersion_NuGetVersion%" -Tool
   - cmd: 7z a "GitReleaseNotes.%GitVersion_NuGetVersion%.zip" -r .\src\GitReleaseNotes\bin\%CONFIGURATION%\*.*
   - cmd: appveyor PushArtifact "GitReleaseNotes.%GitVersion_NuGetVersion%.nupkg"
   - cmd: appveyor PushArtifact "GitReleaseNotes.%GitVersion_NuGetVersion%.zip"
