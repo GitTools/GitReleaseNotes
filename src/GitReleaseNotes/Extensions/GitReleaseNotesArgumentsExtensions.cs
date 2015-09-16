@@ -1,9 +1,24 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using GitTools;
+using GitTools.IssueTrackers;
 
 namespace GitReleaseNotes
 {
     public static class GitReleaseNotesArgumentsExtensions
     {
+        public static AuthSettings ToIssueTrackerSettings(this AuthenticationContext authenticationContext)
+        {
+            if (authenticationContext.IsEmpty())
+                return new AuthSettings();
+            if (authenticationContext.IsTokenAuthentication())
+                return new AuthSettings(authenticationContext.Token);
+            if (authenticationContext.IsUsernameAndPasswordAuthentication())
+                return new AuthSettings(authenticationContext.Username, authenticationContext.Password);
+
+            throw new ArgumentException("Authentication context has an unsupported configuration");
+        }
+
         public static ReleaseNotesGenerationParameters ToContext(this GitReleaseNotesArguments arguments)
         {
             return new ReleaseNotesGenerationParameters

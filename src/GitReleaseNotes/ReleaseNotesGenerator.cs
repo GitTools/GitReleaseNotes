@@ -34,7 +34,7 @@ namespace GitReleaseNotes
                         _generationParameters.IssueTracker.Type.Value)
                     {
                         Project = _generationParameters.IssueTracker.ProjectId,
-                        Authentication = _generationParameters.IssueTracker.Authentication
+                        Authentication = _generationParameters.IssueTracker.Authentication.ToIssueTrackerSettings()
                     });
             }
             else
@@ -80,7 +80,7 @@ namespace GitReleaseNotes
             }
             return IssueTrackerFactory.TryCreateIssueTrackerFromUrl(
                 upstream.Url,
-                context.IssueTracker.Authentication,
+                context.IssueTracker.Authentication.ToIssueTrackerSettings(),
                 out issueTracker);
         }
 

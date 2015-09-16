@@ -48,7 +48,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="GitTools.IssueTrackers, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\GitTools.IssueTrackers.0.1.0-beta0001\lib\net45\GitTools.IssueTrackers.dll</HintPath>
+      <HintPath>..\packages\GitTools.IssueTrackers.0.1.0-beta0002\lib\net45\GitTools.IssueTrackers.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="LibGit2Sharp, Version=0.21.0.176, Culture=neutral, processorArchitecture=MSIL">
