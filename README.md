@@ -48,7 +48,7 @@ Initial versions of this tool allowed publishing to GitHub. This has been remove
 
 To easily create and publish releases, use one of the following alternatives:
 
-- GitHub => [GithubReleaseCreator](https://github.com/dazinator/GithubReleaseCreator) or [On NuGet](https://www.nuget.org/packages/GithubReleaseCreator/)
+- GitHub => [GitReleaseManager](https://github.com/GitTools/GitReleaseManager) or [On NuGet](https://www.nuget.org/packages/gitreleasemanager/)
 - Jira => [JiraCli](https://github.com/CatenaLogic/JiraCli)
 
 To use this workflow you should track the current releases release notes in the repo, then on publish just take the file contents as the description with the above tool.
