@@ -10,6 +10,7 @@
     <projectUrl>https://github.com/GitTools/GitReleaseNotes</projectUrl>
     <tags>GitReleaseNotes Release Notes Jira GitHub YouTrack Git</tags>
     <licenseUrl>https://github.com/GitTools/GitReleaseNotes/blob/master/LICENSE</licenseUrl>
+    <iconUrl>https://raw.github.com/GitTools/GitTools.Core/master/GitTools_logo.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <releaseNotes>https://github.com/GitTools/GitReleaseNotes/releases</releaseNotes>
   </metadata>
