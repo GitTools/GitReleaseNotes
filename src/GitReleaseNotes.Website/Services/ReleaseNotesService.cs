@@ -15,9 +15,6 @@ namespace GitReleaseNotes.Website.Services
     {
         private static readonly ILog Log = LogManager.GetCurrentClassLogger();
 
-        private readonly ICacheStorage<string, SemanticReleaseNotes> _releaseNotesCacheStorage =
-            new CacheStorage<string, SemanticReleaseNotes>(() => ExpirationPolicy.Duration(TimeSpan.FromHours(1)));
-
         private readonly ITypeFactory _typeFactory;
 
         public ReleaseNotesService(ITypeFactory typeFactory)
@@ -29,13 +26,11 @@ namespace GitReleaseNotes.Website.Services
 
         public async Task<SemanticReleaseNotes> GetReleaseNotesAsync(ReleaseNotesGenerationParameters generationParameters)
         {
-            //var cachedReleaseNotes = _releaseNotesCacheStorage.GetFromCacheOrFetchAsync(key, async () =>
-            //{
             try
             {
                 Log.Info("Generating release notes for '{0}'", "..."); // TODO log properly
 
-                var releaseNotesGenerator = _typeFactory.CreateInstanceWithParametersAndAutoCompletion<ReleaseNotesGenerator>(generationParameters);
+                var releaseNotesGenerator = new ReleaseNotesGenerator(generationParameters);
                 var releaseNotes = await releaseNotesGenerator.GenerateReleaseNotesAsync(new SemanticReleaseNotes());
                 return releaseNotes;
             }
@@ -44,20 +39,6 @@ namespace GitReleaseNotes.Website.Services
                 Log.Error(ex, "Failed to generate release notes for context '{0}'", "...");
                 return null;
             }
-            //});
-
-            //return cachedReleaseNotes;
         }
-
-        //public static string GetContextKey(Context context)
-        //{
-        //    var key = string.Join("_", context.Repository.Url, context.Repository.Branch, context.IssueTracker.Server, context.IssueTracker.ProjectId);
-
-        //    key = key.Replace("/", "_")
-        //        .Replace("\\", "_")
-        //        .Replace(":", "_");
-
-        //    return key;
-        //}
     }
 }

@@ -26,19 +26,21 @@ namespace GitReleaseNotes.Website.Controllers.Api
         {
             Argument.IsNotNull(() => releaseNotesRequest);
 
-            var context1 = new ReleaseNotesGenerationParameters
+            var parameters = new ReleaseNotesGenerationParameters
             {
                 RepositorySettings =
                 {
                     Url = releaseNotesRequest.RepositoryUrl,
                     Branch = releaseNotesRequest.RepositoryBranch
                 },
-                IssueTracker = {ProjectId = releaseNotesRequest.IssueTrackerProjectId}
+                IssueTracker =
+                {
+                    ProjectId = releaseNotesRequest.IssueTrackerProjectId
+                }
             };
 
-            var context = context1;
-            context.AllTags = true;
-            var releaseNotes = await releaseNotesService.GetReleaseNotesAsync(context);
+            parameters.AllTags = true;
+            var releaseNotes = await releaseNotesService.GetReleaseNotesAsync(parameters);
             
             return new HttpResponseMessage
             {

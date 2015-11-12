@@ -84,6 +84,7 @@ namespace GitReleaseNotes
                 out issueTracker);
         }
 
+        // TODO: Why is generationParameters not used?
         public static async Task<SemanticReleaseNotes> GenerateReleaseNotesAsync(ReleaseNotesGenerationParameters generationParameters,
             IRepository gitRepo, IIssueTracker issueTracker, SemanticReleaseNotes previousReleaseNotes,
             Categories categories, TaggedCommit tagToStartFrom, ReleaseInfo currentReleaseInfo)
