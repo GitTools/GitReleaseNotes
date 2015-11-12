@@ -35,7 +35,8 @@ namespace GitReleaseNotes
                 ShowHelp(modelBindingDefinition);
                 return 1;
             }
-            var context = arguments.ToContext();
+
+            var parameters = arguments.ToParameters();
             //if (!context.Validate())
             //{
             //    return -1;
@@ -48,12 +49,15 @@ namespace GitReleaseNotes
                 string outputFile = null;
                 var previousReleaseNotes = new SemanticReleaseNotes();
 
-                var outputPath = context.WorkingDirectory;
+                var outputPath = parameters.WorkingDirectory;
                 var outputDirectory = new DirectoryInfo(outputPath);
                 if (outputDirectory.Name == ".git")
                 {
                     outputPath = outputDirectory.Parent.FullName;
                 }
+
+                // In case the user puts in a relative path as current directory, first get the full path
+                outputPath = Path.GetFullPath(outputPath);
 
                 if (!string.IsNullOrEmpty(arguments.OutputFile))
                 {
@@ -63,7 +67,7 @@ namespace GitReleaseNotes
                     previousReleaseNotes = new ReleaseNotesFileReader(fileSystem, outputPath).ReadPreviousReleaseNotes(outputFile);
                 }
 
-                var releaseNotesGenerator = new ReleaseNotesGenerator(context);
+                var releaseNotesGenerator = new ReleaseNotesGenerator(parameters);
                 var releaseNotes = releaseNotesGenerator.GenerateReleaseNotesAsync(previousReleaseNotes).Result;
 
                 var releaseNotesOutput = releaseNotes.ToString();

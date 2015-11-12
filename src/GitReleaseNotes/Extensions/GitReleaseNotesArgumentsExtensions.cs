@@ -19,7 +19,7 @@ namespace GitReleaseNotes
             throw new ArgumentException("Authentication context has an unsupported configuration");
         }
 
-        public static ReleaseNotesGenerationParameters ToContext(this GitReleaseNotesArguments arguments)
+        public static ReleaseNotesGenerationParameters ToParameters(this GitReleaseNotesArguments arguments)
         {
             return new ReleaseNotesGenerationParameters
             {
