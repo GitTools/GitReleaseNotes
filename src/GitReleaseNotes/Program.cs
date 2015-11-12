@@ -35,12 +35,15 @@ namespace GitReleaseNotes
                 ShowHelp(modelBindingDefinition);
                 return 1;
             }
-
+             
             var parameters = arguments.ToParameters();
             //if (!context.Validate())
             //{
             //    return -1;
             //}
+
+            // In case the user puts in a relative path as current directory, first get the full path
+            parameters.WorkingDirectory = Path.GetFullPath(parameters.WorkingDirectory);
 
             try
             {
@@ -55,9 +58,6 @@ namespace GitReleaseNotes
                 {
                     outputPath = outputDirectory.Parent.FullName;
                 }
-
-                // In case the user puts in a relative path as current directory, first get the full path
-                outputPath = Path.GetFullPath(outputPath);
 
                 if (!string.IsNullOrEmpty(arguments.OutputFile))
                 {
