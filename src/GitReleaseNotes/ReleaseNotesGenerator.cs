@@ -26,60 +26,47 @@ namespace GitReleaseNotes
 
         public async Task<SemanticReleaseNotes> GenerateReleaseNotesAsync(SemanticReleaseNotes releaseNotesToUpdate)
         {
-            var repositoryDirectory = _generationParameters.WorkingDirectory;
-            if (!string.IsNullOrEmpty(repositoryDirectory))
+            var repositoryInfo = new RepositoryInfo
             {
-                Log.WriteLine("Looking for a git repository in '{0}'", repositoryDirectory);
+                Directory = _generationParameters.WorkingDirectory,
+                Url = _generationParameters.Repository.Url,
+                Branch = _generationParameters.Repository.Branch,
+                Authentication = _generationParameters.Repository.Authentication
+            };
 
-                repositoryDirectory = Repository.Discover(repositoryDirectory);
-            }
-
-            if (string.IsNullOrEmpty(repositoryDirectory))
+            using (var gitRepository = GitRepositoryFactory.CreateRepository(repositoryInfo))
             {
-                Log.WriteLine("No git repository found, trying to create a dynamic repository");
+                var repository = gitRepository.Repository;
 
-                var gitPreparer = new GitPreparer(_generationParameters.Repository.Url, null, _generationParameters.Repository.Authentication,
-                    true, _generationParameters.WorkingDirectory);
-                gitPreparer.Initialise(true, _generationParameters.Repository.Branch);
+                var issueTracker = CreateIssueTracker(repository);
+                if (issueTracker == null)
+                {
+                    throw new Exception(
+                        "Unable to determine the issue tracker, specify issue tracker type on the command line");
+                }
 
-                repositoryDirectory = gitPreparer.GetDotGitDirectory();
+                var categories = new Categories(_generationParameters.Categories, _generationParameters.AllLabels);
+                var tagToStartFrom = _generationParameters.AllTags
+                    ? repository.GetFirstCommit()
+                    : repository.GetLastTaggedCommit() ?? repository.GetFirstCommit();
+                var currentReleaseInfo = repository.GetCurrentReleaseInfo();
+                if (!string.IsNullOrEmpty(_generationParameters.Version))
+                {
+                    currentReleaseInfo.Name = _generationParameters.Version;
+                    currentReleaseInfo.When = DateTimeOffset.Now;
+                }
+                else
+                {
+                    currentReleaseInfo.Name = "vNext";
+                }
+
+                var releaseNotes = await GenerateReleaseNotesAsync(
+                    _generationParameters, repository, issueTracker,
+                    releaseNotesToUpdate, categories,
+                    tagToStartFrom, currentReleaseInfo);
+
+                return releaseNotes;
             }
-
-            var discoveredRepository = Repository.Discover(repositoryDirectory);
-            if (discoveredRepository == null)
-            {
-                throw new Exception("Unable to find the .git directory (either on disk or dynamically)");
-            }
-
-            var gitRepository = new Repository(discoveredRepository);
-
-            var issueTracker = CreateIssueTracker(gitRepository);
-            if (issueTracker == null)
-            {
-                throw new Exception("Unable to determine the issue tracker, specify issue tracker type on the command line");
-            }
-
-            var categories = new Categories(_generationParameters.Categories, _generationParameters.AllLabels);
-            var tagToStartFrom = _generationParameters.AllTags
-                ? gitRepository.GetFirstCommit()
-                : gitRepository.GetLastTaggedCommit() ?? gitRepository.GetFirstCommit();
-            var currentReleaseInfo = gitRepository.GetCurrentReleaseInfo();
-            if (!string.IsNullOrEmpty(_generationParameters.Version))
-            {
-                currentReleaseInfo.Name = _generationParameters.Version;
-                currentReleaseInfo.When = DateTimeOffset.Now;
-            }
-            else
-            {
-                currentReleaseInfo.Name = "vNext";
-            }
-
-            var releaseNotes = await GenerateReleaseNotesAsync(
-                _generationParameters, gitRepository, issueTracker,
-                releaseNotesToUpdate, categories,
-                tagToStartFrom, currentReleaseInfo);
-
-            return releaseNotes;
         }
 
         private IIssueTracker CreateIssueTracker(IRepository gitRepository)

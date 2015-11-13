@@ -1,6 +1,4 @@
-﻿using System;
-using GitReleaseNotes.Git;
-using GitTools;
+﻿using GitTools.Git;
 
 namespace GitReleaseNotes
 {

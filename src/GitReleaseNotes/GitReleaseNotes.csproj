@@ -80,7 +80,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Git\Extensions\IRepositoryExtensions.cs" />
-    <Compile Include="Git\RepositoryInfo.cs" />
     <Compile Include="IssueTrackerParameters.cs" />
     <Compile Include="Models\BlankLine.cs" />
     <Compile Include="Models\Categories.cs" />
