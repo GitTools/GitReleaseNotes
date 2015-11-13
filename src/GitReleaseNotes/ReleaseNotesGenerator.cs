@@ -26,24 +26,37 @@ namespace GitReleaseNotes
 
         public async Task<SemanticReleaseNotes> GenerateReleaseNotesAsync(SemanticReleaseNotes releaseNotesToUpdate)
         {
-            var gitRepository = new Repository(Repository.Discover(_generationParameters.WorkingDirectory));
-            IIssueTracker issueTracker;
-            if (_generationParameters.IssueTracker.Type.HasValue)
+            var repositoryDirectory = _generationParameters.WorkingDirectory;
+            if (!string.IsNullOrEmpty(repositoryDirectory))
             {
-                issueTracker = IssueTrackerFactory.CreateIssueTracker(new IssueTrackerSettings(_generationParameters.IssueTracker.Server,
-                        _generationParameters.IssueTracker.Type.Value)
-                    {
-                        Project = _generationParameters.IssueTracker.ProjectId,
-                        Authentication = _generationParameters.IssueTracker.Authentication.ToIssueTrackerSettings()
-                    });
+                Log.WriteLine("Looking for a git repository in '{0}'", repositoryDirectory);
+
+                repositoryDirectory = Repository.Discover(repositoryDirectory);
             }
-            else
+
+            if (string.IsNullOrEmpty(repositoryDirectory))
             {
-                if (!TryRemote(gitRepository, "upstream", _generationParameters, out issueTracker) &&
-                    !TryRemote(gitRepository, "origin", _generationParameters, out issueTracker))
-                {
-                    throw new Exception("Unable to guess issue tracker through remote, specify issue tracker type on the command line");
-                }
+                Log.WriteLine("No git repository found, trying to create a dynamic repository");
+
+                var gitPreparer = new GitPreparer(_generationParameters.Repository.Url, null, _generationParameters.Repository.Authentication,
+                    true, _generationParameters.WorkingDirectory);
+                gitPreparer.Initialise(true, _generationParameters.Repository.Branch);
+
+                repositoryDirectory = gitPreparer.GetDotGitDirectory();
+            }
+
+            var discoveredRepository = Repository.Discover(repositoryDirectory);
+            if (discoveredRepository == null)
+            {
+                throw new Exception("Unable to find the .git directory (either on disk or dynamically)");
+            }
+
+            var gitRepository = new Repository(discoveredRepository);
+
+            var issueTracker = CreateIssueTracker(gitRepository);
+            if (issueTracker == null)
+            {
+                throw new Exception("Unable to determine the issue tracker, specify issue tracker type on the command line");
             }
 
             var categories = new Categories(_generationParameters.Categories, _generationParameters.AllLabels);
@@ -69,7 +82,70 @@ namespace GitReleaseNotes
             return releaseNotes;
         }
 
-        private static bool TryRemote(Repository gitRepository, string name, ReleaseNotesGenerationParameters context,
+        private IIssueTracker CreateIssueTracker(IRepository gitRepository)
+        {
+            IIssueTracker issueTracker = null;
+
+            // Step 1: try to use specified issue tracker
+            if (_generationParameters.IssueTracker.Type.HasValue)
+            {
+                Log.WriteLine("Creating issue tracker based on specified issue tracker");
+
+                issueTracker = IssueTrackerFactory.CreateIssueTracker(new IssueTrackerSettings(_generationParameters.IssueTracker.Server,
+                        _generationParameters.IssueTracker.Type.Value)
+                {
+                    Project = _generationParameters.IssueTracker.ProjectId,
+                    Authentication = _generationParameters.IssueTracker.Authentication.ToIssueTrackerSettings()
+                });
+            }
+
+            // Step 2: try to determine from issue tracker url
+            if (issueTracker == null)
+            {
+                if (!string.IsNullOrEmpty(_generationParameters.IssueTracker.Server))
+                {
+                    Log.WriteLine("Trying to determine issue tracker based on issue tracker url");
+
+                    if (IssueTrackerFactory.TryCreateIssueTrackerFromUrl(
+                        _generationParameters.IssueTracker.Server,
+                        _generationParameters.IssueTracker.ProjectId,
+                        _generationParameters.IssueTracker.Authentication.ToIssueTrackerSettings(),
+                        out issueTracker))
+                    {
+                        Log.WriteLine("Determined issue tracker based on issue tracker url");
+                    }
+                    else
+                    {
+                        Log.WriteLine("Could not determine issue tracker based on issue tracker url");
+                    }
+                }
+            }
+
+            // Step 3: try to determine from repository url
+            if (issueTracker == null)
+            {
+                Log.WriteLine("Trying to determine issue tracker based on repository url");
+
+                if (!TryRemote(gitRepository, "upstream", _generationParameters, out issueTracker) &&
+                    !TryRemote(gitRepository, "origin", _generationParameters, out issueTracker))
+                {
+                    Log.WriteLine("Determined issue tracker based on repository url");
+                }
+                else
+                {
+                    Log.WriteLine("Could not determine issue tracker based on repository url");
+                }
+            }
+
+            if (issueTracker != null)
+            {
+                Log.WriteLine("Using issue tracker '{0}'", issueTracker.GetType().Name);
+            }
+
+            return issueTracker;
+        }
+
+        private static bool TryRemote(IRepository gitRepository, string name, ReleaseNotesGenerationParameters parameters,
             out IIssueTracker issueTracker)
         {
             var upstream = gitRepository.Network.Remotes[name];
@@ -78,9 +154,11 @@ namespace GitReleaseNotes
                 issueTracker = null;
                 return false;
             }
+
             return IssueTrackerFactory.TryCreateIssueTrackerFromUrl(
                 upstream.Url,
-                context.IssueTracker.Authentication.ToIssueTrackerSettings(),
+                parameters.IssueTracker.ProjectId,
+                parameters.IssueTracker.Authentication.ToIssueTrackerSettings(),
                 out issueTracker);
         }
 

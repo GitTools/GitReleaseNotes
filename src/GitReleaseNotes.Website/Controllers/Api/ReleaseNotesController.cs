@@ -1,4 +1,6 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.IO;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Catel;
 using GitReleaseNotes.Website.Models.Api;
@@ -26,26 +28,39 @@ namespace GitReleaseNotes.Website.Controllers.Api
         {
             Argument.IsNotNull(() => releaseNotesRequest);
 
-            var parameters = new ReleaseNotesGenerationParameters
-            {
-                RepositorySettings =
-                {
-                    Url = releaseNotesRequest.RepositoryUrl,
-                    Branch = releaseNotesRequest.RepositoryBranch
-                },
-                IssueTracker =
-                {
-                    ProjectId = releaseNotesRequest.IssueTrackerProjectId
-                }
-            };
+            var tempDirectory = Path.Combine(Path.GetTempPath(), "GitTools", "GitReleaseNotes", Guid.NewGuid().ToString());
 
-            parameters.AllTags = true;
-            var releaseNotes = await releaseNotesService.GetReleaseNotesAsync(parameters);
-            
-            return new HttpResponseMessage
+            Directory.CreateDirectory(tempDirectory);
+
+            try
             {
-                Content = new JsonContent(releaseNotes)
-            };
+                var parameters = new ReleaseNotesGenerationParameters
+                {
+                    Repository = 
+                    {
+                        Url = releaseNotesRequest.RepositoryUrl,
+                        Branch = releaseNotesRequest.RepositoryBranch
+                    },
+                    IssueTracker =
+                    {
+                        Server = releaseNotesRequest.IssueTrackerUrl,
+                        ProjectId = releaseNotesRequest.IssueTrackerProjectId
+                    },
+                    WorkingDirectory = tempDirectory
+                };
+
+                parameters.AllTags = true;
+                var releaseNotes = await releaseNotesService.GetReleaseNotesAsync(parameters);
+
+                return new HttpResponseMessage
+                {
+                    Content = new JsonContent(releaseNotes)
+                };
+            }
+            finally
+            {
+                Directory.Delete(tempDirectory, true);
+            }
         }
     }
 }

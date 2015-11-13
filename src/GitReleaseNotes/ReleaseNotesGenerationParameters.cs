@@ -1,4 +1,5 @@
 ﻿using System;
+using GitReleaseNotes.Git;
 using GitTools;
 
 namespace GitReleaseNotes
@@ -7,7 +8,7 @@ namespace GitReleaseNotes
     {
         public ReleaseNotesGenerationParameters()
         {
-            RepositorySettings = new RepositoryContext();
+            Repository = new RepositoryInfo();
             IssueTracker = new IssueTrackerParameters();
         }
 
@@ -16,7 +17,7 @@ namespace GitReleaseNotes
 
         public bool AllTags { get; set; }
         public bool AllLabels { get; set; }
-        public RepositoryContext RepositorySettings { get; private set; }
+        public RepositoryInfo Repository { get; private set; }
         public IssueTrackerParameters IssueTracker { get; private set; }
 
         public string WorkingDirectory { get; set; }
