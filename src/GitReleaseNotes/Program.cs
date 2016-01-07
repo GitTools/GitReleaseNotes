@@ -14,13 +14,13 @@ namespace GitReleaseNotes
         // TODO Fix logging.. Just choose serilog or something which liblog picks up
         private static readonly ILog Log = GitReleaseNotesEnvironment.Log;
 
-        static int Main(string[] args)
+        public static int Main(string[] args)
         {
             GitReleaseNotesEnvironment.Log = new ConsoleLog();
 
             var modelBindingDefinition = Configuration.Configure<GitReleaseNotesArguments>();
 
-            if (args.Any(a => a == "/?" || a == "?" || a.Equals("/help", StringComparison.InvariantCultureIgnoreCase)))
+            if (!args.Any() ||args.Any(a => a == "/?" || a == "?" || a.Equals("/help", StringComparison.InvariantCultureIgnoreCase)))
             {
                 ShowHelp(modelBindingDefinition);
 
@@ -94,7 +94,9 @@ namespace GitReleaseNotes
         private static void ShowHelp(IModelBindingDefinition<GitReleaseNotesArguments> modelBindingDefinition, string reason = null)
         {
             var help = new HelpProvider().GenerateModelHelp(modelBindingDefinition);
-            var f = new ConsoleHelpFormatter();
+
+            var bufferWidth = Console.IsOutputRedirected ? 80 : Console.BufferWidth;
+            var f = new ConsoleHelpFormatter(bufferWidth, 1, 5);
             f.WriteHelp(help, Console.Out);
 
             if (reason != null)
