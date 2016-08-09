@@ -55,7 +55,7 @@ namespace GitReleaseNotes
                     }
                     else if (release.When != null)
                     {
-                        builder.AppendLine(string.Format("# {0} ({1:dd MMMM yyyy})", release.ReleaseName,
+                        builder.AppendLine(string.Format(CultureInfo.InvariantCulture, "# {0} ({1:dd MMMM yyyy})", release.ReleaseName,
                             release.When.Value.Date));
                     }
                     else
