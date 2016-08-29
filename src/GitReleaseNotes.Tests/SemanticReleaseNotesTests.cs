@@ -265,5 +265,25 @@ Commits: asdsadaf...bfdsadre
             readReleaseNotes.Releases[1].ReleaseNoteItems[0].Title.ShouldBe("Issue 2 [#2](http://github.com/org/repo/issues/2) +feature");
             readReleaseNotes.Releases[1].ReleaseNoteItems[1].Title.ShouldBe("Issue 3 [#3](http://github.com/org/repo/issues/3) +fix");
         }
+
+        [Fact]
+        public void CanReadReleaseNotesWithXmlDateFormat()
+        {
+            const string releaseNotes = @"# v0.1.0 (2016-08-29)
+
+ - Issue 1 [#1](http://github.com/org/repo/issues/1) +feature +new
+
+Commits: 12345678...67890123
+";
+            var readReleaseNotes = SemanticReleaseNotes.Parse(releaseNotes);
+
+            readReleaseNotes.Releases.Length.ShouldBe(1);
+            readReleaseNotes.Releases[0].DiffInfo.BeginningSha.ShouldBe("12345678");
+            readReleaseNotes.Releases[0].DiffInfo.EndSha.ShouldBe("67890123");
+            readReleaseNotes.Releases[0].ReleaseName.ShouldBe("v0.1.0");
+            readReleaseNotes.Releases[0].When.ShouldBe(new DateTimeOffset(new DateTime(2016, 08, 29)));
+            readReleaseNotes.Releases[0].ReleaseNoteLines.Count.ShouldBe(1);
+            readReleaseNotes.Releases[0].ReleaseNoteItems[0].Title.ShouldBe("Issue 1 [#1](http://github.com/org/repo/issues/1) +feature +new");
+        }
     }
 }
