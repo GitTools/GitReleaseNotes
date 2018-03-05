@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using Args;
 using Args.Help;
 using Args.Help.Formatters;
@@ -16,11 +17,14 @@ namespace GitReleaseNotes
 
         public static int Main(string[] args)
         {
+            // Add the TLS 1.2 protocol to the Service Point manager to fix `The request was aborted: Could not create SSL/TLS secure channel.`
+            ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
+
             GitReleaseNotesEnvironment.Log = new ConsoleLog();
 
             var modelBindingDefinition = Configuration.Configure<GitReleaseNotesArguments>();
 
-            if (!args.Any() ||args.Any(a => a == "/?" || a == "?" || a.Equals("/help", StringComparison.InvariantCultureIgnoreCase)))
+            if (!args.Any() || args.Any(a => a == "/?" || a == "?" || a.Equals("/help", StringComparison.InvariantCultureIgnoreCase)))
             {
                 ShowHelp(modelBindingDefinition);
 
