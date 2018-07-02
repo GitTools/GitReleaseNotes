@@ -122,8 +122,7 @@ namespace GitReleaseNotes
                         {
                             currentRelease.When = parsed;
                         }
-
-                        if (DateTime.TryParseExact(toParse, "dd MMMM yyyy", CultureInfo.InvariantCulture,
+                        else if (DateTime.TryParseExact(toParse, "dd MMMM yyyy", CultureInfo.InvariantCulture,
                             DateTimeStyles.None, out parsed))
                         {
                             currentRelease.When = parsed;
