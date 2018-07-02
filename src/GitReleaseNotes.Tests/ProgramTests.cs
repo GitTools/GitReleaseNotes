@@ -29,18 +29,28 @@ namespace GitReleaseNotes.Tests
         {
             using (var programWriter = new StringWriter())
             {
-                Console.SetOut(programWriter);
-                Program.Main(new string[0]);
-
-                var modelBindingDefinition = Configuration.Configure<GitReleaseNotesArguments>();
-                var help = new HelpProvider().GenerateModelHelp(modelBindingDefinition);
-                var f = new ConsoleHelpFormatter(80, 1, 5);
-
-                using (var helpWriter = new StringWriter())
+                var originalOut = Console.Out;
+                try
                 {
-                    f.WriteHelp(help, helpWriter);
+                    Console.SetOut(programWriter);
+                    Program.Main(new string[0]);
 
-                    programWriter.ToString().ShouldContain(helpWriter.ToString());
+                    var modelBindingDefinition = Configuration.Configure<GitReleaseNotesArguments>();
+                    var help = new HelpProvider().GenerateModelHelp(modelBindingDefinition);
+
+                    var bufferWidth = Console.IsOutputRedirected ? 80 : Console.BufferWidth;
+                    var f = new ConsoleHelpFormatter(bufferWidth, 1, 5);
+
+                    using (var helpWriter = new StringWriter())
+                    {
+                        f.WriteHelp(help, helpWriter);
+
+                        programWriter.ToString().ShouldContain(helpWriter.ToString());
+                    }
+                }
+                finally
+                {
+                    Console.SetOut(originalOut);
                 }
             }
         }
