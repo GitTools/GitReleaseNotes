@@ -81,6 +81,7 @@
   <ItemGroup>
     <Compile Include="Git\Extensions\IRepositoryExtensions.cs" />
     <Compile Include="IssueTrackerParameters.cs" />
+    <Compile Include="Logging\ConsoleHelpFormatter.cs" />
     <Compile Include="Models\BlankLine.cs" />
     <Compile Include="Models\Categories.cs" />
     <Compile Include="ReleaseNotesGenerationParameters.cs" />
