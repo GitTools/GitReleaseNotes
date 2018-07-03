@@ -15,7 +15,6 @@ public class ConsoleHelpFormatter : IHelpFormatter
     public ConsoleHelpFormatter()
         : this(Console.BufferWidth, 1, 5)
     {
-
     }
 
     public ConsoleHelpFormatter(int bufferWidth, int commandSamplePadding, int argumentDescriptionPadding)
@@ -23,7 +22,6 @@ public class ConsoleHelpFormatter : IHelpFormatter
         BufferWidth = bufferWidth;
         CommandSamplePadding = commandSamplePadding;
         ArgumentDescriptionPadding = argumentDescriptionPadding;
-
     }
 
     public virtual void WriteHelp(ModelHelp modelHelp, TextWriter writer)
@@ -44,10 +42,10 @@ public class ConsoleHelpFormatter : IHelpFormatter
 
     private void WriteArgumentDescriptions(ModelHelp modelHelp)
     {
-        var items = modelHelp.Members
+        var helpMembers = GetHelpMembers(modelHelp);
+
+        var items = helpMembers
             .Where(m => string.IsNullOrEmpty(m.HelpText) == false)
-            .OrderByDescending(m => m.OrdinalIndex.HasValue)
-            .ThenBy(m => m.OrdinalIndex)
             .ToDictionary(ks => ks.OrdinalIndex.HasValue ? ks.Name : GetFullSwitchString(modelHelp.SwitchDelimiter, ks.Switches), es => es.HelpText);
 
         WriteJustifiedOutput(items, ArgumentDescriptionPadding);
@@ -132,14 +130,8 @@ public class ConsoleHelpFormatter : IHelpFormatter
 
     protected virtual void WriteUsage(ModelHelp modelHelp, TextWriter writer)
     {
-        var values = modelHelp.Members.Where(m => m.OrdinalIndex.HasValue)
-            .OrderBy(m => m.OrdinalIndex.Value)
-            .Select(m => m.Name)
-            .Concat(modelHelp.Members
-                .Where(m => m.OrdinalIndex.HasValue == false)
-                .OrderBy(m => m.Name)
-                .Select(m => string.Format("[{0}]", string.Join("|", m.Switches.Select(s => modelHelp.SwitchDelimiter + s).ToArray()))));
-
+        var helpMembers = GetHelpMembers(modelHelp);
+        var values = helpMembers.Select(m => m.OrdinalIndex.HasValue ? m.Name : GetFullSwitchString(modelHelp.SwitchDelimiter, m.Switches));
 
         //TODO: Figure out actual command name?
         var dictionary = new Dictionary<string, string>
@@ -148,5 +140,19 @@ public class ConsoleHelpFormatter : IHelpFormatter
         };
 
         WriteJustifiedOutput(dictionary, CommandSamplePadding);
+    }
+
+    private static IEnumerable<MemberHelp> GetHelpMembers(ModelHelp modelHelp)
+    {
+        var ordinals = modelHelp.Members
+            .Where(m => m.OrdinalIndex.HasValue)
+            .OrderBy(m => m.OrdinalIndex.Value);
+
+        var switches = modelHelp.Members
+            .Where(m => m.OrdinalIndex.HasValue == false)
+            .OrderBy(m => m.Name);
+
+        var memberHelps = ordinals.Concat(switches);
+        return memberHelps;
     }
 }
